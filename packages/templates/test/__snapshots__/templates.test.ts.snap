@@ -114,34 +114,64 @@ exports[`IDTA 템플릿 > idta-02003 > 출력 JSON 골든 1`] = `
           },
           "value": [
             {
-              "idShort": "ClassificationSystem",
-              "modelType": "Property",
+              "idShort": "ProductClassificationItem",
+              "modelType": "SubmodelElementCollection",
               "semanticId": {
                 "keys": [
                   {
                     "type": "GlobalReference",
-                    "value": "https://admin-shell.io/ZVEI/TechnicalData/ClassificationSystem/1/1",
+                    "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassificationItem/1/1",
                   },
                 ],
                 "type": "ExternalReference",
               },
-              "value": "ECLASS",
-              "valueType": "xs:string",
-            },
-            {
-              "idShort": "ProductClassId",
-              "modelType": "Property",
-              "semanticId": {
-                "keys": [
-                  {
-                    "type": "GlobalReference",
-                    "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassId/1/1",
+              "value": [
+                {
+                  "idShort": "ProductClassificationSystem",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassificationSystem/1/1",
+                      },
+                    ],
+                    "type": "ExternalReference",
                   },
-                ],
-                "type": "ExternalReference",
-              },
-              "value": "27-02-26-01",
-              "valueType": "xs:string",
+                  "value": "ECLASS",
+                  "valueType": "xs:string",
+                },
+                {
+                  "idShort": "ClassificationSystemVersion",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/ZVEI/TechnicalData/ClassificationSystemVersion/1/1",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": "14.0 (BASIC)",
+                  "valueType": "xs:string",
+                },
+                {
+                  "idShort": "ProductClassId",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassId/1/1",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": "27-02-26-01",
+                  "valueType": "xs:string",
+                },
+              ],
             },
           ],
         },
@@ -2668,9 +2698,6 @@ exports[`IDTA 템플릿 > local-operational > 출력 JSON 골든 1`] = `
 exports[`IDTA 템플릿 > 미확인 semanticId가 목록으로 드러난다 1`] = `
 {
   "idta-02003": [
-    "TechnicalData/GeneralInformation/ManufacturerName",
-    "TechnicalData/GeneralInformation/ManufacturerArticleNumber",
-    "TechnicalData/GeneralInformation/ManufacturerOrderCode",
     "TechnicalData/TechnicalProperties/RatedPower",
     "TechnicalData/TechnicalProperties/MaxSpindleSpeed",
     "TechnicalData/TechnicalProperties/AmbientTemperature",
