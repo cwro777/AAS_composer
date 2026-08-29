@@ -42,7 +42,7 @@ function docWithShell(): { doc: ReturnType<typeof emptyDoc>; shell: string } {
 describe('IDTA 템플릿', () => {
   const templates = listTemplates();
 
-  it('7종이 등록되어 있다', () => {
+  it('9종이 등록되어 있다', () => {
     expect(templates.map((t) => t.id)).toEqual([
       'idta-02006',
       'idta-02003',
@@ -51,6 +51,8 @@ describe('IDTA 템플릿', () => {
       'idta-02023',
       'local-operational',
       'idta-02011',
+      'idta-02017-mqtt',
+      'idta-02017-opcua',
     ]);
   });
 

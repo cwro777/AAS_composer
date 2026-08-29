@@ -1,0 +1,295 @@
+{
+  "id": "idta-02017-mqtt",
+  "idtaNumber": "02017-1-1",
+  "name": "Asset Interfaces Description (MQTT)",
+  "version": "1.1",
+  "publishedAt": "2024-11",
+  "sourceUrl": "https://github.com/admin-shell-io/submodel-templates/tree/main/published/Asset%20Interfaces%20Description/1/1",
+  "submodel": {
+    "idShort": "AssetInterfacesDescription",
+    "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/1/Submodel",
+    "verified": "spec",
+    "idPattern": "{ns}/sm/{asset}/interfaces"
+  },
+  "elements": [
+    {
+      "t": "smc",
+      "idShort": "InterfaceMQTT",
+      "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/Interface",
+      "supplementalSemanticIds": ["http://www.w3.org/2011/mqtt", "https://www.w3.org/2019/wot/td"],
+      "verified": "spec",
+      "source": "IDTA 02017-1-1 Template JSON, InterfaceTemplateForMQTT. idShort는 인스턴스용으로 InterfaceMQTT를 쓴다(공식 파일의 이름은 템플릿 표시용)",
+      "required": false,
+      "cardinality": "0..*",
+      "children": [
+        {
+          "t": "prop",
+          "idShort": "title",
+          "semanticId": "https://www.w3.org/2019/wot/td#title",
+          "verified": "spec",
+          "required": true,
+          "cardinality": "1",
+          "valueType": "xs:string",
+          "exampleValue": "MX-200 Line1 MQTT"
+        },
+        {
+          "t": "smc",
+          "idShort": "EndpointMetadata",
+          "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/EndpointMetadata",
+          "verified": "spec",
+          "required": true,
+          "cardinality": "1",
+          "children": [
+            {
+              "t": "prop",
+              "idShort": "base",
+              "semanticId": "https://www.w3.org/2019/wot/td#baseURI",
+              "verified": "spec",
+              "required": true,
+              "cardinality": "1",
+              "valueType": "xs:anyURI",
+              "exampleValue": "mqtt://broker.example.com:1883"
+            },
+            {
+              "t": "prop",
+              "idShort": "contentType",
+              "semanticId": "https://www.w3.org/2019/wot/hypermedia#forContentType",
+              "verified": "spec",
+              "required": true,
+              "cardinality": "1",
+              "valueType": "xs:string",
+              "exampleValue": "application/json"
+            },
+            {
+              "t": "sml",
+              "idShort": "security",
+              "semanticId": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+              "semanticIdListElement": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+              "typeValueListElement": "ReferenceElement",
+              "verified": "spec",
+              "source": "자식은 securityDefinitions의 항목을 가리키는 참조다. 대상이 정해진 뒤 만든다",
+              "required": true,
+              "cardinality": "1"
+            },
+            {
+              "t": "smc",
+              "idShort": "securityDefinitions",
+              "semanticId": "https://www.w3.org/2019/wot/td#definesSecurityScheme",
+              "verified": "spec",
+              "required": true,
+              "cardinality": "1",
+              "children": [
+                {
+                  "t": "smc",
+                  "idShort": "nosec_sc",
+                  "semanticId": "https://www.w3.org/2019/wot/security#NoSecurityScheme",
+                  "verified": "spec",
+                  "required": false,
+                  "cardinality": "0..1",
+                  "children": [
+                    {
+                      "t": "prop",
+                      "idShort": "scheme",
+                      "semanticId": "https://www.w3.org/2019/wot/security#SecurityScheme",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "valueType": "xs:string",
+                      "exampleValue": "nosec"
+                    }
+                  ]
+                },
+                {
+                  "t": "smc",
+                  "idShort": "basic_sc",
+                  "semanticId": "https://www.w3.org/2019/wot/security#BasicSecurityScheme",
+                  "verified": "spec",
+                  "source": "브로커에 인증이 걸린 경우에 쓴다. 자격증명 자체는 AAS에 넣지 않는다",
+                  "required": false,
+                  "cardinality": "0..1",
+                  "children": [
+                    {
+                      "t": "prop",
+                      "idShort": "scheme",
+                      "semanticId": "https://www.w3.org/2019/wot/security#SecurityScheme",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "valueType": "xs:string",
+                      "exampleValue": "basic"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "name",
+                      "semanticId": "https://www.w3.org/2019/wot/security#name",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "in",
+                      "semanticId": "https://www.w3.org/2019/wot/security#in",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "exampleValue": "header"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "t": "smc",
+          "idShort": "InteractionMetadata",
+          "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/InteractionMetadata",
+          "supplementalSemanticIds": ["https://www.w3.org/2019/wot/td#InteractionAffordance"],
+          "verified": "spec",
+          "required": true,
+          "cardinality": "1",
+          "children": [
+            {
+              "t": "smc",
+              "idShort": "properties",
+              "semanticId": "https://www.w3.org/2019/wot/td#PropertyAffordance",
+              "verified": "spec",
+              "required": false,
+              "cardinality": "0..1",
+              "children": [
+                {
+                  "t": "smc",
+                  "idShort": "property_name",
+                  "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/PropertyDefinition",
+                  "supplementalSemanticIds": ["https://www.w3.org/2019/wot/td#name"],
+                  "verified": "spec",
+                  "source": "신호 하나당 하나. idShort를 실제 신호 이름으로 바꿔 쓴다(공식 템플릿의 자리표시자 이름)",
+                  "required": false,
+                  "cardinality": "0..*",
+                  "children": [
+                    {
+                      "t": "prop",
+                      "idShort": "key",
+                      "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/key",
+                      "supplementalSemanticIds": ["https://www.w3.org/2019/wot/td#name"],
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "exampleValue": "spindleTemperature"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "type",
+                      "semanticId": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "exampleValue": "number"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "title",
+                      "semanticId": "https://www.w3.org/2019/wot/td#title",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "exampleValue": "Spindle temperature"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "observable",
+                      "semanticId": "https://www.w3.org/2019/wot/td#isObservable",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:boolean",
+                      "exampleValue": "true"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "unit",
+                      "semanticId": "https://schema.org/unitCode",
+                      "verified": "spec",
+                      "source": "단위는 값이 아니라 개념에 속한다. 여기 값은 UN/CEFACT 코드다",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "exampleValue": "CEL"
+                    },
+                    {
+                      "t": "smc",
+                      "idShort": "forms",
+                      "semanticId": "https://www.w3.org/2019/wot/td#hasForm",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "children": [
+                        {
+                          "t": "prop",
+                          "idShort": "href",
+                          "semanticId": "https://www.w3.org/2019/wot/hypermedia#hasTarget",
+                          "verified": "spec",
+                          "source": "MQTT는 토픽이 href에 들어간다",
+                          "required": true,
+                          "cardinality": "1",
+                          "valueType": "xs:string",
+                          "exampleValue": "mqtt://broker.example.com:1883/machine/mx200/spindleTemperature"
+                        },
+                        {
+                          "t": "prop",
+                          "idShort": "contentType",
+                          "semanticId": "https://www.w3.org/2019/wot/hypermedia#forContentType",
+                          "verified": "spec",
+                          "required": false,
+                          "cardinality": "0..1",
+                          "valueType": "xs:string",
+                          "exampleValue": "application/json"
+                        },
+                        {
+                          "t": "prop",
+                          "idShort": "mqv_controlPacket",
+                          "semanticId": "https://www.w3.org/2019/wot/mqtt#ControlPacket",
+                          "verified": "spec",
+                          "required": false,
+                          "cardinality": "0..1",
+                          "valueType": "xs:string",
+                          "exampleValue": "subscribe"
+                        },
+                        {
+                          "t": "prop",
+                          "idShort": "mqv_qos",
+                          "semanticId": "https://www.w3.org/2019/wot/mqtt#hasQoSFlag",
+                          "verified": "spec",
+                          "required": false,
+                          "cardinality": "0..1",
+                          "valueType": "xs:string",
+                          "exampleValue": "1"
+                        },
+                        {
+                          "t": "prop",
+                          "idShort": "mqv_retain",
+                          "semanticId": "https://www.w3.org/2019/wot/mqtt#hasRetainFlag",
+                          "verified": "spec",
+                          "required": false,
+                          "cardinality": "0..1",
+                          "valueType": "xs:string",
+                          "exampleValue": "false"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,266 @@
+{
+  "id": "idta-02017-opcua",
+  "idtaNumber": "02017-1-1",
+  "name": "Asset Interfaces Description (OPC UA)",
+  "version": "1.1",
+  "publishedAt": "2024-11",
+  "sourceUrl": "https://github.com/admin-shell-io/submodel-templates/tree/main/published/Asset%20Interfaces%20Description/1/1",
+  "submodel": {
+    "idShort": "AssetInterfacesDescription",
+    "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/1/Submodel",
+    "verified": "spec",
+    "idPattern": "{ns}/sm/{asset}/interfaces"
+  },
+  "elements": [
+    {
+      "t": "smc",
+      "idShort": "InterfaceOPCUA",
+      "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/Interface",
+      "supplementalSemanticIds": ["https://www.w3.org/2019/wot/td"],
+      "verified": "spec",
+      "source": "IDTA 02017-1-1 Template JSON, InterfaceTemplateForOPCUA. 공식 파일은 보조 semanticId로 http://www.w3.org/2011/mqtt를 달고 있는데 OPC UA 인터페이스에 MQTT 값이라 오류로 보인다. 베끼지도 추측하지도 않고 뺐다",
+      "required": false,
+      "cardinality": "0..*",
+      "children": [
+        {
+          "t": "prop",
+          "idShort": "title",
+          "semanticId": "https://www.w3.org/2019/wot/td#title",
+          "verified": "spec",
+          "required": true,
+          "cardinality": "1",
+          "valueType": "xs:string",
+          "exampleValue": "MX-200 Line1 OPC UA"
+        },
+        {
+          "t": "smc",
+          "idShort": "EndpointMetadata",
+          "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/EndpointMetadata",
+          "verified": "spec",
+          "required": true,
+          "cardinality": "1",
+          "children": [
+            {
+              "t": "prop",
+              "idShort": "base",
+              "semanticId": "https://www.w3.org/2019/wot/td#baseURI",
+              "verified": "spec",
+              "required": true,
+              "cardinality": "1",
+              "valueType": "xs:anyURI",
+              "exampleValue": "opc.tcp://10.0.1.20:4840"
+            },
+            {
+              "t": "prop",
+              "idShort": "contentType",
+              "semanticId": "https://www.w3.org/2019/wot/hypermedia#forContentType",
+              "verified": "spec",
+              "required": true,
+              "cardinality": "1",
+              "valueType": "xs:string",
+              "exampleValue": "application/json"
+            },
+            {
+              "t": "sml",
+              "idShort": "security",
+              "semanticId": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+              "semanticIdListElement": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+              "typeValueListElement": "ReferenceElement",
+              "verified": "spec",
+              "source": "자식은 securityDefinitions의 항목을 가리키는 참조다. 대상이 정해진 뒤 만든다",
+              "required": true,
+              "cardinality": "1"
+            },
+            {
+              "t": "smc",
+              "idShort": "securityDefinitions",
+              "semanticId": "https://www.w3.org/2019/wot/td#definesSecurityScheme",
+              "verified": "spec",
+              "required": true,
+              "cardinality": "1",
+              "children": [
+                {
+                  "t": "smc",
+                  "idShort": "opcua_channel_sc",
+                  "semanticId": "http://opcfoundation.org/UA/WoT-Binding/OPCUASecurityChannelScheme",
+                  "verified": "spec",
+                  "required": false,
+                  "cardinality": "0..1",
+                  "children": [
+                    {
+                      "t": "prop",
+                      "idShort": "uav_securityMode",
+                      "semanticId": "http://opcfoundation.org/UA/WoT-Binding/securityMode",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "valueType": "xs:string",
+                      "exampleValue": "SignAndEncrypt"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "uav_securityPolicy",
+                      "semanticId": "http://opcfoundation.org/UA/WoT-Binding/securityPolicy",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "valueType": "xs:string",
+                      "exampleValue": "Basic256Sha256"
+                    }
+                  ]
+                },
+                {
+                  "t": "smc",
+                  "idShort": "opcua_authentication_sc",
+                  "semanticId": "http://opcfoundation.org/UA/WoT-Binding/OPCUASecurityAuthenticationScheme",
+                  "verified": "spec",
+                  "source": "자격증명 자체는 AAS에 넣지 않는다. 토큰 종류만 기술한다",
+                  "required": false,
+                  "cardinality": "0..1",
+                  "children": [
+                    {
+                      "t": "prop",
+                      "idShort": "uav_userIdentityToken",
+                      "semanticId": "http://opcfoundation.org/UA/WoT-Binding/userIdentityToken",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "valueType": "xs:string",
+                      "exampleValue": "UserName"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "t": "smc",
+          "idShort": "InteractionMetadata",
+          "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/InteractionMetadata",
+          "supplementalSemanticIds": ["https://www.w3.org/2019/wot/td#InteractionAffordance"],
+          "verified": "spec",
+          "required": true,
+          "cardinality": "1",
+          "children": [
+            {
+              "t": "smc",
+              "idShort": "properties",
+              "semanticId": "https://www.w3.org/2019/wot/td#PropertyAffordance",
+              "verified": "spec",
+              "required": false,
+              "cardinality": "0..1",
+              "children": [
+                {
+                  "t": "smc",
+                  "idShort": "property_name",
+                  "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/PropertyDefinition",
+                  "supplementalSemanticIds": ["https://www.w3.org/2019/wot/td#name"],
+                  "verified": "spec",
+                  "source": "신호 하나당 하나. idShort를 실제 신호 이름으로 바꿔 쓴다(공식 템플릿의 자리표시자 이름)",
+                  "required": false,
+                  "cardinality": "0..*",
+                  "children": [
+                    {
+                      "t": "prop",
+                      "idShort": "key",
+                      "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/key",
+                      "supplementalSemanticIds": ["https://www.w3.org/2019/wot/td#name"],
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "exampleValue": "spindleTemperature"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "type",
+                      "semanticId": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "exampleValue": "number"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "title",
+                      "semanticId": "https://www.w3.org/2019/wot/td#title",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "exampleValue": "Spindle temperature"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "observable",
+                      "semanticId": "https://www.w3.org/2019/wot/td#isObservable",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:boolean",
+                      "exampleValue": "true"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "unit",
+                      "semanticId": "https://schema.org/unitCode",
+                      "verified": "spec",
+                      "source": "단위는 값이 아니라 개념에 속한다. 여기 값은 UN/CEFACT 코드다",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "exampleValue": "CEL"
+                    },
+                    {
+                      "t": "smc",
+                      "idShort": "forms",
+                      "semanticId": "https://www.w3.org/2019/wot/td#hasForm",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "children": [
+                        {
+                          "t": "prop",
+                          "idShort": "href",
+                          "semanticId": "https://www.w3.org/2019/wot/hypermedia#hasTarget",
+                          "verified": "spec",
+                          "required": true,
+                          "cardinality": "1",
+                          "valueType": "xs:string",
+                          "exampleValue": "opc.tcp://10.0.1.20:4840"
+                        },
+                        {
+                          "t": "prop",
+                          "idShort": "contentType",
+                          "semanticId": "https://www.w3.org/2019/wot/hypermedia#forContentType",
+                          "verified": "spec",
+                          "required": false,
+                          "cardinality": "0..1",
+                          "valueType": "xs:string",
+                          "exampleValue": "application/json"
+                        },
+                        {
+                          "t": "prop",
+                          "idShort": "uav_browsePath",
+                          "semanticId": "http://opcfoundation.org/UA/WoT-Binding/browsePath",
+                          "verified": "spec",
+                          "source": "OPC UA는 노드 위치가 browsePath에 들어간다",
+                          "required": false,
+                          "cardinality": "0..1",
+                          "valueType": "xs:string",
+                          "exampleValue": "/Objects/2:MX200/2:SpindleTemperature"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

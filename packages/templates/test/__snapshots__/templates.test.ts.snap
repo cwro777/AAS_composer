@@ -1,5 +1,976 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`IDTA 템플릿 > Asset Interfaces Description (MQTT) (02017-1-1 v1.1) > 출력 JSON 골든 1`] = `
+{
+  "assetAdministrationShells": [
+    {
+      "assetInformation": {
+        "assetKind": "Instance",
+        "globalAssetId": "https://bnb.co.kr/ids/asset/mx200-line1-001",
+      },
+      "id": "https://bnb.co.kr/ids/aas/mx200-line1-001",
+      "idShort": "MX200_Line1_AAS",
+      "modelType": "AssetAdministrationShell",
+      "submodels": [
+        {
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/mx200-line1-001/interfaces",
+            },
+          ],
+          "type": "ModelReference",
+        },
+      ],
+    },
+  ],
+  "submodels": [
+    {
+      "id": "https://bnb.co.kr/ids/sm/mx200-line1-001/interfaces",
+      "idShort": "AssetInterfacesDescription",
+      "kind": "Instance",
+      "modelType": "Submodel",
+      "semanticId": {
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/1/Submodel",
+          },
+        ],
+        "type": "ExternalReference",
+      },
+      "submodelElements": [
+        {
+          "idShort": "InterfaceMQTT",
+          "modelType": "SubmodelElementCollection",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/Interface",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "supplementalSemanticIds": [
+            {
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "http://www.w3.org/2011/mqtt",
+                },
+              ],
+              "type": "ExternalReference",
+            },
+            {
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "https://www.w3.org/2019/wot/td",
+                },
+              ],
+              "type": "ExternalReference",
+            },
+          ],
+          "value": [
+            {
+              "idShort": "title",
+              "modelType": "Property",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://www.w3.org/2019/wot/td#title",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "value": "MX-200 Line1 MQTT",
+              "valueType": "xs:string",
+            },
+            {
+              "idShort": "EndpointMetadata",
+              "modelType": "SubmodelElementCollection",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/EndpointMetadata",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "value": [
+                {
+                  "idShort": "base",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#baseURI",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": "mqtt://broker.example.com:1883",
+                  "valueType": "xs:anyURI",
+                },
+                {
+                  "idShort": "contentType",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/hypermedia#forContentType",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": "application/json",
+                  "valueType": "xs:string",
+                },
+                {
+                  "idShort": "security",
+                  "modelType": "SubmodelElementList",
+                  "orderRelevant": true,
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "semanticIdListElement": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "typeValueListElement": "ReferenceElement",
+                },
+                {
+                  "idShort": "securityDefinitions",
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#definesSecurityScheme",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": [
+                    {
+                      "idShort": "nosec_sc",
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/security#NoSecurityScheme",
+                          },
+                        ],
+                        "type": "ExternalReference",
+                      },
+                      "value": [
+                        {
+                          "idShort": "scheme",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/security#SecurityScheme",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "nosec",
+                          "valueType": "xs:string",
+                        },
+                      ],
+                    },
+                    {
+                      "idShort": "basic_sc",
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://www.w3.org/2019/wot/security#BasicSecurityScheme",
+                          },
+                        ],
+                        "type": "ExternalReference",
+                      },
+                      "value": [
+                        {
+                          "idShort": "scheme",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/security#SecurityScheme",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "basic",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "name",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/security#name",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "in",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/security#in",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "header",
+                          "valueType": "xs:string",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              "idShort": "InteractionMetadata",
+              "modelType": "SubmodelElementCollection",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/InteractionMetadata",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "supplementalSemanticIds": [
+                {
+                  "keys": [
+                    {
+                      "type": "GlobalReference",
+                      "value": "https://www.w3.org/2019/wot/td#InteractionAffordance",
+                    },
+                  ],
+                  "type": "ExternalReference",
+                },
+              ],
+              "value": [
+                {
+                  "idShort": "properties",
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#PropertyAffordance",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": [
+                    {
+                      "idShort": "property_name",
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/PropertyDefinition",
+                          },
+                        ],
+                        "type": "ExternalReference",
+                      },
+                      "supplementalSemanticIds": [
+                        {
+                          "keys": [
+                            {
+                              "type": "GlobalReference",
+                              "value": "https://www.w3.org/2019/wot/td#name",
+                            },
+                          ],
+                          "type": "ExternalReference",
+                        },
+                      ],
+                      "value": [
+                        {
+                          "idShort": "key",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/key",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "supplementalSemanticIds": [
+                            {
+                              "keys": [
+                                {
+                                  "type": "GlobalReference",
+                                  "value": "https://www.w3.org/2019/wot/td#name",
+                                },
+                              ],
+                              "type": "ExternalReference",
+                            },
+                          ],
+                          "value": "spindleTemperature",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "type",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "number",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "title",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#title",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "Spindle temperature",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "observable",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#isObservable",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "true",
+                          "valueType": "xs:boolean",
+                        },
+                        {
+                          "idShort": "unit",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://schema.org/unitCode",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "CEL",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "forms",
+                          "modelType": "SubmodelElementCollection",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#hasForm",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": [
+                            {
+                              "idShort": "href",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#hasTarget",
+                                  },
+                                ],
+                                "type": "ExternalReference",
+                              },
+                              "value": "mqtt://broker.example.com:1883/machine/mx200/spindleTemperature",
+                              "valueType": "xs:string",
+                            },
+                            {
+                              "idShort": "contentType",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#forContentType",
+                                  },
+                                ],
+                                "type": "ExternalReference",
+                              },
+                              "value": "application/json",
+                              "valueType": "xs:string",
+                            },
+                            {
+                              "idShort": "mqv_controlPacket",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/mqtt#ControlPacket",
+                                  },
+                                ],
+                                "type": "ExternalReference",
+                              },
+                              "value": "subscribe",
+                              "valueType": "xs:string",
+                            },
+                            {
+                              "idShort": "mqv_qos",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/mqtt#hasQoSFlag",
+                                  },
+                                ],
+                                "type": "ExternalReference",
+                              },
+                              "value": "1",
+                              "valueType": "xs:string",
+                            },
+                            {
+                              "idShort": "mqv_retain",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/mqtt#hasRetainFlag",
+                                  },
+                                ],
+                                "type": "ExternalReference",
+                              },
+                              "value": "false",
+                              "valueType": "xs:string",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`IDTA 템플릿 > Asset Interfaces Description (OPC UA) (02017-1-1 v1.1) > 출력 JSON 골든 1`] = `
+{
+  "assetAdministrationShells": [
+    {
+      "assetInformation": {
+        "assetKind": "Instance",
+        "globalAssetId": "https://bnb.co.kr/ids/asset/mx200-line1-001",
+      },
+      "id": "https://bnb.co.kr/ids/aas/mx200-line1-001",
+      "idShort": "MX200_Line1_AAS",
+      "modelType": "AssetAdministrationShell",
+      "submodels": [
+        {
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/mx200-line1-001/interfaces",
+            },
+          ],
+          "type": "ModelReference",
+        },
+      ],
+    },
+  ],
+  "submodels": [
+    {
+      "id": "https://bnb.co.kr/ids/sm/mx200-line1-001/interfaces",
+      "idShort": "AssetInterfacesDescription",
+      "kind": "Instance",
+      "modelType": "Submodel",
+      "semanticId": {
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/1/Submodel",
+          },
+        ],
+        "type": "ExternalReference",
+      },
+      "submodelElements": [
+        {
+          "idShort": "InterfaceOPCUA",
+          "modelType": "SubmodelElementCollection",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/Interface",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "supplementalSemanticIds": [
+            {
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "https://www.w3.org/2019/wot/td",
+                },
+              ],
+              "type": "ExternalReference",
+            },
+          ],
+          "value": [
+            {
+              "idShort": "title",
+              "modelType": "Property",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://www.w3.org/2019/wot/td#title",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "value": "MX-200 Line1 OPC UA",
+              "valueType": "xs:string",
+            },
+            {
+              "idShort": "EndpointMetadata",
+              "modelType": "SubmodelElementCollection",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/EndpointMetadata",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "value": [
+                {
+                  "idShort": "base",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#baseURI",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": "opc.tcp://10.0.1.20:4840",
+                  "valueType": "xs:anyURI",
+                },
+                {
+                  "idShort": "contentType",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/hypermedia#forContentType",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": "application/json",
+                  "valueType": "xs:string",
+                },
+                {
+                  "idShort": "security",
+                  "modelType": "SubmodelElementList",
+                  "orderRelevant": true,
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "semanticIdListElement": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "typeValueListElement": "ReferenceElement",
+                },
+                {
+                  "idShort": "securityDefinitions",
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#definesSecurityScheme",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": [
+                    {
+                      "idShort": "opcua_channel_sc",
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "http://opcfoundation.org/UA/WoT-Binding/OPCUASecurityChannelScheme",
+                          },
+                        ],
+                        "type": "ExternalReference",
+                      },
+                      "value": [
+                        {
+                          "idShort": "uav_securityMode",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "http://opcfoundation.org/UA/WoT-Binding/securityMode",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "SignAndEncrypt",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "uav_securityPolicy",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "http://opcfoundation.org/UA/WoT-Binding/securityPolicy",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "Basic256Sha256",
+                          "valueType": "xs:string",
+                        },
+                      ],
+                    },
+                    {
+                      "idShort": "opcua_authentication_sc",
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "http://opcfoundation.org/UA/WoT-Binding/OPCUASecurityAuthenticationScheme",
+                          },
+                        ],
+                        "type": "ExternalReference",
+                      },
+                      "value": [
+                        {
+                          "idShort": "uav_userIdentityToken",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "http://opcfoundation.org/UA/WoT-Binding/userIdentityToken",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "UserName",
+                          "valueType": "xs:string",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              "idShort": "InteractionMetadata",
+              "modelType": "SubmodelElementCollection",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/InteractionMetadata",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "supplementalSemanticIds": [
+                {
+                  "keys": [
+                    {
+                      "type": "GlobalReference",
+                      "value": "https://www.w3.org/2019/wot/td#InteractionAffordance",
+                    },
+                  ],
+                  "type": "ExternalReference",
+                },
+              ],
+              "value": [
+                {
+                  "idShort": "properties",
+                  "modelType": "SubmodelElementCollection",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#PropertyAffordance",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": [
+                    {
+                      "idShort": "property_name",
+                      "modelType": "SubmodelElementCollection",
+                      "semanticId": {
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/PropertyDefinition",
+                          },
+                        ],
+                        "type": "ExternalReference",
+                      },
+                      "supplementalSemanticIds": [
+                        {
+                          "keys": [
+                            {
+                              "type": "GlobalReference",
+                              "value": "https://www.w3.org/2019/wot/td#name",
+                            },
+                          ],
+                          "type": "ExternalReference",
+                        },
+                      ],
+                      "value": [
+                        {
+                          "idShort": "key",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/key",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "supplementalSemanticIds": [
+                            {
+                              "keys": [
+                                {
+                                  "type": "GlobalReference",
+                                  "value": "https://www.w3.org/2019/wot/td#name",
+                                },
+                              ],
+                              "type": "ExternalReference",
+                            },
+                          ],
+                          "value": "spindleTemperature",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "type",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "number",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "title",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#title",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "Spindle temperature",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "observable",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#isObservable",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "true",
+                          "valueType": "xs:boolean",
+                        },
+                        {
+                          "idShort": "unit",
+                          "modelType": "Property",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://schema.org/unitCode",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": "CEL",
+                          "valueType": "xs:string",
+                        },
+                        {
+                          "idShort": "forms",
+                          "modelType": "SubmodelElementCollection",
+                          "semanticId": {
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#hasForm",
+                              },
+                            ],
+                            "type": "ExternalReference",
+                          },
+                          "value": [
+                            {
+                              "idShort": "href",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#hasTarget",
+                                  },
+                                ],
+                                "type": "ExternalReference",
+                              },
+                              "value": "opc.tcp://10.0.1.20:4840",
+                              "valueType": "xs:string",
+                            },
+                            {
+                              "idShort": "contentType",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#forContentType",
+                                  },
+                                ],
+                                "type": "ExternalReference",
+                              },
+                              "value": "application/json",
+                              "valueType": "xs:string",
+                            },
+                            {
+                              "idShort": "uav_browsePath",
+                              "modelType": "Property",
+                              "semanticId": {
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "http://opcfoundation.org/UA/WoT-Binding/browsePath",
+                                  },
+                                ],
+                                "type": "ExternalReference",
+                              },
+                              "value": "/Objects/2:MX200/2:SpindleTemperature",
+                              "valueType": "xs:string",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+`;
+
 exports[`IDTA 템플릿 > Carbon Footprint (IDTA 02023 v1.0) > 출력 JSON 골든 1`] = `
 {
   "assetAdministrationShells": [
@@ -1696,6 +2667,8 @@ exports[`IDTA 템플릿 > 미확인 semanticId가 목록으로 드러난다 1`] 
   ],
   "idta-02008": [],
   "idta-02011": [],
+  "idta-02017-mqtt": [],
+  "idta-02017-opcua": [],
   "idta-02023": [
     "CarbonFootprint/ProductCarbonFootprints/ProductCarbonFootprint/LifeCyclePhases",
     "CarbonFootprint/ProductCarbonFootprints/ProductCarbonFootprint/LifeCyclePhases/LifeCyclePhase",

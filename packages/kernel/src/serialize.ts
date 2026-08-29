@@ -129,15 +129,18 @@ function serializeElement(doc: AasDoc, id: NodeId, parentIsList: boolean): Json 
     case 'ref':
       if (n.value) o['value'] = refToJson(n.value);
       break;
+    /* 비어 있으면 value를 내보내지 않는다.
+       규격은 "설정하지 않거나 최소 1개"를 요구하므로 `value: []`는 위반이다.
+       Entity의 statements도 같은 이유로 kids.length를 본다. */
     case 'smc':
-      o['value'] = kids.map((c) => serializeElement(doc, c, false));
+      if (kids.length) o['value'] = kids.map((c) => serializeElement(doc, c, false));
       break;
     case 'sml':
       o['typeValueListElement'] = n.typeValueListElement;
       o['orderRelevant'] = n.orderRelevant;
       if (n.valueTypeListElement) o['valueTypeListElement'] = n.valueTypeListElement;
       if (n.semanticIdListElement) o['semanticIdListElement'] = extRef(n.semanticIdListElement);
-      o['value'] = kids.map((c) => serializeElement(doc, c, true));
+      if (kids.length) o['value'] = kids.map((c) => serializeElement(doc, c, true));
       break;
     case 'entity':
       o['entityType'] = n.entityType;
@@ -220,7 +223,8 @@ export function serialize(doc: AasDoc): Environment {
     o['id'] = n.identifier;
     o['kind'] = n.kind;
     if (n.administration) o['administration'] = administrationToJson(n.administration);
-    o['submodelElements'] = childrenOf(doc, id).map((c) => serializeElement(doc, c, false));
+    const els = childrenOf(doc, id).map((c) => serializeElement(doc, c, false));
+    if (els.length) o['submodelElements'] = els;
     submodels.push(withRaw(n, o));
   };
 
@@ -240,8 +244,11 @@ export function serialize(doc: AasDoc): Environment {
   env['assetAdministrationShells'] = shells;
   env['submodels'] = submodels;
   /* 빈 배열은 내보내지 않는다 — 규격이 "설정하지 않거나 최소 1개"를 요구한다.
-     (프로토타입은 항상 빈 배열을 내보내 aas-core3.0 검증에 걸렸다.) */
-  const cds = env['conceptDescriptions'];
-  if (Array.isArray(cds) && cds.length === 0) delete env['conceptDescriptions'];
+     세 배열 전부에 적용된다. conceptDescriptions만 걸러내던 때는 Shell 없는 문서
+     (서브모델만 가져온 경우)가 조용히 무효 Environment가 되었다. */
+  for (const key of ['assetAdministrationShells', 'submodels', 'conceptDescriptions']) {
+    const v = env[key];
+    if (Array.isArray(v) && v.length === 0) delete env[key];
+  }
   return env;
 }

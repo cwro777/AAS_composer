@@ -21,6 +21,8 @@ import timeseries from './idta/timeseries.json' with { type: 'json' };
 import carbon from './idta/carbon.json' with { type: 'json' };
 import operational from './idta/operational.json' with { type: 'json' };
 import hierarchical from './idta/hierarchical.json' with { type: 'json' };
+import aidMqtt from './idta/aid-mqtt.json' with { type: 'json' };
+import aidOpcua from './idta/aid-opcua.json' with { type: 'json' };
 
 export type { ElementDef, TemplateDef, Verified } from './types.js';
 
@@ -32,6 +34,8 @@ const DEFS = [
   carbon,
   operational,
   hierarchical,
+  aidMqtt,
+  aidOpcua,
 ] as unknown as TemplateDef[];
 
 const BY_ID = new Map<string, TemplateDef>(DEFS.map((d) => [d.id, d]));
