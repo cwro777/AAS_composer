@@ -1,0 +1,90 @@
+{
+  "id": "idta-02008",
+  "idtaNumber": "IDTA 02008-1-1",
+  "name": "Time Series Data",
+  "version": "1.1",
+  "publishedAt": "2023-03",
+  "sourceUrl": "https://industrialdigitaltwin.org/en/content-hub/downloads",
+  "submodel": {
+    "idShort": "TimeSeries",
+    "semanticId": "https://admin-shell.io/idta/TimeSeries/1/1",
+    "verified": "spec",
+    "idPattern": "{ns}/sm/{asset}/timeseries"
+  },
+  "elements": [
+    {
+      "t": "smc",
+      "idShort": "Metadata",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1",
+      "children": [
+        {
+          "t": "mlp",
+          "idShort": "Name",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
+          "semanticId": "https://admin-shell.io/idta/TimeSeries/Metadata/Name/1/1",
+          "langs": [
+            {
+              "language": "en",
+              "text": "Spindle temperature series"
+            }
+          ]
+        },
+        {
+          "t": "prop",
+          "idShort": "RecordCount",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:long",
+          "semanticId": "https://admin-shell.io/idta/TimeSeries/Segment/RecordCount/1/1",
+          "exampleValue": "8640"
+        }
+      ],
+      "semanticId": "https://admin-shell.io/idta/TimeSeries/Metadata/1/1"
+    },
+    {
+      "t": "smc",
+      "idShort": "Segments",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1",
+      "children": [
+        {
+          "t": "prop",
+          "idShort": "StartTime",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:dateTime",
+          "semanticId": "https://admin-shell.io/idta/TimeSeries/Segment/StartTime/1/1",
+          "exampleValue": "2026-08-26T00:00:00+09:00"
+        },
+        {
+          "t": "prop",
+          "idShort": "EndTime",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:dateTime",
+          "semanticId": "https://admin-shell.io/idta/TimeSeries/Segment/EndTime/1/1",
+          "exampleValue": "2026-08-26T23:59:59+09:00"
+        },
+        {
+          "t": "prop",
+          "idShort": "SamplingInterval",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:double",
+          "semanticId": "https://admin-shell.io/idta/TimeSeries/Segment/SamplingInterval/1/1",
+          "exampleValue": "10.0"
+        }
+      ],
+      "semanticId": "https://admin-shell.io/idta/TimeSeries/Segments/1/1"
+    }
+  ]
+}

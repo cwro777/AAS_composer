@@ -1,0 +1,17 @@
+{
+  "name": "@aas/e2e",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e": "playwright test",
+    "test": "echo \"(e2e는 pnpm e2e 로 실행한다 — verify에서는 돌리지 않는다)\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo \"(lint: P10)\""
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.7.0",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,469 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`P2 메타모델 커버리지 > 출력 JSON 골든 1`] = `
+{
+  "assetAdministrationShells": [
+    {
+      "administration": {
+        "revision": "3",
+        "templateId": "https://bnb.co.kr/ids/tpl/machine",
+        "version": "1",
+      },
+      "assetInformation": {
+        "assetKind": "Instance",
+        "assetType": "https://bnb.co.kr/ids/assettype/cnc-mill",
+        "globalAssetId": "https://bnb.co.kr/ids/asset/mx200-line1-001",
+        "specificAssetIds": [
+          {
+            "name": "PlantEquipmentNo",
+            "value": "F1-L1-007",
+          },
+          {
+            "name": "ErpMaterial",
+            "semanticId": {
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO676#005",
+                },
+              ],
+              "type": "ExternalReference",
+            },
+            "value": "MAT-88231",
+          },
+        ],
+      },
+      "derivedFrom": {
+        "keys": [
+          {
+            "type": "AssetAdministrationShell",
+            "value": "https://bnb.co.kr/ids/aas/mx200-type",
+          },
+        ],
+        "type": "ModelReference",
+      },
+      "description": [
+        {
+          "language": "ko",
+          "text": "1공장 1라인 CNC 가공기",
+        },
+      ],
+      "id": "https://bnb.co.kr/ids/aas/mx200-line1-001",
+      "idShort": "MX200_Line1_AAS",
+      "modelType": "AssetAdministrationShell",
+      "submodels": [
+        {
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/mx200-line1-001/full",
+            },
+          ],
+          "type": "ModelReference",
+        },
+      ],
+    },
+  ],
+  "submodels": [
+    {
+      "administration": {
+        "revision": "0",
+        "version": "1",
+      },
+      "extensions": [
+        {
+          "name": "internalReviewState",
+          "value": "approved",
+          "valueType": "xs:string",
+        },
+      ],
+      "id": "https://bnb.co.kr/ids/sm/mx200-line1-001/full",
+      "idShort": "FullCoverage",
+      "kind": "Instance",
+      "modelType": "Submodel",
+      "qualifiers": [
+        {
+          "type": "Cardinality",
+          "value": "One",
+          "valueType": "xs:string",
+        },
+      ],
+      "semanticId": {
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://bnb.co.kr/ids/cd/FullCoverage/1/0",
+          },
+        ],
+        "type": "ExternalReference",
+      },
+      "submodelElements": [
+        {
+          "idShort": "RatedPower",
+          "modelType": "Property",
+          "qualifiers": [
+            {
+              "kind": "ValueQualifier",
+              "type": "Unit",
+              "value": "kW",
+              "valueType": "xs:string",
+            },
+          ],
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-AAF018#003",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "value": "15.0",
+          "valueType": "xs:double",
+        },
+        {
+          "idShort": "OperatorNote",
+          "modelType": "MultiLanguageProperty",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/OperatorNote/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "value": [
+            {
+              "language": "ko",
+              "text": "주 1회 점검",
+            },
+            {
+              "language": "en",
+              "text": "Inspect weekly",
+            },
+          ],
+        },
+        {
+          "idShort": "AmbientTemperature",
+          "max": "40",
+          "min": "5",
+          "modelType": "Range",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-BAA120#008",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "valueType": "xs:double",
+        },
+        {
+          "contentType": "application/pdf",
+          "idShort": "Manual",
+          "modelType": "File",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-ABK126#002",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "value": "/aasx/files/mx200_manual.pdf",
+        },
+        {
+          "contentType": "application/octet-stream",
+          "idShort": "CalibrationCert",
+          "modelType": "Blob",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/CalibrationCert/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "value": "QUFTIENhbGlicmF0aW9u",
+        },
+        {
+          "idShort": "RelatedShell",
+          "modelType": "ReferenceElement",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/RelatedShell/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+        },
+        {
+          "idShort": "ProcessQuality",
+          "modelType": "SubmodelElementCollection",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/ProcessQuality/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "value": [
+            {
+              "idShort": "ToolWearRate",
+              "modelType": "Property",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/ToolWearRate/1/0",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "value": "0.34",
+              "valueType": "xs:double",
+            },
+          ],
+        },
+        {
+          "idShort": "Phases",
+          "modelType": "SubmodelElementList",
+          "orderRelevant": true,
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/Phases/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "semanticIdListElement": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/Phase/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "typeValueListElement": "Property",
+          "value": [
+            {
+              "modelType": "Property",
+              "value": "A3",
+              "valueType": "xs:string",
+            },
+            {
+              "modelType": "Property",
+              "value": "A4",
+              "valueType": "xs:string",
+            },
+          ],
+          "valueTypeListElement": "xs:string",
+        },
+        {
+          "entityType": "SelfManagedEntity",
+          "globalAssetId": "https://bnb.co.kr/ids/asset/spindle-9912",
+          "idShort": "Spindle",
+          "modelType": "Entity",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/Component/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "statements": [
+            {
+              "idShort": "MaxSpeed",
+              "modelType": "Property",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-BAF161#004",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "value": "12000",
+              "valueType": "xs:double",
+            },
+          ],
+        },
+        {
+          "first": {
+            "keys": [
+              {
+                "type": "Submodel",
+                "value": "https://bnb.co.kr/ids/sm/mx200-line1-001/full",
+              },
+            ],
+            "type": "ModelReference",
+          },
+          "idShort": "SpindleIsPartOfMachine",
+          "modelType": "RelationshipElement",
+          "second": {
+            "keys": [
+              {
+                "type": "Submodel",
+                "value": "https://bnb.co.kr/ids/sm/mx200-line1-001/full",
+              },
+            ],
+            "type": "ModelReference",
+          },
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/IsPartOf/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+        },
+        {
+          "annotations": [
+            {
+              "idShort": "TorqueNm",
+              "modelType": "Property",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/TorqueNm/1/0",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "value": "85",
+              "valueType": "xs:double",
+            },
+          ],
+          "first": {
+            "keys": [
+              {
+                "type": "Submodel",
+                "value": "https://bnb.co.kr/ids/sm/mx200-line1-001/full",
+              },
+            ],
+            "type": "ModelReference",
+          },
+          "idShort": "ToolMount",
+          "modelType": "AnnotatedRelationshipElement",
+          "second": {
+            "keys": [
+              {
+                "type": "Submodel",
+                "value": "https://bnb.co.kr/ids/sm/mx200-line1-001/full",
+              },
+            ],
+            "type": "ModelReference",
+          },
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/ToolMount/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+        },
+        {
+          "idShort": "StartCycle",
+          "inoutputVariables": [
+            {
+              "value": {
+                "idShort": "Overrides",
+                "modelType": "Property",
+                "semanticId": {
+                  "keys": [
+                    {
+                      "type": "GlobalReference",
+                      "value": "https://bnb.co.kr/ids/cd/Overrides/1/0",
+                    },
+                  ],
+                  "type": "ExternalReference",
+                },
+                "valueType": "xs:string",
+              },
+            },
+          ],
+          "inputVariables": [
+            {
+              "value": {
+                "idShort": "ProgramNo",
+                "modelType": "Property",
+                "semanticId": {
+                  "keys": [
+                    {
+                      "type": "GlobalReference",
+                      "value": "https://bnb.co.kr/ids/cd/ProgramNo/1/0",
+                    },
+                  ],
+                  "type": "ExternalReference",
+                },
+                "value": "O1234",
+                "valueType": "xs:string",
+              },
+            },
+          ],
+          "modelType": "Operation",
+          "outputVariables": [
+            {
+              "value": {
+                "idShort": "CycleId",
+                "modelType": "Property",
+                "semanticId": {
+                  "keys": [
+                    {
+                      "type": "GlobalReference",
+                      "value": "https://bnb.co.kr/ids/cd/CycleId/1/0",
+                    },
+                  ],
+                  "type": "ExternalReference",
+                },
+                "valueType": "xs:string",
+              },
+            },
+          ],
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/StartCycle/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+        },
+        {
+          "idShort": "Milling",
+          "modelType": "Capability",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/Milling/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+        },
+      ],
+    },
+  ],
+}
+`;

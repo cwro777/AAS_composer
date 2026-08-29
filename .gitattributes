@@ -1,0 +1,10 @@
+# 줄바꿈을 LF로 고정한다.
+# Windows에서 core.autocrlf=true이면 체크아웃 시 CRLF로 바뀌고,
+# 그러면 골든 스냅샷이 "이유 없이" 깨진다. 그 사고를 여기서 막는다.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.pdf binary
+*.aasx binary
+*.tar.gz binary

@@ -1,0 +1,71 @@
+{
+  "id": "local-operational",
+  "idtaNumber": "사내 정의",
+  "name": "Operational Data",
+  "version": "1.0",
+  "publishedAt": "2026-08",
+  "sourceUrl": "(사내 문서)",
+  "submodel": {
+    "idShort": "OperationalData",
+    "semanticId": "https://admin-shell.io/idta/OperationalData/1/0",
+    "verified": "none",
+    "idPattern": "{ns}/sm/{asset}/operational"
+  },
+  "elements": [
+    {
+      "t": "prop",
+      "idShort": "CurrentTemperature",
+      "verified": "none",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:double",
+      "semanticId": "0173-1#02-BAA092#002",
+      "source": "사내 정의 — eCl@ss 미대조",
+      "exampleValue": "45.2"
+    },
+    {
+      "t": "prop",
+      "idShort": "RotationSpeed",
+      "verified": "none",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:double",
+      "semanticId": "0173-1#02-BAF161#004",
+      "source": "사내 정의 — eCl@ss 미대조",
+      "exampleValue": "1450"
+    },
+    {
+      "t": "prop",
+      "idShort": "OperatingHours",
+      "verified": "none",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:double",
+      "semanticId": "0173-1#02-AAH252#003",
+      "source": "사내 정의 — eCl@ss 미대조",
+      "exampleValue": "12874.5"
+    },
+    {
+      "t": "prop",
+      "idShort": "MachineState",
+      "verified": "none",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:string",
+      "semanticId": "0173-1#02-ABH789#001",
+      "source": "사내 정의 — eCl@ss 미대조",
+      "exampleValue": "Running"
+    },
+    {
+      "t": "prop",
+      "idShort": "Timestamp",
+      "verified": "none",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:dateTime",
+      "semanticId": "https://admin-shell.io/idta/TimeSeries/UtcTime/1/1",
+      "source": "사내 정의",
+      "exampleValue": "2026-08-26T09:30:00+09:00"
+    }
+  ]
+}

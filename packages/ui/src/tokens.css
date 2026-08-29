@@ -1,0 +1,156 @@
+/*
+ * @aas/ui — 디자인 토큰.
+ * 프로토타입의 시각 언어를 승계한다 — 계기판 같은 슬레이트 중성색에 신호 앰버 액센트.
+ *
+ * 규칙:
+ * - 컴포넌트는 색상 리터럴(#hex)을 쓰지 않고 이 변수만 참조한다.
+ * - 의미색(ok/warn/err)은 브랜드 액센트와 별개 토큰이다. 섞지 않는다.
+ * - 다크 토큰은 미디어 쿼리와 [data-theme] 양쪽에 정의한다.
+ *   한쪽에만 두면 시스템 설정이 "기본"인 사용자에게 색이 적용되지 않는다.
+ */
+
+:root {
+  --bg: #e9ecf1;
+  --grid: #c6cfdb;
+  --surface: #ffffff;
+  --surface-2: #f3f6f9;
+  --surface-3: #e7ecf2;
+  --line: #c6d0dc;
+  --line-soft: #dee4ec;
+
+  --ink: #111823;
+  --ink-2: #4c596a;
+  --ink-3: #7a8798;
+
+  --accent: #a85400;
+  --accent-ink: #ffffff;
+  --accent-soft: #f5e5d2;
+
+  --wire: #3b7abe;
+  --wire-hi: #a85400;
+
+  /* 의미색 — 액센트와 분리 */
+  --ok: #1b7350;
+  --warn: #7f5900;
+  --err: #a82920;
+  --ok-bg: #dcf0e6;
+  --warn-bg: #f7ebcf;
+  --err-bg: #f7dedb;
+
+  /* 노드 타입 색 — 좌측 스트라이프로만 쓴다. 배경을 물들이면 캔버스가 시끄러워진다 */
+  --n-shell: #5e4a9e;
+  --n-submodel: #1c6aac;
+  --n-smc: #0c7370;
+  --n-sml: #3a712b;
+  --n-prop: #a85400;
+  --n-mlp: #9a3a70;
+  --n-range: #71621b;
+  --n-file: #556577;
+  --n-blob: #46586b;
+  --n-ref: #814527;
+  --n-entity: #2f6b8f;
+  --n-rel: #7a5230;
+  --n-operation: #6b4a86;
+  --n-capability: #3f6d5a;
+
+  --sans: 'IBM Plex Sans', 'IBM Plex Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --r: 5px;
+  --sh: 0 1px 2px rgba(16, 24, 36, 0.1), 0 6px 16px rgba(16, 24, 36, 0.08);
+  --sh-hi: 0 2px 4px rgba(16, 24, 36, 0.14), 0 12px 28px rgba(16, 24, 36, 0.16);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0f131a;
+    --grid: #1f2833;
+    --surface: #161c24;
+    --surface-2: #1c232d;
+    --surface-3: #232b36;
+    --line: #2b3542;
+    --line-soft: #212933;
+
+    --ink: #dbe3ec;
+    --ink-2: #98a5b5;
+    --ink-3: #6a7889;
+
+    --accent: #e59a3e;
+    --accent-ink: #1a1206;
+    --accent-soft: #32240f;
+
+    --wire: #5ca1df;
+    --wire-hi: #e59a3e;
+
+    --ok: #4fc08d;
+    --warn: #deb24c;
+    --err: #ee857c;
+    --ok-bg: #12291f;
+    --warn-bg: #2c2410;
+    --err-bg: #2e1614;
+
+    --n-shell: #a08ee0;
+    --n-submodel: #5ca1df;
+    --n-smc: #3cb5b0;
+    --n-sml: #77bc62;
+    --n-prop: #e59a3e;
+    --n-mlp: #db7cb2;
+    --n-range: #c0ac4e;
+    --n-file: #93a3b5;
+    --n-blob: #8496a8;
+    --n-ref: #c68259;
+    --n-entity: #6fa8cc;
+    --n-rel: #c39a72;
+    --n-operation: #b096d4;
+    --n-capability: #74b39a;
+
+    --sh: 0 1px 2px rgba(0, 0, 0, 0.5), 0 6px 16px rgba(0, 0, 0, 0.4);
+    --sh-hi: 0 2px 4px rgba(0, 0, 0, 0.6), 0 12px 28px rgba(0, 0, 0, 0.55);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f131a;
+  --grid: #1f2833;
+  --surface: #161c24;
+  --surface-2: #1c232d;
+  --surface-3: #232b36;
+  --line: #2b3542;
+  --line-soft: #212933;
+
+  --ink: #dbe3ec;
+  --ink-2: #98a5b5;
+  --ink-3: #6a7889;
+
+  --accent: #e59a3e;
+  --accent-ink: #1a1206;
+  --accent-soft: #32240f;
+
+  --wire: #5ca1df;
+  --wire-hi: #e59a3e;
+
+  --ok: #4fc08d;
+  --warn: #deb24c;
+  --err: #ee857c;
+  --ok-bg: #12291f;
+  --warn-bg: #2c2410;
+  --err-bg: #2e1614;
+
+  --n-shell: #a08ee0;
+  --n-submodel: #5ca1df;
+  --n-smc: #3cb5b0;
+  --n-sml: #77bc62;
+  --n-prop: #e59a3e;
+  --n-mlp: #db7cb2;
+  --n-range: #c0ac4e;
+  --n-file: #93a3b5;
+  --n-blob: #8496a8;
+  --n-ref: #c68259;
+  --n-entity: #6fa8cc;
+  --n-rel: #c39a72;
+  --n-operation: #b096d4;
+  --n-capability: #74b39a;
+
+  --sh: 0 1px 2px rgba(0, 0, 0, 0.5), 0 6px 16px rgba(0, 0, 0, 0.4);
+  --sh-hi: 0 2px 4px rgba(0, 0, 0, 0.6), 0 12px 28px rgba(0, 0, 0, 0.55);
+}

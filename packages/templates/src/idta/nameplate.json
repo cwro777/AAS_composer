@@ -1,0 +1,289 @@
+{
+  "id": "idta-02006",
+  "idtaNumber": "IDTA 02006-3-0",
+  "name": "Digital Nameplate",
+  "version": "3.0",
+  "publishedAt": "2024-11",
+  "sourceUrl": "https://industrialdigitaltwin.io/idta-submodel-templates/Digital%20Nameplate%20for%20Industrial%20Equipment/3.0/index.html",
+  "submodel": {
+    "idShort": "Nameplate",
+    "semanticId": "https://admin-shell.io/idta/nameplate/3/0/Nameplate",
+    "verified": "spec",
+    "idPattern": "{ns}/sm/{asset}/nameplate"
+  },
+  "elements": [
+    {
+      "t": "prop",
+      "idShort": "URIOfTheProduct",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1",
+      "valueType": "xs:anyURI",
+      "semanticId": "0112/2///61987#ABN590#002",
+      "supplementalSemanticIds": [
+        "0173-1#02-ABH173#003"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "exampleValue": "https://example.com/products/MX-200/0001"
+    },
+    {
+      "t": "mlp",
+      "idShort": "ManufacturerName",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1",
+      "semanticId": "0112/2///61987#ABA565#009",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAO677#004"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "langs": [
+        {
+          "language": "en",
+          "text": "ACME Machinery"
+        }
+      ]
+    },
+    {
+      "t": "mlp",
+      "idShort": "ManufacturerProductDesignation",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1",
+      "semanticId": "0112/2///61987#ABA567#009",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAW338#003"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "langs": [
+        {
+          "language": "en",
+          "text": "CNC Milling Center MX-200"
+        }
+      ]
+    },
+    {
+      "t": "smc",
+      "idShort": "AddressInformation",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1",
+      "children": [
+        {
+          "t": "mlp",
+          "idShort": "Street",
+          "verified": "none",
+          "required": true,
+          "cardinality": "1",
+          "semanticId": "0173-1#02-AAO128#002",
+          "source": "Nameplate 2.0 값 — 3.0 사양서 재확인 필요",
+          "langs": [
+            {
+              "language": "ko",
+              "text": "과학산단로 123"
+            }
+          ]
+        },
+        {
+          "t": "mlp",
+          "idShort": "Zipcode",
+          "verified": "none",
+          "required": true,
+          "cardinality": "1",
+          "semanticId": "0173-1#02-AAO129#002",
+          "source": "Nameplate 2.0 값 — 3.0 사양서 재확인 필요",
+          "langs": [
+            {
+              "language": "ko",
+              "text": "46744"
+            }
+          ]
+        },
+        {
+          "t": "mlp",
+          "idShort": "CityTown",
+          "verified": "none",
+          "required": true,
+          "cardinality": "1",
+          "semanticId": "0173-1#02-AAO132#002",
+          "source": "Nameplate 2.0 값 — 3.0 사양서 재확인 필요",
+          "langs": [
+            {
+              "language": "ko",
+              "text": "부산"
+            }
+          ]
+        },
+        {
+          "t": "mlp",
+          "idShort": "NationalCode",
+          "verified": "none",
+          "required": true,
+          "cardinality": "1",
+          "semanticId": "0173-1#02-AAO134#002",
+          "source": "Nameplate 2.0 값 — 3.0 사양서 재확인 필요",
+          "langs": [
+            {
+              "language": "en",
+              "text": "KR"
+            }
+          ]
+        }
+      ],
+      "semanticId": "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/AddressInformation",
+      "supplementalSemanticIds": [
+        "0112/2///61360_7#AAS002#001",
+        "0173-1#02-AAQ837#008"
+      ],
+      "source": "IDTA 02006-3-0 catalog"
+    },
+    {
+      "t": "mlp",
+      "idShort": "ManufacturerProductRoot",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "semanticId": "0112/2///61360_7#AAS011#001",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAU732#003"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "langs": [
+        {
+          "language": "en",
+          "text": "Milling machine"
+        }
+      ]
+    },
+    {
+      "t": "mlp",
+      "idShort": "ManufacturerProductFamily",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "semanticId": "0112/2///61987#ABP464#002",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAU731#003"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "langs": [
+        {
+          "language": "en",
+          "text": "MX series"
+        }
+      ]
+    },
+    {
+      "t": "prop",
+      "idShort": "ManufacturerProductType",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:string",
+      "semanticId": "0112/2///61987#ABA300#008",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAO057#004"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "exampleValue": "MX-200"
+    },
+    {
+      "t": "prop",
+      "idShort": "OrderCodeOfManufacturer",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:string",
+      "semanticId": "0112/2///61987#ABA950#008",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAO227#004"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "exampleValue": "MX200-KR-2026"
+    },
+    {
+      "t": "prop",
+      "idShort": "ProductArticleNumberOfManufacturer",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:string",
+      "semanticId": "0112/2///61987#ABA581#007",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAO676#005"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "exampleValue": "MX-200-STD"
+    },
+    {
+      "t": "prop",
+      "idShort": "SerialNumber",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:string",
+      "semanticId": "0112/2///61987#ABA951#009",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAM556#004"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "exampleValue": "SN-2026-000187"
+    },
+    {
+      "t": "prop",
+      "idShort": "YearOfConstruction",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1",
+      "valueType": "xs:string",
+      "semanticId": "0112/2///61987#ABP000#002",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAP906#003"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "exampleValue": "2026"
+    },
+    {
+      "t": "prop",
+      "idShort": "DateOfManufacture",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:date",
+      "semanticId": "0112/2///61987#ABB757#007",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAR972#004"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "exampleValue": "2026-03-14"
+    },
+    {
+      "t": "prop",
+      "idShort": "CountryOfOrigin",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "valueType": "xs:string",
+      "semanticId": "0112/2///61987#ABP462#001",
+      "supplementalSemanticIds": [
+        "0173-1#02-AAO259#007"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "exampleValue": "KR"
+    },
+    {
+      "t": "file",
+      "idShort": "CompanyLogo",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "contentType": "image/png",
+      "semanticId": "0112/2///61987#ABP463#001",
+      "supplementalSemanticIds": [
+        "0173-1#02-ABI776#002"
+      ],
+      "source": "IDTA 02006-3-0 catalog",
+      "exampleValue": "/aasx/files/acme_logo.png"
+    }
+  ]
+}

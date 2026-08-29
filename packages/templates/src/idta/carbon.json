@@ -1,0 +1,130 @@
+{
+  "id": "idta-02023",
+  "idtaNumber": "IDTA 02023",
+  "name": "Carbon Footprint",
+  "version": "1.0",
+  "publishedAt": "2025-03",
+  "sourceUrl": "https://industrialdigitaltwin.org/wp-content/uploads/2025/03/IDTA-02023_Submodel_CarbonFootprint.pdf",
+  "submodel": {
+    "idShort": "CarbonFootprint",
+    "semanticId": "https://admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0",
+    "verified": "spec",
+    "idPattern": "{ns}/sm/{asset}/carbonfootprint"
+  },
+  "elements": [
+    {
+      "t": "sml",
+      "idShort": "ProductCarbonFootprints",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1..*",
+      "typeValueListElement": "SubmodelElementCollection",
+      "children": [
+        {
+          "t": "smc",
+          "idShort": "ProductCarbonFootprint",
+          "verified": "spec",
+          "required": true,
+          "cardinality": "1",
+          "children": [
+            {
+              "t": "prop",
+              "idShort": "PcfCalculationMethod",
+              "verified": "spec",
+              "required": true,
+              "cardinality": "1",
+              "valueType": "xs:string",
+              "semanticId": "0173-1#02-ABG854#003",
+              "source": "IDTA 02023 v1.0 사양서 (2025-03)",
+              "exampleValue": "ISO 14067"
+            },
+            {
+              "t": "prop",
+              "idShort": "PcfCO2eq",
+              "verified": "spec",
+              "required": true,
+              "cardinality": "1",
+              "valueType": "xs:double",
+              "semanticId": "0173-1#02-ABG855#003",
+              "source": "IDTA 02023 v1.0 사양서 (2025-03)",
+              "exampleValue": "1842.5"
+            },
+            {
+              "t": "prop",
+              "idShort": "ReferenceImpactUnitForCalculation",
+              "verified": "spec",
+              "required": false,
+              "cardinality": "0..1",
+              "valueType": "xs:string",
+              "semanticId": "0173-1#02-ABG856#003",
+              "source": "IDTA 02023 v1.0 사양서 (2025-03)",
+              "exampleValue": "piece"
+            },
+            {
+              "t": "prop",
+              "idShort": "QuantityOfMeasureForCalculation",
+              "verified": "spec",
+              "required": false,
+              "cardinality": "0..1",
+              "valueType": "xs:double",
+              "semanticId": "0173-1#02-ABG857#003",
+              "source": "IDTA 02023 v1.0 사양서 (2025-03)",
+              "exampleValue": "1.0"
+            },
+            {
+              "t": "sml",
+              "idShort": "LifeCyclePhases",
+              "verified": "none",
+              "required": false,
+              "cardinality": "0..1",
+              "typeValueListElement": "Property",
+              "children": [
+                {
+                  "t": "prop",
+                  "idShort": "LifeCyclePhase",
+                  "verified": "none",
+                  "required": true,
+                  "cardinality": "1",
+                  "valueType": "xs:string",
+                  "source": "semanticIdListElement가 대신함",
+                  "exampleValue": "A3 - production"
+                }
+              ],
+              "semanticId": "https://admin-shell.io/idta/CarbonFootprint/LifeCyclePhases/1/0",
+              "semanticIdListElement": "0173-1#02-ABG858#003",
+              "source": "semanticIdListElement는 0.9 문서 값 — v1.0 사양서 재확인 필요",
+              "valueTypeListElement": "xs:string"
+            },
+            {
+              "t": "prop",
+              "idShort": "PublicationDate",
+              "verified": "spec",
+              "required": false,
+              "cardinality": "0..1",
+              "valueType": "xs:dateTime",
+              "semanticId": "https://admin-shell.io/idta/CarbonFootprint/PublicationDate/1/0",
+              "source": "IDTA 02023 v1.0 사양서 (2025-03)",
+              "exampleValue": "2026-03-14T00:00:00+09:00"
+            },
+            {
+              "t": "prop",
+              "idShort": "ExpirationDate",
+              "verified": "spec",
+              "required": false,
+              "cardinality": "0..1",
+              "valueType": "xs:dateTime",
+              "semanticId": "https://admin-shell.io/idta/CarbonFootprint/ExpirationDate/1/0",
+              "source": "IDTA 02023 v1.0 사양서 (2025-03)",
+              "exampleValue": "2027-03-14T00:00:00+09:00"
+            }
+          ],
+          "semanticId": "https://admin-shell.io/idta/CarbonFootprint/ProductCarbonFootprint/1/0",
+          "source": "IDTA 02023 v1.0 사양서 (2025-03)"
+        }
+      ],
+      "semanticId": "https://admin-shell.io/idta/CarbonFootprint/ProductCarbonFootprints/1/0",
+      "semanticIdListElement": "https://admin-shell.io/idta/CarbonFootprint/ProductCarbonFootprint/1/0",
+      "source": "IDTA 02023 v1.0 사양서 (2025-03)"
+    }
+  ]
+}

@@ -1,0 +1,811 @@
+{
+  "assetAdministrationShells": [
+    {
+      "modelType": "AssetAdministrationShell",
+      "id": "https://example.com/ids/aas/machine_001",
+      "idShort": "Machine_001_AAS",
+      "description": [
+        {
+          "language": "ko",
+          "text": "스마트공장 CNC 가공기 1호기"
+        }
+      ],
+      "assetInformation": {
+        "assetKind": "Instance",
+        "globalAssetId": "https://example.com/ids/asset/machine_001"
+      },
+      "submodels": [
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://example.com/ids/sm/operational_data_001"
+            }
+          ]
+        },
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://example.com/ids/sm/nameplate/1"
+            }
+          ]
+        },
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://example.com/ids/sm/technicaldata/1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "submodels": [
+    {
+      "modelType": "Submodel",
+      "id": "https://example.com/ids/sm/operational_data_001",
+      "idShort": "OperationalData",
+      "kind": "Instance",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/OperationalData/1/0"
+          }
+        ]
+      },
+      "submodelElements": [
+        {
+          "modelType": "Property",
+          "idShort": "CurrentTemperature",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-BAA092#002"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "45.2"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "RotationSpeed",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-BAF161#004"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "1450"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "OperatingHours",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-AAH252#003"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "12874.5"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "MachineState",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-ABH789#001"
+              }
+            ]
+          },
+          "valueType": "xs:string",
+          "value": "Running"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "Timestamp",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/TimeSeries/UtcTime/1/1"
+              }
+            ]
+          },
+          "valueType": "xs:dateTime",
+          "value": "2026-08-26T09:30:00+09:00"
+        }
+      ]
+    },
+    {
+      "modelType": "Submodel",
+      "id": "https://example.com/ids/sm/nameplate/1",
+      "idShort": "Nameplate",
+      "kind": "Instance",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/nameplate/3/0/Nameplate"
+          }
+        ]
+      },
+      "submodelElements": [
+        {
+          "modelType": "Property",
+          "idShort": "URIOfTheProduct",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABN590#002"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-ABH173#003"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:anyURI",
+          "value": "https://example.com/products/MX-200/0001"
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerName",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA565#009"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO677#004"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "ACME Machinery"
+            },
+            {
+              "language": "ko",
+              "text": "에이스머시너리"
+            }
+          ]
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerProductDesignation",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA567#009"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAW338#003"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "CNC Milling Center MX-200"
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "AddressInformation",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/AddressInformation"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0112/2///61360_7#AAS002#001"
+                }
+              ]
+            },
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAQ837#008"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "Street",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO128#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "ko",
+                  "text": "과학산단로 123"
+                }
+              ]
+            },
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "Zipcode",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO129#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "ko",
+                  "text": "46744"
+                }
+              ]
+            },
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "CityTown",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO132#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "ko",
+                  "text": "부산"
+                }
+              ]
+            },
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "NationalCode",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO134#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "en",
+                  "text": "KR"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerProductRoot",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61360_7#AAS011#001"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAU732#003"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "Milling machine"
+            }
+          ]
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerProductFamily",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP464#002"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAU731#003"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "MX series"
+            }
+          ]
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ManufacturerProductType",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA300#008"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO057#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "MX-200"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "OrderCodeOfManufacturer",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA950#008"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO227#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "MX200-KR-2026"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ProductArticleNumberOfManufacturer",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA581#007"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO676#005"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "MX-200-STD"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "SerialNumber",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA951#009"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAM556#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "SN-2026-000187"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "YearOfConstruction",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP000#002"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAP906#003"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "2026"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "DateOfManufacture",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABB757#007"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAR972#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:date",
+          "value": "2026-03-14"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "CountryOfOrigin",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP462#001"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO259#007"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "KR"
+        },
+        {
+          "modelType": "File",
+          "idShort": "CompanyLogo",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP463#001"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-ABI776#002"
+                }
+              ]
+            }
+          ],
+          "contentType": "image/png",
+          "value": "/aasx/files/acme_logo.png"
+        }
+      ]
+    },
+    {
+      "modelType": "Submodel",
+      "id": "https://example.com/ids/sm/technicaldata/1",
+      "idShort": "TechnicalData",
+      "kind": "Instance",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2"
+          }
+        ]
+      },
+      "submodelElements": [
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "GeneralInformation",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1"
+              }
+            ]
+          },
+          "value": [
+            {
+              "modelType": "Property",
+              "idShort": "ManufacturerName",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO677#002"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "ACME Machinery"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "ManufacturerArticleNumber",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO676#003"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "MX-200-STD"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "ManufacturerOrderCode",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO227#002"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "MX200-KR-2026"
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "ProductClassifications",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassifications/1/1"
+              }
+            ]
+          },
+          "value": [
+            {
+              "modelType": "Property",
+              "idShort": "ClassificationSystem",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/ZVEI/TechnicalData/ClassificationSystem/1/1"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "ECLASS"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "ProductClassId",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassId/1/1"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "27-02-26-01"
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "TechnicalProperties",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/ZVEI/TechnicalData/TechnicalProperties/1/1"
+              }
+            ]
+          },
+          "value": [
+            {
+              "modelType": "Property",
+              "idShort": "RatedPower",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAF018#003"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "15.0"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "MaxSpindleSpeed",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-BAF161#004"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "12000"
+            },
+            {
+              "modelType": "Range",
+              "idShort": "AmbientTemperature",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-BAA120#008"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "min": "5",
+              "max": "40"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

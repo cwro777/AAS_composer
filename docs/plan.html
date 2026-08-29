@@ -1,0 +1,1015 @@
+<title>AAS Composer 고도화 계획</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+
+<style>
+:root{
+  --bg:#E9ECF1; --paper:#FFFFFF; --panel:#F3F6F9; --panel-2:#E7ECF2;
+  --line:#C6D0DC; --line-soft:#DEE4EC;
+  --ink:#111823; --ink-2:#4C596A; --ink-3:#7A8798;
+  --accent:#A85400; --accent-soft:#F5E5D2; --accent-ink:#FFFFFF;
+  --blue:#1C6AAC; --teal:#0C7370; --violet:#5E4A9E; --moss:#3A712B; --plum:#9A3A70;
+  --ok:#1B7350; --warn:#7F5900; --err:#A82920;
+  --ok-bg:#DCF0E6; --warn-bg:#F7EBCF; --err-bg:#F7DEDB;
+  --sans:'IBM Plex Sans','IBM Plex Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --code:#12171F; --code-ink:#C9D4E2; --code-dim:#6E7D90; --code-line:#242D39; --code-hi:#E8A24A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F131A; --paper:#161C24; --panel:#1C232D; --panel-2:#232B36;
+    --line:#2B3542; --line-soft:#212933;
+    --ink:#DBE3EC; --ink-2:#98A5B5; --ink-3:#6A7889;
+    --accent:#E59A3E; --accent-soft:#32240F; --accent-ink:#1A1206;
+    --blue:#5CA1DF; --teal:#3CB5B0; --violet:#A08EE0; --moss:#77BC62; --plum:#DB7CB2;
+    --ok:#4FC08D; --warn:#DEB24C; --err:#EE857C;
+    --ok-bg:#12291F; --warn-bg:#2C2410; --err-bg:#2E1614;
+    --code:#0B0F15; --code-line:#1C242E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F131A; --paper:#161C24; --panel:#1C232D; --panel-2:#232B36;
+  --line:#2B3542; --line-soft:#212933;
+  --ink:#DBE3EC; --ink-2:#98A5B5; --ink-3:#6A7889;
+  --accent:#E59A3E; --accent-soft:#32240F; --accent-ink:#1A1206;
+  --blue:#5CA1DF; --teal:#3CB5B0; --violet:#A08EE0; --moss:#77BC62; --plum:#DB7CB2;
+  --ok:#4FC08D; --warn:#DEB24C; --err:#EE857C;
+  --ok-bg:#12291F; --warn-bg:#2C2410; --err-bg:#2E1614;
+  --code:#0B0F15; --code-line:#1C242E;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.72;-webkit-font-smoothing:antialiased}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 96px;
+  display:grid;grid-template-columns:minmax(0,1fr) 208px;gap:50px;align-items:start}
+
+header{grid-column:1/-1;padding:54px 0 28px;border-bottom:2px solid var(--ink);margin-bottom:34px}
+.kick{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 13px}
+h1{font-size:clamp(29px,4.5vw,44px);line-height:1.12;letter-spacing:-.022em;margin:0 0 15px;
+  font-weight:700;text-wrap:balance;max-width:21ch}
+.lede{font-size:16.5px;color:var(--ink-2);max-width:64ch;margin:0 0 22px;line-height:1.68}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.04em;
+  border:1px solid var(--line);border-radius:3px;padding:3px 9px;color:var(--ink-2);background:var(--paper)}
+
+nav{grid-column:2;grid-row:2;position:sticky;top:22px;font-size:12.5px;line-height:1.5}
+nav p{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 10px}
+nav ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+nav a{display:flex;gap:8px;color:var(--ink-2);text-decoration:none;border-left:2px solid var(--line-soft);padding-left:9px}
+nav a i{font-family:var(--mono);font-size:10px;font-style:normal;color:var(--ink-3);flex:0 0 auto}
+nav a:hover{color:var(--accent);border-left-color:var(--accent)}
+nav .prog{margin-top:16px;padding-left:11px;font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+nav .bar{height:3px;background:var(--panel-2);border-radius:2px;margin-top:5px;overflow:hidden}
+nav .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+
+main{grid-column:1;grid-row:2;min-width:0}
+section{margin-bottom:50px;scroll-margin-top:20px}
+h2{font-size:22px;line-height:1.26;letter-spacing:-.015em;margin:0 0 7px;font-weight:700;text-wrap:balance}
+h2 .num{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);display:block;
+  letter-spacing:.1em;margin-bottom:5px}
+h3{font-size:15.5px;font-weight:600;margin:28px 0 8px}
+h4{font-size:13.5px;font-weight:600;margin:18px 0 6px;color:var(--ink-2)}
+p{margin:0 0 13px;max-width:66ch}
+ul,ol{margin:0 0 13px;padding-left:20px;max-width:66ch}
+li{margin-bottom:5px}
+code{font-family:var(--mono);font-size:.86em;background:var(--panel-2);padding:1.5px 5px;border-radius:3px;word-break:break-all}
+a{color:var(--accent)}
+.sub{color:var(--ink-2);font-size:13.5px;max-width:66ch;margin:-1px 0 18px}
+
+/* 코드 블록 — 두 테마 동일 */
+.code{background:var(--code);border:1px solid var(--code-line);border-radius:7px;margin:14px 0 18px;overflow:hidden}
+.codebar{display:flex;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid var(--code-line);
+  background:rgba(255,255,255,.02)}
+.codebar .ttl{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--code-dim)}
+.code pre{margin:0;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:11.5px;line-height:1.68;
+  color:var(--code-ink);tab-size:2}
+.code pre .d{color:var(--code-dim)}
+.code pre .h{color:var(--code-hi)}
+
+/* 표 */
+.scroll{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:560px}
+th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.55}
+th{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);background:var(--panel);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.k{font-family:var(--mono);font-size:11.5px;color:var(--ink)}
+td.m{font-family:var(--mono);font-size:11.5px}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:3px;
+  letter-spacing:.05em;white-space:nowrap}
+.pill.e{background:var(--err-bg);color:var(--err)}
+.pill.w{background:var(--warn-bg);color:var(--warn)}
+.pill.o{background:var(--ok-bg);color:var(--ok)}
+.pill.n{background:var(--panel-2);color:var(--ink-3)}
+
+.call{border-left:3px solid var(--accent);background:var(--paper);padding:13px 17px;margin:18px 0;border-radius:0 5px 5px 0}
+.call .lab{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--accent);display:block;margin-bottom:4px}
+.call p{margin:0;font-size:14px}
+.call.w{border-left-color:var(--warn)} .call.w .lab{color:var(--warn)}
+.call.e{border-left-color:var(--err)} .call.e .lab{color:var(--err)}
+
+/* 차별점 카드 */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:12px;margin:20px 0 24px}
+.card{border:1px solid var(--line);border-radius:6px;background:var(--paper);padding:14px 15px}
+.card .role{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 6px}
+.card h4{margin:0 0 6px;font-size:14px;font-weight:700;color:var(--ink)}
+.card p{font-size:12.5px;line-height:1.62;color:var(--ink-2);margin:0;max-width:none}
+
+/* 계층 스택 */
+.stack{display:flex;flex-direction:column;gap:9px;margin:20px 0 22px}
+.lyr{display:grid;grid-template-columns:118px minmax(0,1fr);border:1px solid var(--line);
+  border-radius:6px;overflow:hidden;background:var(--paper)}
+.lyr .lh{padding:12px 13px;background:var(--panel);border-right:1px solid var(--line)}
+.lyr .lh b{display:block;font-size:12.5px;line-height:1.3}
+.lyr .lh i{display:block;font-family:var(--mono);font-size:9px;font-style:normal;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.lyr .lb{padding:11px 13px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.box{font-size:12px;padding:5px 10px;border-radius:4px;background:var(--panel-2);border:1px solid var(--line-soft);line-height:1.4}
+.box.a{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.box.m{font-family:var(--mono);font-size:11px}
+.flowdown{text-align:center;color:var(--ink-3);font-family:var(--mono);font-size:11px;letter-spacing:.1em;margin:0}
+
+/* 단계 카드 */
+.ph{border:1px solid var(--line);border-radius:8px;background:var(--paper);margin:0 0 14px;overflow:hidden}
+.phhead{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid var(--line-soft);background:var(--panel)}
+.phid{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;background:var(--accent);
+  color:var(--accent-ink);border-radius:4px;padding:3px 8px}
+.phhead b{font-size:14.5px}
+.phhead .wk{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+.phbody{padding:13px 16px 6px}
+.phbody p{font-size:13.5px}
+.phbody p:first-child{margin-top:0}
+.dod{list-style:none;padding:0;margin:6px 0 12px;max-width:none;display:flex;flex-direction:column;gap:1px}
+.dod li{margin:0}
+.dod label{display:flex;gap:9px;align-items:flex-start;padding:5px 8px;border-radius:5px;cursor:pointer;
+  font-size:13px;line-height:1.58;color:var(--ink-2)}
+.dod label:hover{background:var(--panel)}
+.dod input{margin:5px 0 0;accent-color:var(--accent);flex:0 0 auto;width:14px;height:14px}
+.dod input:checked + span{color:var(--ink-3);text-decoration:line-through}
+
+footer{grid-column:1/-1;border-top:1px solid var(--line);padding-top:20px;margin-top:12px;
+  font-size:12.5px;color:var(--ink-3);max-width:72ch;line-height:1.7}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0}
+  main{grid-column:1}
+  nav{display:none}
+}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="kick">AAS Node Composer · 고도화 구현 계획 · 2026-08-29 · 결정사항 5건 반영</p>
+  <h1>프로토타입의 그래프를 문서 커널로 바꾼다</h1>
+  <p class="lede">현재 프로토타입은 <b>노드 9종·IDTA 템플릿 6종·실시간 검증</b>으로 구조가 옳다는 것을 증명했습니다. 다만 지금 구조로는 설비 한 대를 넘어가는 순간 세 곳에서 막힙니다 — <b>순서를 표현할 수 없고, 실행취소가 없고, 키 입력마다 전체를 다시 직렬화</b>합니다. 이 문서는 그 셋을 한 번에 푸는 커널 재설계와, 그 위에 얹는 고도화 기능의 구현 순서입니다.</p>
+  <div class="meta">
+    <span class="tag">문서 커널 + 명령 로그</span>
+    <span class="tag">캔버스 · 트리 · 표 3뷰</span>
+    <span class="tag">템플릿 적합성 검사</span>
+    <span class="tag">IEC CDD 단독</span>
+    <span class="tag">11단계 · 직렬 21.5주</span>
+  </div>
+</header>
+
+<nav>
+  <p>목차</p>
+  <ol>
+    <li><a href="#s1"><i>01</i>진단</a></li>
+    <li><a href="#s2"><i>02</i>다섯 가지 차별점</a></li>
+    <li><a href="#s3"><i>03</i>아키텍처</a></li>
+    <li><a href="#s4"><i>04</i>커널 설계</a></li>
+    <li><a href="#s5"><i>05</i>메타모델 확장</a></li>
+    <li><a href="#s6"><i>06</i>시맨틱 자동화</a></li>
+    <li><a href="#s7"><i>07</i>템플릿 엔진</a></li>
+    <li><a href="#s8"><i>08</i>에디터 3뷰</a></li>
+    <li><a href="#s9"><i>09</i>서버 · 출력</a></li>
+    <li><a href="#s10"><i>10</i>검증 · 성능 예산</a></li>
+    <li><a href="#s11"><i>11</i>로드맵</a></li>
+    <li><a href="#s12"><i>12</i>리스크 · 결정</a></li>
+  </ol>
+  <div class="prog">진행 <span id="pc">0</span>/<span id="pt">0</span><div class="bar"><i id="pb"></i></div></div>
+</nav>
+
+<main>
+
+<section id="s1">
+  <h2><span class="num">01</span>진단 — 프로토타입이 증명한 것과 막히는 지점</h2>
+  <p class="sub">아래는 추측이 아니라 <code>AAS_Node_Composer.html</code>의 실제 코드에서 읽어낸 제약입니다. 각 항목이 고도화 단계 하나에 대응합니다.</p>
+
+  <p><b>이미 옳게 되어 있는 것</b> — 포함 관계만을 간선으로 삼는 결정(<code>connect()</code>), AASd-120을 지키는 List 자식 idShort 생략(<code>inList()</code>), 주·보조 semanticId 분리(<code>supRefs()</code>), 그리고 무손실에 가까운 왕복(<code>serialize()</code> ↔ <code>importJson()</code>). 이 네 가지는 그대로 커널로 옮깁니다.</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>막히는 지점</th><th>지금 코드에서</th><th>결과</th><th>푸는 단계</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>자식 순서를 표현할 수 없다</b></td>
+        <td class="m">childrenOf()가 edges 배열의 삽입 순서를 그대로 반환</td>
+        <td>SubmodelElementList는 <code>orderRelevant:true</code>로 나가는데 사용자가 순서를 바꿀 방법이 없음. 왕복 시 순서 보존도 우연에 기댐</td>
+        <td class="m">P1</td>
+      </tr>
+      <tr>
+        <td><b>실행취소가 없다</b></td>
+        <td class="m">인스펙터 input 이벤트가 S.nodes를 직접 변형</td>
+        <td>오타 하나에 되돌릴 방법이 없어 실사용에서 가장 먼저 신뢰를 잃음</td>
+        <td class="m">P1</td>
+      </tr>
+      <tr>
+        <td><b>키 입력마다 전체 재계산</b></td>
+        <td class="m">render() → serialize() + validate() 전체 순회, DOM 전체 재도색</td>
+        <td>노드 수에 비례해 타이핑이 밀림. 500노드에서는 편집 불가</td>
+        <td class="m">P1 · P4</td>
+      </tr>
+      <tr>
+        <td><b>좌표가 의미 데이터에 섞임</b></td>
+        <td class="m">노드 객체 안에 x, y가 함께 저장</td>
+        <td>노드를 옮기기만 해도 문서가 바뀐 것으로 보여 버전 비교·병합이 무의미해짐</td>
+        <td class="m">P1</td>
+      </tr>
+      <tr>
+        <td><b>conceptDescriptions가 항상 비어 나감</b></td>
+        <td class="m">serialize()가 빈 배열이면 delete</td>
+        <td>수신 측이 단위·자료형을 알 수 없음. <code>"45.2"</code>가 ℃인지 ℉인지 모델 밖에 있음</td>
+        <td class="m">P6</td>
+      </tr>
+      <tr>
+        <td><b>semanticId가 자유 문자열</b></td>
+        <td class="m">인스펙터의 단순 text input</td>
+        <td>버전 접미사 오기입을 잡을 수 없음. 사양서에서 확인한 값과 사람이 찍은 값이 구분되지 않음</td>
+        <td class="m">P6</td>
+      </tr>
+      <tr>
+        <td><b>노드 9종으로는 못 그리는 모델</b></td>
+        <td class="m">TYPES에 Entity·Operation·Relationship·Blob 없음</td>
+        <td>Hierarchical Structures(BoM), Asset Interfaces Description 템플릿을 아예 표현할 수 없음</td>
+        <td class="m">P2</td>
+      </tr>
+      <tr>
+        <td><b>속성 60개를 노드로 그린다</b></td>
+        <td class="m">Nameplate 템플릿 삽입 = 노드 20여 개 생성</td>
+        <td>캔버스가 즉시 포화. 실제 설비는 서브모델당 수십~수백 요소</td>
+        <td class="m">P5</td>
+      </tr>
+      <tr>
+        <td><b>검증 규칙을 손으로 구현</b></td>
+        <td class="m">validate() 안의 AASd-022 · 108 · 120 자체 구현</td>
+        <td>나머지 수십 개 제약은 BaSyx 등록 시점에 처음 발견됨</td>
+        <td class="m">P1</td>
+      </tr>
+      <tr>
+        <td><b>모델이 브라우저 한 곳에만</b></td>
+        <td class="m">localStorage 단일 키에 통째 저장</td>
+        <td>공유·버전·감사 추적 불가. 캐시를 지우면 사라짐</td>
+        <td class="m">P7</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="call">
+    <span class="lab">이 계획의 한 문장</span>
+    <p>프로토타입의 <b>노드·간선 그래프</b>를 <b>순서를 가진 문서 트리 + 명령 로그</b>로 바꾸면, 실행취소·버전·감사·일괄생성·협업이 각각의 기능이 아니라 <b>한 설계의 부산물</b>로 따라옵니다. 나머지 열 개 단계는 그 위에 얹는 일입니다.</p>
+  </div>
+</section>
+
+<section id="s2">
+  <h2><span class="num">02</span>무엇이 "advanced"인가 — 다섯 가지 차별점</h2>
+  <p class="sub">AASX Package Explorer를 웹으로 다시 만드는 것은 목표가 아닙니다. 아래 다섯 가지가 없으면 만들 이유가 없습니다.</p>
+
+  <div class="cards">
+    <div class="card">
+      <p class="role">01 · 커널</p>
+      <h4>명령으로 편집한다</h4>
+      <p>모든 변경이 <code>Cmd</code> 하나로 표현되고 역명령을 돌려줍니다. 에디터의 Ctrl+Z, 서버의 버전 로그, CSV 일괄 생성, n8n 노드가 전부 같은 명령을 씁니다.</p>
+    </div>
+    <div class="card">
+      <p class="role">02 · 편집</p>
+      <h4>캔버스만 고집하지 않는다</h4>
+      <p>구조는 캔버스, 대량 입력은 표, 키보드 작업은 트리. 세 뷰가 같은 문서를 보며 실시간 동기화됩니다. Nameplate 15개 항목을 노드로 그리게 하지 않습니다.</p>
+    </div>
+    <div class="card">
+      <p class="role">03 · 템플릿</p>
+      <h4>템플릿이 계약으로 남는다</h4>
+      <p>삽입 후에도 인스턴스가 템플릿 ID·버전을 기억합니다. 필수 요소 누락, 카디널리티 위반, semanticId 이탈을 계속 감시하고, 사양서 개정 시 마이그레이션을 안내합니다.</p>
+    </div>
+    <div class="card">
+      <p class="role">04 · 시맨틱</p>
+      <h4>semanticId가 타입을 갖는다</h4>
+      <p>IRDI·IRI를 파싱해 체계·코드·버전으로 분해하고, 사전 프록시가 실재·폐기 여부를 확인합니다. <span class="pill o">확인됨</span> <span class="pill w">미확인</span> <span class="pill e">폐기됨</span> 배지로 드러냅니다.</p>
+    </div>
+    <div class="card">
+      <p class="role">05 · 출력</p>
+      <h4>단위까지 실어 보낸다</h4>
+      <p>사용된 semanticId를 모아 <code>conceptDescriptions</code>를 자동 생성합니다. 수신 측이 사전을 다시 조회하지 않고도 단위와 자료형을 해석할 수 있어야 교환이 성립합니다.</p>
+    </div>
+  </div>
+</section>
+
+<section id="s3">
+  <h2><span class="num">03</span>아키텍처 — 무엇이 무엇에 의존하는가</h2>
+  <p class="sub">플레이북의 pnpm 모노레포 구성을 그대로 따르되, 패키지 두 개를 더 쪼갭니다. 이유는 각각 아래에 적었습니다.</p>
+
+  <div class="stack">
+    <div class="lyr">
+      <div class="lh"><b>저작</b><i>apps/web</i></div>
+      <div class="lb">
+        <span class="box a">캔버스 (React Flow)</span><span class="box">트리 뷰</span><span class="box">표 편집기</span>
+        <span class="box">인스펙터</span><span class="box">검증 패널 · 퀵픽스</span><span class="box">버전 비교</span>
+      </div>
+    </div>
+    <p class="flowdown">↓ Cmd (명령) / AasDoc (문서)</p>
+    <div class="lyr">
+      <div class="lh"><b>커널</b><i>@aas/kernel</i></div>
+      <div class="lb">
+        <span class="box a">문서 모델 · 명령 · 역명령</span><span class="box">직렬화 / 파싱 (무손실)</span>
+        <span class="box">증분 검증 4계층</span><span class="box">ConceptDescription 생성</span>
+        <span class="box m">순수 TypeScript · React·DOM·fetch 금지</span>
+      </div>
+    </div>
+    <p class="flowdown">↓ Environment JSON</p>
+    <div class="lyr">
+      <div class="lh"><b>주변 패키지</b><i>packages/*</i></div>
+      <div class="lb">
+        <span class="box">@aas/templates <span class="m">IDTA 정의 + 적합성</span></span>
+        <span class="box">@aas/aasx <span class="m">OPC 패키징 (fflate)</span></span>
+        <span class="box">@aas/semantic <span class="m">IRDI 파서 · 사전 클라이언트</span></span>
+        <span class="box">@aas/ui</span>
+      </div>
+    </div>
+    <p class="flowdown">↓ REST</p>
+    <div class="lyr">
+      <div class="lh"><b>서비스</b><i>apps/api</i></div>
+      <div class="lb">
+        <span class="box">모델 저장소 · 명령 로그 · 버전</span><span class="box">사전 프록시 캐시</span>
+        <span class="box">일괄 생성 워커</span><span class="box">BaSyx 게이트웨이</span>
+        <span class="box m">Hono + Zod + Drizzle/PostgreSQL</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>패키지를 더 쪼개는 이유</h3>
+  <ul>
+    <li><b><code>@aas/aasx</code>를 커널에서 분리</b> — AASX는 ZIP이라 커널의 "의존성 0" 원칙과 충돌합니다. 대신 <code>fflate</code>(브라우저·Node 공용)로 구현해 <b>서버 없이도 브라우저에서 내보내기</b>가 됩니다. 폐쇄망 현장에서 이 차이가 큽니다.</li>
+    <li><b><code>@aas/semantic</code>을 분리</b> — IRDI 파싱은 순수 로직(커널이 씀)이고 사전 조회는 네트워크(웹·API가 씀)입니다. 한 패키지에 두되 <b>파서와 클라이언트를 별도 엔트리로</b> 내보내, 커널은 파서만 가져다 씁니다.</li>
+  </ul>
+
+  <div class="call">
+    <span class="lab">CI로 강제할 경계</span>
+    <p><code>@aas/kernel</code>의 import 그래프에 <code>react</code> · <code>next</code> · <code>hono</code> · <code>fflate</code> · <code>fetch</code>가 나타나면 빌드를 실패시킵니다. 이 검사 하나가 이후 모든 재사용(CLI, 일괄 생성 워커, n8n 노드, Orange 애드온의 JSON 검증)을 지켜 줍니다.</p>
+  </div>
+</section>
+
+<section id="s4">
+  <h2><span class="num">04</span>커널 설계 — 이 계획의 전부</h2>
+  <p class="sub">P1에서 2주를 여기에 씁니다. 다른 열 단계를 다 미뤄도 이것만은 먼저 끝냅니다.</p>
+
+  <h3>문서 모델 — 좌표와 의미를 분리한다</h3>
+  <div class="code">
+    <div class="codebar"><span class="ttl">packages/kernel/src/model.ts</span></div>
+<pre>export type NodeId = string;
+
+<span class="d">/* 의미 문서 — 이것만이 버전·비교·해시의 대상 */</span>
+export interface AasDoc {
+  schema: 1;
+  nodes:  Record&lt;NodeId, AasNode&gt;;
+  <span class="h">order:  Record&lt;NodeId, NodeId[]&gt;;</span>   <span class="d">부모 → 자식. 배열 순서가 곧 모델 순서</span>
+  parent: Record&lt;NodeId, NodeId | null&gt;;
+  roots:  NodeId[];
+}
+
+<span class="d">/* 화면 문서 — 별도 저장. 실행취소·diff·해시에서 제외 */</span>
+export interface Layout {
+  pos:       Record&lt;NodeId, { x: number; y: number }&gt;;
+  collapsed: Record&lt;NodeId, boolean&gt;;
+}</pre>
+  </div>
+  <p><b>바뀌는 것</b> — 프로토타입의 <code>edges</code> 배열이 사라지고 <code>order</code> 맵이 들어옵니다. 부모 하나당 자식 배열 하나이므로 순서 변경이 배열 splice 한 번이고, SubmodelElementList의 <code>orderRelevant</code>가 비로소 의미를 갖습니다. 좌표는 <code>Layout</code>으로 빠져, <b>노드를 옮겼다고 문서가 더러워지지 않습니다.</b></p>
+
+  <h3>명령 — 실행취소·버전·자동화가 한 지점에서 나온다</h3>
+  <div class="code">
+    <div class="codebar"><span class="ttl">packages/kernel/src/command.ts</span></div>
+<pre>export type Cmd =
+  | { t:'insert';   parent:NodeId|null; index:number; node:AasNode }
+  | { t:'remove';   node:NodeId }
+  | { t:'move';     node:NodeId; parent:NodeId; index:number }
+  | { t:'set';      node:NodeId; path:string; value:Json }
+  | { t:'template'; templateId:string; version:string; parent:NodeId|null }
+  | { t:'batch';    label:string; cmds:Cmd[] };        <span class="d">한 번의 실행취소 단위</span>
+
+export function apply(doc: AasDoc, cmd: Cmd):
+  { doc: AasDoc; <span class="h">undo: Cmd[]</span>; rejected?: Reject };
+
+<span class="d">/* 거부는 예외가 아니라 값. 사유를 코드로 돌려준다 */</span>
+export type Reject =
+  { code:'CONTAINMENT'; parent:AasNodeType; child:AasNodeType }
+  | { code:'CYCLE' } | { code:'ALREADY_PARENTED' } | { code:'LIST_TYPE_MISMATCH' };</pre>
+  </div>
+  <p>프로토타입의 <code>connect()</code>가 한국어 문자열을 반환하던 자리에 <b>판별 가능한 코드</b>가 들어갑니다. UI는 코드를 메시지로 번역하고(ko/en), 테스트는 문자열이 아니라 코드로 단언하며, 서버는 같은 코드로 일괄 생성 실패 리포트를 만듭니다.</p>
+
+  <h4>명령 하나로 따라오는 것들</h4>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>기능</th><th>구현</th><th>추가 비용</th></tr></thead>
+    <tbody>
+      <tr><td>실행취소 / 다시실행</td><td class="m">undo 스택에 역명령 push</td><td>거의 없음</td></tr>
+      <tr><td>버전 · 감사 추적</td><td class="m">서버가 명령 로그를 append, N개마다 스냅샷</td><td>스냅샷 정책만</td></tr>
+      <tr><td>버전 비교 (diff)</td><td class="m">두 버전 사이 명령 목록을 사람이 읽는 문장으로</td><td>렌더러만</td></tr>
+      <tr><td>CSV 일괄 생성</td><td class="m">행 하나 → 명령 배열 → apply 반복</td><td>매핑 UI만</td></tr>
+      <tr><td>낙관적 잠금 병합</td><td class="m">충돌 시 상대 명령을 내 문서에 재적용 시도</td><td>충돌 해소 화면</td></tr>
+      <tr><td>실시간 협업 (선택)</td><td class="m">명령을 CRDT 연산으로 승격</td><td>요구가 확인된 뒤에</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>직렬화 계약 — 테스트로 못 박는다</h3>
+  <div class="code">
+    <div class="codebar"><span class="ttl">왕복 불변식</span></div>
+<pre>serialize(doc)          → Environment
+parse(env)              → { doc, warnings[] }
+canonicalize(env)       → Environment   <span class="d">키 정렬 · 빈 배열 제거 · 공백 정규화</span>
+
+<span class="h">∀ doc:  parse(serialize(doc)).doc  ≡  doc</span>                    <span class="d">구조 동등</span>
+<span class="h">∀ env:  canonicalize(serialize(parse(env).doc))  ≡  canonicalize(env)</span>  <span class="d">의미 동등</span></pre>
+  </div>
+  <p><code>canonicalize()</code>를 커널이 제공하는 것이 핵심입니다. Package Explorer가 만든 AASX의 JSON은 키 순서와 빈 배열 처리가 우리와 다릅니다. 텍스트를 비교하면 영원히 실패하지만, 정규화 후 비교하면 <b>"우리 도구가 남의 파일을 손상시키지 않는다"</b>를 CI에서 증명할 수 있습니다.</p>
+
+  <h3>검증 4계층 — 무엇을 누가 판단하는가</h3>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>계층</th><th>담당</th><th>예시</th><th>실행 시점</th></tr></thead>
+    <tbody>
+      <tr><td class="k">L0 구조</td><td>커널 명령</td><td>포함 규칙 위반, 순환 참조 — <b>애초에 만들 수 없음</b></td><td>편집 즉시 (거부)</td></tr>
+      <tr><td class="k">L1 규격</td><td>aas-core3.0</td><td class="m">AASd-002 · 022 · 108 · 120 …</td><td>증분 · 30ms 이내</td></tr>
+      <tr><td class="k">L2 정책</td><td>사내 규칙</td><td>IRI 네임스페이스 규약, 필수 서브모델 존재, 명명 컨벤션</td><td>증분</td></tr>
+      <tr><td class="k">L3 템플릿</td><td>@aas/templates</td><td>필수 요소 누락, 카디널리티, semanticId 이탈</td><td>증분</td></tr>
+      <tr><td class="k">L4 사전</td><td>사전 프록시</td><td>IRDI 실재 여부, 폐기 버전, 후속 버전 안내</td><td>비동기 · 결과 캐시</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>프로토타입의 <code>validate()</code>에 섞여 있던 규격 제약(AASd-022·108·120)은 <b>L1으로 이관하고 지웁니다.</b> 남는 것은 L2뿐입니다. 이슈는 모두 같은 모양을 갖습니다.</p>
+  <div class="code">
+    <div class="codebar"><span class="ttl">packages/kernel/src/issue.ts</span></div>
+<pre>export interface Issue {
+  code:     string;                 <span class="d">'AASd-022' | 'POL-IRI-001' | 'T-002' | 'DIC-004'</span>
+  layer:    'core'|'policy'|'template'|'dictionary';
+  severity: 'error'|'warn'|'info';
+  node:     NodeId;
+  path:     string;                 <span class="d">Submodel/TechnicalProperties/RatedPower</span>
+  message:  { ko:string; en:string };
+  <span class="h">quickFix?: { label:string; cmds:Cmd[] }</span>;   <span class="d">클릭 한 번으로 고치기</span>
+}</pre>
+  </div>
+  <p><code>quickFix</code>가 고도화의 실질입니다. "semanticId 없음" 경고에 <b>사전에서 찾아 채우기</b>, "필수 요소 누락"에 <b>템플릿에서 생성하기</b>, "폐기된 IRDI"에 <b>후속 버전으로 갱신하기</b>를 명령 배열로 붙입니다. 지적만 하는 검증은 결국 무시됩니다.</p>
+
+  <h3>증분 검증 — 타이핑을 막지 않는 방법</h3>
+  <p>노드마다 서브트리 해시를 캐싱하고, 변경된 노드의 <b>조상 체인만</b> 다시 직렬화·검증합니다. 2,000노드 문서에서 속성 값 하나를 고칠 때 재계산 대상은 보통 3~5개 서브트리입니다. JSON 미리보기는 100ms 디바운스로 <b>바뀐 서브모델만</b> 다시 그립니다.</p>
+</section>
+
+<section id="s5">
+  <h2><span class="num">05</span>메타모델 커버리지 확장</h2>
+  <p class="sub">노드 9종 → 15종. 여기까지 오면 Package Explorer가 다루는 범위를 사실상 덮습니다.</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>추가 노드</th><th>modelType</th><th>왜 필요한가</th><th>단계</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Entity</td><td class="m">Entity</td><td>설비 구성(BoM). Hierarchical Structures 02011-1-1의 전제</td><td class="m">P2</td></tr>
+      <tr><td class="k">Relationship</td><td class="m">RelationshipElement</td><td>자산 간 관계 — HasPart / IsPartOf</td><td class="m">P2</td></tr>
+      <tr><td class="k">AnnotatedRel.</td><td class="m">AnnotatedRelationshipElement</td><td>관계에 속성을 붙임 (연결 지점, 수량)</td><td class="m">P2</td></tr>
+      <tr><td class="k">Operation</td><td class="m">Operation</td><td>원격 호출. input/output/inoutput 변수를 자식으로</td><td class="m">P2</td></tr>
+      <tr><td class="k">Blob</td><td class="m">Blob</td><td>내장 바이너리 (File은 참조, Blob은 포함)</td><td class="m">P2</td></tr>
+      <tr><td class="k">Capability</td><td class="m">Capability</td><td>자산이 제공하는 능력 선언</td><td class="m">P2</td></tr>
+      <tr><td class="k">BasicEvent</td><td class="m">BasicEventElement</td><td>값 변경 이벤트 — n8n Watch 노드의 근거</td><td class="m">P8</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>노드가 아닌 것들 — 인스펙터 탭으로</h3>
+  <p>다음은 캔버스에 노드로 띄우면 안 되는 부속 정보입니다. 노드로 만들면 캔버스가 순식간에 읽을 수 없게 됩니다. 인스펙터에 <b>기본 / 시맨틱 / 한정자 / 관리정보</b> 네 탭을 두고 거기서 다룹니다.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>속성</th><th>어디에</th><th>왜 지금 필요한가</th></tr></thead>
+    <tbody>
+      <tr><td class="k">qualifiers[]</td><td>한정자 탭</td><td>Qualifier로 카디널리티·단위·유효기간을 표현. IDTA 템플릿이 실제로 씀</td></tr>
+      <tr><td class="k">extensions[]</td><td>한정자 탭</td><td>사내 확장 정보를 규격 위반 없이 담는 유일한 자리</td></tr>
+      <tr><td class="k">administration</td><td>관리정보 탭</td><td class="m">version · revision · creator · templateId</td></tr>
+      <tr><td class="k">category, displayName</td><td>기본 탭</td><td>displayName은 다국어. idShort와 역할이 다름</td></tr>
+      <tr><td class="k">specificAssetIds[]</td><td>Shell 인스펙터</td><td>사내 설비번호 ↔ 자산 매핑. MES 연동의 접점</td></tr>
+      <tr><td class="k">assetType, defaultThumbnail</td><td>Shell 인스펙터</td><td>Type/Instance 구분과 목록 화면 썸네일</td></tr>
+      <tr><td class="k">derivedFrom</td><td>Shell 인스펙터</td><td>Type Shell로부터 파생 — 설비 100대 일괄 생성의 기반</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="call w">
+    <span class="lab">파싱에서 잃고 있는 것</span>
+    <p>현재 <code>importJson()</code>은 위 항목을 전부 버립니다. 남의 AASX를 열어 저장하면 <b>조용히 정보가 사라집니다.</b> P2가 끝나기 전까지는 "가져오기"를 읽기 전용으로 두거나, 파싱하지 못한 필드를 노드에 <code>_raw</code>로 보존해 그대로 다시 내보내는 편이 안전합니다. 후자를 권합니다.</p>
+  </div>
+</section>
+
+<section id="s6">
+  <h2><span class="num">06</span>시맨틱 자동화 — semanticId에 타입을 준다</h2>
+  <p class="sub">첨부 <code>AAS_semanticId_정리.html</code>의 분석을 코드로 옮기는 단계입니다. 사람이 사전을 검색해 문자열을 복사하는 일을 도구가 대신합니다.</p>
+
+  <div class="call">
+    <span class="lab">결정 반영 · eCl@ss 미보유</span>
+    <p>사전 조회는 <b>IEC CDD 단독</b>으로 설계합니다. eCl@ss IRDI는 <b>입력·보존·출력은 정상 동작</b>하되 실재·버전 검증만 불가능하며, 그 값들은 사양서 대조 여부에 따라 <span class="pill o">사양서 확인</span> 또는 <span class="pill w">미확인</span>으로 남습니다. 사전 어댑터는 <code>DictAdapter</code> 인터페이스로 분리해, 나중에 회원 자격이 생기면 <b>어댑터 하나를 더 붙이는 것으로 끝나게</b> 둡니다.</p>
+  </div>
+
+  <div class="code">
+    <div class="codebar"><span class="ttl">packages/semantic/src/parse.ts</span></div>
+<pre>export interface SemanticRef {
+  raw:     string;
+  scheme:  'iec-cdd' | 'eclass' | 'iri' | 'unknown';
+  code?:   string;      <span class="d">ABA565</span>
+  version?:string;      <span class="d">009  — 끝 세 자리가 사고를 낸다</span>
+  status:  'confirmed' | 'unverified' | 'deprecated' | 'unknown';
+  checkedAt?: string;
+}
+
+<span class="d">eCl@ss  0173-1#02-AAO677#002    ICD-OI#CSI-Code#VI</span>
+<span class="d">IEC CDD 0112/2///61987#ABA565#009    슬래시 개수가 하나만 틀려도 다른 식별자</span>
+<span class="d">IDTA    https://admin-shell.io/idta/nameplate/3/0/Nameplate</span></pre>
+  </div>
+
+  <h3>상태 배지 — 어디서 온 값인지, 무엇으로 확인했는지</h3>
+  <p>eCl@ss를 조회할 수 없게 되면서 <b>"확인됨"을 둘로 쪼개는 것이 중요해졌습니다.</b> 사양서에서 눈으로 대조한 값과 사전이 기계적으로 확인해 준 값은 신뢰 수준이 다릅니다.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>상태</th><th>의미</th><th>어떻게 얻어지나</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill o">사전 확인</span></td><td>IEC CDD에서 실재·현행 확인</td><td>사전 프록시 조회 성공. <code>checkedAt</code> 기록</td></tr>
+      <tr><td><span class="pill o">사양서 확인</span></td><td>IDTA 사양서에서 사람이 대조</td><td>템플릿 JSON의 <code>"verified":"spec"</code>. <b>eCl@ss 보조 식별자 대부분이 여기</b></td></tr>
+      <tr><td><span class="pill w">미확인</span></td><td>입력했으나 아직 대조되지 않음</td><td>인스펙터 직접 입력의 기본 상태. 내보내기 요약에 건수 표시</td></tr>
+      <tr><td><span class="pill e">폐기됨</span></td><td>사전에서 superseded 처리</td><td>사전 프록시가 후속 버전을 함께 반환 → 퀵픽스로 갱신</td></tr>
+      <tr><td><span class="pill n">자체 IRI</span></td><td>사내 도메인 발급</td><td>정책(L2)이 네임스페이스 규약 준수를 검사</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="sub" style="margin-top:14px">첨부 문서가 권고한 자체 IRI 규약 <code>https://{도메인}/ids/cd|sm|aas|asset/…</code>을 L2 정책 규칙 <code>POL-IRI-001</code>로 코드화합니다. 개념 정의와 인스턴스 네임스페이스가 섞이면 경고합니다.</p>
+
+  <h3>사전 프록시 — IEC CDD 단독, 캐시 우선</h3>
+  <div class="code">
+    <div class="codebar"><span class="ttl">apps/api · dictionary cache</span></div>
+<pre>create table dict_concept (
+  irdi        text primary key,
+  scheme      text not null,          <span class="d">iec-cdd (조회) | eclass (보존만)</span>
+  source      text,                   <span class="d">IEC 61987 · 62683 · 62720 …</span>
+  name_ko     text, name_en text, definition text,
+  unit        text, data_type text,   <span class="d">ConceptDescription 생성에 그대로 쓰임</span>
+  status      text,                   <span class="d">current | deprecated | superseded</span>
+  successor   text,
+  payload     jsonb, fetched_at timestamptz );
+
+<span class="d">한글 검색: pg_trgm + bigram 인덱스로 충분 (항목명이 짧다).</span>
+<span class="d">          CDD는 한글 라벨이 없으므로 사내 용어 매핑 테이블을 함께 둔다</span>
+<span class="d">외부 사전 장애 시: stale 캐시 + 경고 응답. 절대 에러를 던지지 않는다</span>
+<span class="d">eCl@ss IRDI: 파싱·표시·출력은 하되 조회하지 않는다 (status = 'unknown')</span></pre>
+  </div>
+  <p class="sub" style="margin-top:-4px">CDD에는 한글 표제어가 없습니다. 현장에서 "정격출력"으로 검색해도 찾히게 하려면 <b>사내 용어 ↔ IRDI 매핑 테이블</b>이 함께 필요합니다. 첨부 문서의 권고대로 <b>가장 많이 교환되는 20~30개 속성</b>만 먼저 채우면 충분합니다.</p>
+
+  <h3>ConceptDescription 자동 생성</h3>
+  <p>문서에서 사용된 semanticId를 모아, 사전 캐시의 <code>unit</code> · <code>dataType</code> · <code>preferredName</code>으로 <code>DataSpecificationIec61360</code>을 채웁니다. 해석되지 않은 값은 조용히 빠지지 않고 <b>내보내기 요약에 건수로</b> 뜹니다.</p>
+  <div class="code">
+    <div class="codebar"><span class="ttl">packages/kernel/src/concept.ts</span></div>
+<pre>buildConceptDescriptions(doc, resolver): { cds: ConceptDescription[]; unresolved: Issue[] }
+
+<span class="d">· id 기준 사전순 정렬 — 골든 테스트가 흔들리지 않도록 결정적으로</span>
+<span class="d">· resolver는 인터페이스. 브라우저는 프록시 호출, 테스트는 픽스처를 주입</span>
+<span class="d">· 커널은 fetch를 모른다 (의존성 경계 유지)</span></pre>
+  </div>
+  <div class="call">
+    <span class="lab">왜 이것이 선택이 아닌가</span>
+    <p>첨부 문서의 지적대로, 값 칸에 <code>"45.2 C"</code>라고 쓰지 않는 이유가 단위는 개념 정의에 속하기 때문입니다. <code>conceptDescriptions</code>가 비어 있으면 수신 측은 <code>45.2</code>가 무엇인지 알 수 없습니다. <b>교환 가능성이 이 배열에 달려 있습니다.</b></p>
+  </div>
+</section>
+
+<section id="s7">
+  <h2><span class="num">07</span>템플릿 엔진 — 삽입으로 끝내지 않는다</h2>
+  <p class="sub">현재는 템플릿이 노드를 뿌리고 사라집니다. 고도화의 핵심은 <b>삽입 후에도 계약이 남는 것</b>입니다.</p>
+
+  <div class="code">
+    <div class="codebar"><span class="ttl">packages/templates/src/idta/nameplate-3-0.json (발췌)</span></div>
+<pre>{
+  "idtaNumber": "02006-3-0", "version": "3.0", "publishedAt": "2024-11",
+  "sourceUrl": "https://industrialdigitaltwin.org/...",
+  "submodel": { "idShort":"Nameplate",
+    "semanticId": { "raw":"https://admin-shell.io/idta/nameplate/3/0/Nameplate",
+                    "verified": true } },
+  "elements": [
+    { "idShort":"ManufacturerName", "modelType":"MultiLanguageProperty",
+      <span class="h">"cardinality": "1..1"</span>,
+      "semanticId": { "raw":"0112/2///61987#ABA565#009", <span class="h">"verified":"spec"</span> },
+      "supplementalSemanticIds": [ { "raw":"0173-1#02-AAO677#004", "verified":"spec" } ] },
+    { "idShort":"AddressInformation", "modelType":"SubmodelElementCollection",
+      "cardinality":"0..1", "elements":[ <span class="d">재귀</span> ] }
+  ]
+}</pre>
+  </div>
+
+  <h3>인스턴스가 템플릿을 기억한다</h3>
+  <p>템플릿으로 만든 Submodel 노드에 <code>templateRef: { id, version }</code>을 남깁니다. 그 순간부터 L3 적합성 검사가 계속 돕니다.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>코드</th><th>검사</th><th>등급</th><th>퀵픽스</th></tr></thead>
+    <tbody>
+      <tr><td class="k">T-001</td><td>필수 요소 누락 (<code>1..1</code> · <code>1..*</code>)</td><td><span class="pill e">ERROR</span></td><td>템플릿에서 생성</td></tr>
+      <tr><td class="k">T-002</td><td>카디널리티 위반 (개수 초과·부족)</td><td><span class="pill e">ERROR</span></td><td>—</td></tr>
+      <tr><td class="k">T-003</td><td>semanticId가 템플릿 지정값과 다름</td><td><span class="pill w">WARN</span></td><td>템플릿 값으로 되돌리기</td></tr>
+      <tr><td class="k">T-004</td><td>템플릿에 없는 요소가 추가됨</td><td><span class="pill n">INFO</span></td><td>—</td></tr>
+      <tr><td class="k">T-005</td><td>더 새 버전의 템플릿이 있음</td><td><span class="pill w">WARN</span></td><td>마이그레이션 미리보기</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>템플릿 개정 마이그레이션</h3>
+  <p>첨부 문서가 지적한 대로 Nameplate 2.0 → 3.0에서는 서브모델 IRI와 속성 IRDI가 <b>동시에</b> 바뀝니다. 이를 매핑 파일로 선언하고, 명령 배열로 변환한 뒤 <b>먼저 미리보기</b>를 보여줍니다.</p>
+  <div class="code">
+    <div class="codebar"><span class="ttl">packages/templates/src/migrations/nameplate-2-0__3-0.json</span></div>
+<pre>{ "from":"02006-2-0", "to":"02006-3-0",
+  "submodelSemanticId": { "from":"https://admin-shell.io/zvei/nameplate/2/0/Nameplate",
+                          "to":  "https://admin-shell.io/idta/nameplate/3/0/Nameplate" },
+  "rename":   [ { "from":"Address", "to":"AddressInformation" } ],
+  "semanticId":[ { "idShort":"ManufacturerName",
+                   "to":"0112/2///61987#ABA565#009",
+                   "supplemental":["0173-1#02-AAO677#004"] } ],
+  "removed":  [ "TransportCarbonFootprint" ],
+  "manual":   [ <span class="d">사람이 판단해야 하는 항목 — 자동 변환하지 않고 목록으로 보고</span> ] }</pre>
+  </div>
+
+  <h3>템플릿 확보 순서</h3>
+  <p>현행 6종을 위 스키마로 옮기고, 플레이북의 <code>template-harvester</code> 서브에이전트로 2종을 추가합니다 — <b>Hierarchical Structures(02011-1-1)</b>와 <b>Asset Interfaces Description(02017-1-1)</b>. 후자는 OPC UA·MQTT 접점을 기술하므로 P8의 n8n 연동과 P9 대시보드의 데이터 경로 근거가 됩니다. 사양서에서 직접 확인하지 못한 semanticId는 <code>"verified":"none"</code>으로 남기고 UI에 <span class="pill w">미확인</span> 배지를 띄웁니다. <b>추측한 값을 조용히 넣지 않는 것이 규칙입니다.</b> eCl@ss 조회가 불가능해진 만큼, 템플릿 harvest 시 <b>사양서 페이지 번호까지 함께 기록</b>해 두면 나중에 재대조가 쉬워집니다.</p>
+</section>
+
+<section id="s8">
+  <h2><span class="num">08</span>에디터 — 세 개의 뷰, 하나의 문서</h2>
+  <p class="sub">캔버스 하나로 버티려는 순간 도구가 무너집니다. 작업의 성격마다 맞는 뷰가 다릅니다.</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>뷰</th><th>무엇에 쓰나</th><th>구현</th></tr></thead>
+    <tbody>
+      <tr><td class="k">캔버스</td><td><b>구조를 만든다</b> — Shell·Submodel·Collection의 관계, BoM 계층</td><td>React Flow + ELK 자동 정렬(Web Worker). 서브트리 접기, 뷰포트 밖 미렌더</td></tr>
+      <tr><td class="k">트리</td><td><b>탐색하고 옮긴다</b> — 키보드만으로 생성·이동·편집. 접근성 대체 경로 겸 대형 모델의 실사용 경로</td><td>가상 스크롤. 방향키·Enter·F2·Ctrl+↑↓로 순서 변경</td></tr>
+      <tr><td class="k">표</td><td><b>대량으로 채운다</b> — 선택한 Submodel·Collection의 자식을 스프레드시트로. 붙여넣기 지원</td><td>열: idShort · modelType · semanticId · valueType · value. 열 단위 일괄 편집</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>세 뷰는 같은 <code>AasDoc</code>을 보고 같은 <code>Cmd</code>를 냅니다. 선택 상태도 공유하므로 <b>캔버스에서 고른 노드가 트리에서 펼쳐지고 표에서 강조</b>됩니다. 검증 이슈 클릭 시 현재 뷰에서 해당 노드로 이동합니다.</p>
+
+  <div class="call">
+    <span class="lab">표 뷰가 실질입니다</span>
+    <p>Nameplate 하나가 요소 15개, Technical Data가 중첩 포함 12개입니다. 설비 한 대에 서브모델 5개면 노드 70~100개입니다. <b>이것을 캔버스에서 그리게 하면 아무도 쓰지 않습니다.</b> 캔버스는 서브모델 수준 구조만 보여주고, 그 안은 표로 채우는 것이 실제 작업 흐름입니다.</p>
+  </div>
+
+  <h3>성능 예산 — 숫자로 못 박는다</h3>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>동작</th><th>조건</th><th>예산</th><th>측정</th></tr></thead>
+    <tbody>
+      <tr><td>키 입력 → 인스펙터 반영</td><td class="n">문서 2,000노드</td><td class="n">&lt; 16 ms</td><td>Playwright 트레이스</td></tr>
+      <tr><td>증분 검증 (L0~L3)</td><td class="n">문서 2,000노드</td><td class="n">&lt; 30 ms</td><td>Vitest 벤치</td></tr>
+      <tr><td>JSON 미리보기 갱신</td><td>변경 서브모델만</td><td class="n">100 ms 디바운스</td><td>—</td></tr>
+      <tr><td>캔버스 드래그</td><td class="n">가시 노드 500</td><td class="n">60 fps</td><td>Playwright 트레이스</td></tr>
+      <tr><td>ELK 자동 정렬</td><td class="n">1,000노드</td><td class="n">&lt; 300 ms</td><td>워커 벤치</td></tr>
+      <tr><td>문서 열기</td><td class="n">2,000노드</td><td class="n">&lt; 1.5 s</td><td>Playwright</td></tr>
+      <tr><td>표 뷰 붙여넣기</td><td class="n">500행</td><td class="n">&lt; 1 s</td><td>Playwright</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>키보드 · 접근성</h3>
+  <p>캔버스는 접근성이 구조적으로 취약합니다. <b>트리 뷰를 완전한 대체 경로로</b> 만들어 생성·연결·편집·삭제가 전부 키보드로 가능해야 합니다. 상태는 색만으로 구분하지 않고 pill 라벨과 아이콘 형태를 함께 씁니다. 포커스 링은 캔버스 노드에도 보여야 합니다.</p>
+</section>
+
+<section id="s9">
+  <h2><span class="num">09</span>서버 · 출력 · 연동</h2>
+
+  <div class="code">
+    <div class="codebar"><span class="ttl">apps/api — 엔드포인트</span></div>
+<pre>GET  POST /models                      목록 · 생성
+GET  PATCH /models/:id                 조회 · 수정 (<span class="h">ETag 낙관적 잠금</span>)
+POST /models/:id/commands              명령 append → 새 버전. 충돌 시 409 (<span class="d">단일 사용자 — 병합 대신 재적재 안내</span>)
+GET  /models/:id/versions              버전 목록
+GET  /models/:id/diff?from=&amp;to=        명령 기반 변경 요약
+POST /models/:id/validate              서버도 <span class="h">같은 커널</span>로 검증. 결과를 저장
+
+GET  /dictionary/search?q=&amp;lang=ko      한글·영문 통합 검색. 캐시 히트 100ms
+GET  /dictionary/:irdi                 단일 조회 + 버전 유효성 + 후속 버전
+
+POST /export/aasx                      스트리밍 ZIP. File 요소가 가리키는 첨부 동봉
+POST /publish/:id                      BaSyx 등록. <span class="d">부분 실패를 롤백하지 않고 항목별 결과 반환</span>
+POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개. 실패 행은 리포트로</pre>
+  </div>
+
+  <div class="call">
+    <span class="lab">결정 반영 · 단일 사용자</span>
+    <p>공동 편집이 요구가 아니므로 <b>병합 화면과 CRDT 준비를 걷어냅니다.</b> 충돌은 한 사람이 탭 두 개를 연 경우뿐이라 ETag 409 + "다시 불러오기"로 충분합니다. 다만 <b>명령 로그 자체는 유지합니다</b> — 버전 비교, "누가 언제 무엇을 바꿨는가", 잘못된 일괄 변경 되돌리기가 전부 여기서 나오고, 이것은 사용자 수와 무관한 가치입니다.</p>
+  </div>
+
+  <h3>AASX 패키징</h3>
+  <p>OPC 패키지 구조는 첨부 문서에 정리된 그대로입니다. <code>@aas/aasx</code>가 브라우저·서버 양쪽에서 같은 코드로 조립합니다.</p>
+  <div class="code">
+    <div class="codebar"><span class="ttl">machine_001.aasx</span></div>
+<pre>├─ [Content_Types].xml
+├─ _rels/.rels
+└─ aasx/
+   ├─ aasx-origin
+   ├─ _rels/aasx-origin.rels
+   ├─ data/environment.json      <span class="d">serialize() 결과 그대로</span>
+   └─ files/                     <span class="d">File 요소가 가리키는 첨부</span></pre>
+  </div>
+  <p>완료 기준은 <b>AASX Package Explorer로 열린다</b>이고, 이를 CI에서 확인할 수 없으므로 <b>구조 검사 테스트 + 사람이 한 번 여는 수동 확인</b>을 병행합니다. 자동화 가능한 대체 검사는 basyx-python-sdk의 AASX reader로 읽어 의미 동등을 확인하는 것입니다.</p>
+
+  <h3>BaSyx 게시</h3>
+  <p><code>{smId}</code>는 전역 id의 Base64URL 인코딩입니다. 값 갱신 경로 <code>PATCH /submodels/{smId}/submodel-elements/{path}/$value</code>가 n8n 연동의 접점이 됩니다. 게시는 셸·서브모델 단위로 부분 성공을 허용하고, 실패 항목만 재시도할 수 있어야 합니다.</p>
+
+  <h3>운전 데이터는 AAS에 담지 않는다</h3>
+  <p>플레이북의 판단을 그대로 따릅니다. n8n이 설비에서 읽어 <b>시계열 저장소(TimescaleDB)에 적재</b>하고 대시보드는 그것을 읽습니다. AAS는 구조와 의미의 원본이지 시계열 데이터베이스가 아닙니다. Time Series Data 서브모델에는 <b>구간 메타데이터와 저장소 참조</b>만 둡니다.</p>
+</section>
+
+<section id="s10">
+  <h2><span class="num">10</span>검증 전략</h2>
+  <p class="sub">"테스트를 짜라"가 아니라 <b>무엇을 지켜야 하는지</b>를 지정합니다.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>층</th><th>도구</th><th>지키는 것</th></tr></thead>
+    <tbody>
+      <tr><td class="k">골든 파일</td><td>Vitest 스냅샷</td><td>템플릿 8종의 출력 JSON이 의도 없이 바뀌지 않을 것. <code>golden:update</code>는 별도 명령으로 분리</td></tr>
+      <tr><td class="k">왕복 속성</td><td>Vitest + fast-check</td><td>임의 문서에서 <code>parse(serialize(doc)) ≡ doc</code></td></tr>
+      <tr><td class="k">외부 파일 왕복</td><td>Vitest</td><td>Package Explorer가 만든 AASX의 JSON을 열고 저장했을 때 <code>canonicalize</code> 기준 의미 동등</td></tr>
+      <tr><td class="k">명령 대칭</td><td>fast-check</td><td>임의 명령 열에 대해 <code>apply → undo</code>가 원문서로 복귀</td></tr>
+      <tr><td class="k">규격 검증</td><td>aas-core3.0</td><td>모든 출력이 AASd-* 위반 0건</td></tr>
+      <tr><td class="k">템플릿 적합성</td><td>Vitest</td><td>템플릿 인스턴스가 자기 템플릿에 대해 T-001·T-002 위반 0건</td></tr>
+      <tr><td class="k">외부 호환</td><td>BaSyx 통합</td><td>docker-compose의 실제 리포지터리에 등록될 것</td></tr>
+      <tr><td class="k">시나리오</td><td>Playwright</td><td>템플릿 삽입 → 표 편집 → 검증 해소 → AASX 내보내기가 끝까지 동작</td></tr>
+      <tr><td class="k">시각 회귀</td><td>Playwright 스크린샷</td><td>라이트/다크 × 1440·768에서 레이아웃 유지</td></tr>
+      <tr><td class="k">성능</td><td>Playwright 트레이스</td><td>08장 예산표의 수치를 CI에서 회귀 검사</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="call w">
+    <span class="lab">골든 파일의 함정</span>
+    <p>테스트 실패를 스냅샷 갱신으로 해결하는 습관이 들면 골든 파일은 의미를 잃습니다. <code>golden:update</code>를 별도 명령으로 두고, 갱신 커밋에는 <b>왜 출력이 바뀌었는지</b>를 반드시 적습니다.</p>
+  </div>
+</section>
+
+<section id="s11">
+  <h2><span class="num">11</span>로드맵</h2>
+  <p class="sub">결정사항 5건을 반영해 <b>직렬 21.5주</b>로 조정했습니다(당초 24주). P9는 별도 워크트리에서 병렬로 돌릴 수 있어 실제로는 18~19주입니다. <b>커널을 건드리는 단계는 절대 병렬로 돌리지 않습니다.</b></p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>단계</th><th>당초</th><th>조정</th><th>이유</th></tr></thead>
+    <tbody>
+      <tr><td class="k">P3 템플릿</td><td class="n">2주</td><td class="n">2.5주</td><td>설비 수십 대 규모에서는 템플릿 품질이 자동화보다 가치가 큼</td></tr>
+      <tr><td class="k">P6 시맨틱</td><td class="n">2주</td><td class="n">1.5주</td><td>사전 어댑터가 IEC CDD 하나. 인터넷 접근 가능해 오프라인 시드 불필요</td></tr>
+      <tr><td class="k">P7 서버</td><td class="n">3주</td><td class="n">2주</td><td>단일 사용자 — 병합 화면·CRDT 준비 제외</td></tr>
+      <tr><td class="k">P8 일괄·n8n</td><td class="n">2주</td><td class="n">1주</td><td>수십 대 규모 — CSV는 고정 컬럼 최소 구현, n8n 노드 팩에 집중</td></tr>
+      <tr><td class="k">P10 마무리</td><td class="n">2주</td><td class="n">1.5주</td><td>폐쇄망 오프라인 설치 이미지 제외</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P0</span><b>실측 — 계획을 싸게 고치는 단계</b><span class="wk">1주</span></div>
+    <div class="phbody">
+      <p>지금 프로토타입으로 <b>실제 설비 3대를 끝까지 모델링</b>합니다. 어떤 노드가 없어서 막히는지, 어떤 검증이 성가신지가 그 자리에서 드러납니다. 재작성 범위를 정하는 가장 싼 방법입니다.</p>
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>설비 3대의 완성 JSON 확보 — 이후 전 단계의 골든 픽스처가 됨</span></label></li>
+        <li><label><input type="checkbox"><span>부족한 노드·필드 목록 작성 (05장 표를 이것으로 갱신)</span></label></li>
+        <li><label><input type="checkbox" checked><span>결정 사항 5건 확정 — <b>완료</b>, 12장 참조</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P1</span><b>커널 — 문서 모델 · 명령 · 무손실 왕복</b><span class="wk">2주</span></div>
+    <div class="phbody">
+      <p>프로토타입의 model·serialize·parse·validate를 <code>@aas/kernel</code>로 옮기면서 <b>order 맵 도입, Layout 분리, 명령 도입, aas-core3.0 위임</b>을 동시에 합니다. 나눠서 하면 두 번 옮기게 됩니다.</p>
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>임의 문서 100건에 대해 <code>parse(serialize(doc)) ≡ doc</code></span></label></li>
+        <li><label><input type="checkbox"><span>임의 명령 열에 대해 apply → undo가 원문서 복귀</span></label></li>
+        <li><label><input type="checkbox"><span>템플릿 6종 전부 aas-core3.0 위반 0건</span></label></li>
+        <li><label><input type="checkbox"><span>P0의 설비 3대 JSON이 의미 동등으로 왕복</span></label></li>
+        <li><label><input type="checkbox"><span>kernel의 의존성 검사 스크립트가 react import를 실제로 막는다</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P2</span><b>메타모델 커버리지 — 노드 6종 · 부속 필드</b><span class="wk">2주</span></div>
+    <div class="phbody">
+      <p>Entity · Relationship · AnnotatedRelationship · Operation · Blob · Capability와 qualifiers · extensions · administration · specificAssetIds. 순서는 <b>model → serialize → parse → validate → 노드 컴포넌트 → 골든 테스트</b>, 하나라도 빠지면 왕복이 깨집니다.</p>
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>Package Explorer 샘플 AASX 3종을 손실 없이 열고 다시 저장</span></label></li>
+        <li><label><input type="checkbox"><span>파싱하지 못한 필드는 <code>_raw</code>로 보존되어 그대로 재출력된다</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P3</span><b>템플릿 엔진 — 정의 · 적합성 · 마이그레이션</b><span class="wk">2.5주</span></div>
+    <div class="phbody">
+      <p>설비 수십 대 규모에서는 <b>일괄 생성보다 템플릿 품질이 훨씬 큰 가치</b>입니다. 반나절 늘려 harvest 결과를 사양서와 두 번 대조하고, 확인 출처(사양서·페이지)를 템플릿 JSON에 남깁니다.</p>
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>템플릿 8종 (기존 6 + Hierarchical Structures + Asset Interfaces Description)</span></label></li>
+        <li><label><input type="checkbox"><span>모든 템플릿에 골든 테스트, 미확인 semanticId는 배지로 노출</span></label></li>
+        <li><label><input type="checkbox"><span>Nameplate 2.0 → 3.0 마이그레이션 미리보기가 동작</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P4</span><b>에디터 셸 — 캔버스 · 트리 · 인스펙터 · 실행취소</b><span class="wk">3주</span></div>
+    <div class="phbody">
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>캔버스·트리·인스펙터가 같은 선택 상태를 공유</span></label></li>
+        <li><label><input type="checkbox"><span>Ctrl+Z가 값 편집·노드 추가·템플릿 삽입을 되돌린다 (노드 이동은 대상 외)</span></label></li>
+        <li><label><input type="checkbox"><span>트리 뷰만으로 생성·이동·편집·삭제가 전부 가능</span></label></li>
+        <li><label><input type="checkbox"><span>08장 성능 예산 중 캔버스·문서 열기 항목 통과</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P5</span><b>표 편집 · 검증 퀵픽스</b><span class="wk">2주</span></div>
+    <div class="phbody">
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>Nameplate 15항목을 표에서 붙여넣기 한 번으로 채운다</span></label></li>
+        <li><label><input type="checkbox"><span>주요 이슈 5종에 퀵픽스가 붙고, 적용이 하나의 실행취소 단위</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P6</span><b>시맨틱 — IEC CDD 프록시 · ConceptDescription</b><span class="wk">1.5주</span></div>
+    <div class="phbody">
+      <p>어댑터가 IEC CDD 하나뿐이고 오프라인 시드 번들이 빠져 반주 줄었습니다. 대신 <b>사내 용어 ↔ IRDI 매핑 20~30건</b>을 이 단계에서 확보합니다.</p>
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>한글 용어로 검색해 IRDI를 찾을 수 있다 (매핑 20건 이상, 1초 이내)</span></label></li>
+        <li><label><input type="checkbox"><span>cdd.iec.ch가 응답하지 않아도 캐시로 편집과 검색이 계속된다</span></label></li>
+        <li><label><input type="checkbox"><span>eCl@ss IRDI가 조회 불가 상태에서도 손실 없이 입력·출력된다</span></label></li>
+        <li><label><input type="checkbox"><span>내보낸 JSON의 conceptDescriptions가 채워지고, 미해석 건수가 요약에 뜬다</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P7</span><b>서버 — 저장소 · 버전 · AASX · BaSyx V2</b><span class="wk">2주</span></div>
+    <div class="phbody">
+      <p>단일 사용자 결정으로 병합 화면과 CRDT 준비가 빠졌습니다. BaSyx는 <b>V2(AAS V3 API)</b> 기준이므로 계획서 09장의 엔드포인트를 그대로 씁니다.</p>
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>탭 두 개로 동시 저장 시 409가 뜨고 재적재 안내가 나온다</span></label></li>
+        <li><label><input type="checkbox"><span>버전 비교가 "무엇이 바뀌었는지"를 문장으로 보여준다</span></label></li>
+        <li><label><input type="checkbox"><span>생성한 AASX가 Package Explorer에서 열린다</span></label></li>
+        <li><label><input type="checkbox"><span>docker-compose의 BaSyx에 실제로 등록된다</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P8</span><b>n8n 노드 팩 · 최소 일괄 생성</b><span class="wk">1주</span></div>
+    <div class="phbody">
+      <p>대상이 수십 대이므로 <b>매핑 UI를 만들지 않습니다.</b> 템플릿별 고정 컬럼 CSV만 받고, 실패 행은 건너뛰어 리포트에 남깁니다. 무게중심은 n8n 노드 팩 — AAS Read Submodel / Write SubmodelElement / Watch Model 세 개이고, 이것이 P9 대시보드의 데이터 경로가 됩니다.</p>
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>설비 50대 Nameplate를 CSV 한 장으로 생성, 실패 행 리포트 확인</span></label></li>
+        <li><label><input type="checkbox"><span>n8n에서 값 갱신이 BaSyx V2에 반영된다</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P9</span><b>대시보드 2종</b><span class="wk">3주</span></div>
+    <div class="phbody">
+      <p>모델 자산 관리(표준 준수 히트맵·검증 이슈 큐·사전 사용 현황)와 설비 운전 모니터링(수집 지연을 1급 지표로). 화면 설계는 플레이북 06장을 그대로 씁니다.</p>
+      <ul class="dod">
+        <li><label><input type="checkbox"><span>두 화면 모두 빈 상태·로딩·오류 화면이 있다</span></label></li>
+        <li><label><input type="checkbox"><span>시계열 10만 점에서 팬·줌이 부드럽다</span></label></li>
+        <li><label><input type="checkbox"><span>히트맵의 빈칸을 클릭하면 해당 템플릿 삽입으로 이어진다</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ph">
+    <div class="phhead"><span class="phid">P10</span><b>접근성 · 다국어 · 배포</b><span class="wk">1.5주</span></div>
+    <div class="phbody">
+      <p>키보드 전용 경로 완성, next-intl로 ko/en (UI 언어와 AAS 데이터 언어를 분리해 다룸), Docker Compose 단일 스택 설치. 인터넷 접근이 가능하므로 <b>폐쇄망 오프라인 이미지는 만들지 않습니다</b> — 다만 사전 캐시는 PostgreSQL 볼륨에 남으므로 일시적 단절에는 그대로 견딥니다.</p>
+    </div>
+  </div>
+</section>
+
+<section id="s12">
+  <h2><span class="num">12</span>확정된 결정과 리스크</h2>
+  <p class="sub">P0의 결정 5건이 확정되어 아래와 같이 반영했습니다. 각 결정이 어느 단계를 어떻게 바꿨는지 함께 적었습니다.</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>결정</th><th>확정</th><th>계획에 반영된 것</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="k">eCl@ss 사전</td>
+        <td><b>미보유</b></td>
+        <td>사전 조회는 IEC CDD 단독. eCl@ss IRDI는 입력·보존·출력만 지원하고 검증하지 않음. 배지를 <span class="pill o">사전 확인</span> / <span class="pill o">사양서 확인</span>으로 분리. <code>DictAdapter</code> 인터페이스로 분리해 추후 확장 여지를 남김 <span class="pill n">06장 · P6</span></td>
+      </tr>
+      <tr>
+        <td class="k">망 환경</td>
+        <td><b>인터넷 접근 가능</b></td>
+        <td>사전 프록시는 실시간 조회 + 캐시. 폐쇄망 시드 번들과 오프라인 설치 이미지를 범위에서 제외 <span class="pill n">P6 −0.5주 · P10 −0.5주</span></td>
+      </tr>
+      <tr>
+        <td class="k">동시 편집</td>
+        <td><b>단일 사용자</b></td>
+        <td>병합 화면과 CRDT 준비 제외. 충돌은 ETag 409 + 재적재 안내. <b>명령 로그·버전·감사 추적은 유지</b> — 사용자 수와 무관한 가치 <span class="pill n">P1 단순화 · P7 −1주</span></td>
+      </tr>
+      <tr>
+        <td class="k">BaSyx</td>
+        <td><b>V2 (AAS V3 API)</b></td>
+        <td>09장의 엔드포인트·Base64URL 식별자·<code>$value</code> 갱신 경로가 그대로 적용. 버전 어댑터 불필요 <span class="pill n">P7 · P8</span></td>
+      </tr>
+      <tr>
+        <td class="k">대상 규모</td>
+        <td><b>수십 대 (10~50)</b></td>
+        <td>CSV 매핑 UI를 만들지 않고 고정 컬럼 최소 구현. 그 시간을 템플릿 품질과 표 편집으로 이전 <span class="pill n">P3 +0.5주 · P8 −1주</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="call w">
+    <span class="lab">규모 결정이 바꾸는 것 하나</span>
+    <p>설비 10~50대라면 <b>자동화보다 사람이 손으로 채우는 시간이 압도적</b>입니다. 따라서 이 프로젝트의 성패는 P8(일괄 생성)이 아니라 <b>P3(템플릿이 얼마나 정확한가)와 P5(표에서 얼마나 빨리 채우는가)</b>에 걸립니다. 이 둘의 완료 기준을 느슨하게 넘기지 마십시오.</p>
+  </div>
+
+  <h3>리스크와 대응</h3>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>리스크</th><th>영향</th><th>대응</th></tr></thead>
+    <tbody>
+      <tr><td>커널 재설계를 미루고 UI부터 만듦</td><td>검증 로직이 컴포넌트에 흩어져 되돌릴 수 없음</td><td>P1을 건너뛰지 않음. P4 이전에 커널 계약을 테스트로 고정</td></tr>
+      <tr><td>템플릿의 IRDI가 그럴듯하지만 틀림</td><td>수신 측이 의미를 해석하지 못함</td><td>"추측 금지" 규칙 + <code>verified:false</code> 배지 + P6의 사전 대조</td></tr>
+      <tr><td>eCl@ss IRDI를 검증할 수 없다 <span class="pill w">확정 리스크</span></td><td>템플릿의 보조 식별자가 사양서 오독이어도 발견되지 않음</td><td>harvest 시 사양서 페이지를 함께 기록하고 두 사람이 대조. IEC CDD에 같은 개념이 있으면 주 식별자로 승격</td></tr>
+      <tr><td>IEC CDD에 한글 표제어가 없다</td><td>현장 용어로 검색이 안 되어 사전 기능을 쓰지 않게 됨</td><td>P6에서 사내 용어 ↔ IRDI 매핑 20~30건을 함께 만든다. 이것이 사전 기능의 실사용 여부를 가른다</td></tr>
+      <tr><td>표 뷰가 캔버스와 어긋남</td><td>같은 문서인데 다르게 보임 — 신뢰 상실</td><td>세 뷰가 같은 <code>AasDoc</code>·<code>Cmd</code>만 쓰도록 강제. 파생 상태 저장 금지</td></tr>
+      <tr><td>범용 트리 편집기로 흘러감</td><td>Package Explorer 재현 — 차별점 상실</td><td>템플릿 적합성·대량 편집·자동 검증 셋에 집중</td></tr>
+      <tr><td>대형 모델에서 캔버스 성능 저하</td><td>수백 노드에서 편집 불가</td><td>08장 예산을 CI 회귀 검사로. 초과하면 기능을 늘리지 않음</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>P0에 남은 일</h3>
+  <p>결정 5건이 끝났으므로 P0에는 <b>실측만 남았습니다</b> — 지금 프로토타입으로 실제 설비 3대를 끝까지 모델링하고, 그 JSON을 이후 전 단계의 골든 픽스처로 삼는 일입니다. 여기서 나온 "없어서 못 그린 노드" 목록으로 05장 표를 갱신하면 P2의 범위가 확정됩니다.</p>
+
+  <div class="call">
+    <span class="lab">먼저 할 일</span>
+    <p>P0(실측 1주)과 P1(커널 2주). <b>이 3주만 끝내면 나머지는 어느 순서로 가도 회복 가능합니다.</b> 캔버스가 먼저 예뻐지는 것보다 커널이 먼저 옳은 것이 비교할 수 없이 중요합니다.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  이 계획은 같은 폴더의 <code>AAS_Node_Composer.html</code>(프로토타입 소스), <code>AAS_툴체인_구축방안.html</code>, <code>AAS_semanticId_정리.html</code>, <code>AAS_개발플레이북.html</code>, <code>machine_001_aas.json</code>을 근거로 작성했습니다. 인용된 IDTA 규격 번호와 IRDI는 각 문서에 실린 참조값이며, 구현 착수 시 IDTA 공식 배포본과 사전에서 최신 버전을 대조해야 합니다. 체크박스 상태는 이 브라우저에만 저장됩니다.
+</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var K='aas-plan/checks/v1';
+  var boxes=[].slice.call(document.querySelectorAll('.dod input[type=checkbox]'));
+  boxes.forEach(function(b,i){ b.dataset.i=i; });
+  var saved={};
+  try{ saved=JSON.parse(localStorage.getItem(K)||'{}')||{}; }catch(e){ saved={}; }
+  boxes.forEach(function(b){
+    if(Object.prototype.hasOwnProperty.call(saved, b.dataset.i)) b.checked=!!saved[b.dataset.i];
+  });
+  function paint(){
+    var done=boxes.filter(function(b){ return b.checked; }).length;
+    var pc=document.getElementById('pc'), pt=document.getElementById('pt'), pb=document.getElementById('pb');
+    if(!pc) return;
+    pc.textContent=done; pt.textContent=boxes.length;
+    pb.style.width=(boxes.length?done/boxes.length*100:0)+'%';
+  }
+  boxes.forEach(function(b){
+    b.addEventListener('change', function(){
+      saved[b.dataset.i]=b.checked;
+      try{ localStorage.setItem(K, JSON.stringify(saved)); }catch(e){}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>

@@ -1,0 +1,29 @@
+{
+  "name": "aas-composer",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "check:kernel": "node scripts/check-kernel-deps.mjs",
+    "verify": "pnpm check:kernel && turbo run typecheck test lint",
+    "golden:update": "vitest run --update --dir packages/kernel",
+    "e2e": "pnpm --filter @aas/e2e e2e",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "prettier": "^3.3.3",
+    "turbo": "^2.1.3",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  },
+  "packageManager": "pnpm@10.28.0"
+}

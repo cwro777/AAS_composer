@@ -1,0 +1,133 @@
+{
+  "id": "idta-02003",
+  "idtaNumber": "IDTA 02003-1-2",
+  "name": "Technical Data",
+  "version": "1.2",
+  "publishedAt": "2022-10",
+  "sourceUrl": "https://industrialdigitaltwin.org/en/content-hub/downloads",
+  "submodel": {
+    "idShort": "TechnicalData",
+    "semanticId": "https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2",
+    "verified": "spec",
+    "idPattern": "{ns}/sm/{asset}/technicaldata"
+  },
+  "elements": [
+    {
+      "t": "smc",
+      "idShort": "GeneralInformation",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1",
+      "children": [
+        {
+          "t": "prop",
+          "idShort": "ManufacturerName",
+          "verified": "none",
+          "required": true,
+          "cardinality": "1",
+          "valueType": "xs:string",
+          "semanticId": "0173-1#02-AAO677#002",
+          "source": "eCl@ss 사전 미대조",
+          "exampleValue": "ACME Machinery"
+        },
+        {
+          "t": "prop",
+          "idShort": "ManufacturerArticleNumber",
+          "verified": "none",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:string",
+          "semanticId": "0173-1#02-AAO676#003",
+          "source": "eCl@ss 사전 미대조",
+          "exampleValue": "MX-200-STD"
+        },
+        {
+          "t": "prop",
+          "idShort": "ManufacturerOrderCode",
+          "verified": "none",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:string",
+          "semanticId": "0173-1#02-AAO227#002",
+          "source": "eCl@ss 사전 미대조",
+          "exampleValue": "MX200-KR-2026"
+        }
+      ],
+      "semanticId": "https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1"
+    },
+    {
+      "t": "smc",
+      "idShort": "ProductClassifications",
+      "verified": "spec",
+      "required": false,
+      "cardinality": "0..1",
+      "children": [
+        {
+          "t": "prop",
+          "idShort": "ClassificationSystem",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:string",
+          "semanticId": "https://admin-shell.io/ZVEI/TechnicalData/ClassificationSystem/1/1",
+          "exampleValue": "ECLASS"
+        },
+        {
+          "t": "prop",
+          "idShort": "ProductClassId",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:string",
+          "semanticId": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassId/1/1",
+          "exampleValue": "27-02-26-01"
+        }
+      ],
+      "semanticId": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassifications/1/1"
+    },
+    {
+      "t": "smc",
+      "idShort": "TechnicalProperties",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1",
+      "children": [
+        {
+          "t": "prop",
+          "idShort": "RatedPower",
+          "verified": "none",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:double",
+          "semanticId": "0173-1#02-AAF018#003",
+          "source": "eCl@ss 사전 미대조",
+          "exampleValue": "15.0"
+        },
+        {
+          "t": "prop",
+          "idShort": "MaxSpindleSpeed",
+          "verified": "none",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:double",
+          "semanticId": "0173-1#02-BAF161#004",
+          "source": "eCl@ss 사전 미대조",
+          "exampleValue": "12000"
+        },
+        {
+          "t": "range",
+          "idShort": "AmbientTemperature",
+          "verified": "none",
+          "required": false,
+          "cardinality": "0..1",
+          "valueType": "xs:double",
+          "min": "5",
+          "max": "40",
+          "semanticId": "0173-1#02-BAA120#008",
+          "source": "eCl@ss 사전 미대조"
+        }
+      ],
+      "semanticId": "https://admin-shell.io/ZVEI/TechnicalData/TechnicalProperties/1/1"
+    }
+  ]
+}

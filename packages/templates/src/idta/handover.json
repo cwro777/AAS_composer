@@ -1,0 +1,242 @@
+{
+  "id": "idta-02004",
+  "idtaNumber": "IDTA 02004-2-0",
+  "name": "Handover Documentation",
+  "version": "2.0",
+  "publishedAt": "2025-07",
+  "sourceUrl": "https://industrialdigitaltwin.io/idta-submodel-templates/Handover%20Documentation/v2.0/index.html",
+  "submodel": {
+    "idShort": "HandoverDocumentation",
+    "semanticId": "0173-1#01-AHF578#003",
+    "verified": "spec",
+    "idPattern": "{ns}/sm/{asset}/handover"
+  },
+  "elements": [
+    {
+      "t": "sml",
+      "idShort": "Documents",
+      "verified": "spec",
+      "required": true,
+      "cardinality": "1..*",
+      "typeValueListElement": "SubmodelElementCollection",
+      "children": [
+        {
+          "t": "smc",
+          "idShort": "Document",
+          "verified": "spec",
+          "required": true,
+          "cardinality": "1",
+          "children": [
+            {
+              "t": "sml",
+              "idShort": "DocumentIds",
+              "verified": "spec",
+              "required": true,
+              "cardinality": "1..*",
+              "typeValueListElement": "SubmodelElementCollection",
+              "children": [
+                {
+                  "t": "smc",
+                  "idShort": "DocumentId",
+                  "verified": "spec",
+                  "required": true,
+                  "cardinality": "1",
+                  "children": [
+                    {
+                      "t": "prop",
+                      "idShort": "DocumentDomainId",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "valueType": "xs:string",
+                      "semanticId": "0173-1#02-ABH994#003",
+                      "source": "IDTA 02004 v2.0 catalog",
+                      "exampleValue": "ACME"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "DocumentIdentifier",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "valueType": "xs:string",
+                      "semanticId": "0173-1#02-AAO099#004",
+                      "source": "IDTA 02004 v2.0 catalog",
+                      "exampleValue": "DOC-MX200-OPM-01"
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "DocumentIsPrimary",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:boolean",
+                      "semanticId": "0173-1#02-ABH995#003",
+                      "source": "IDTA 02004 v2.0 catalog",
+                      "exampleValue": "true"
+                    }
+                  ],
+                  "source": "IDTA 02004 v2.0 catalog"
+                }
+              ],
+              "semanticId": "0173-1#02-ABI501#003",
+              "semanticIdListElement": "0173-1#01-AHF580#003",
+              "source": "IDTA 02004 v2.0 catalog"
+            },
+            {
+              "t": "sml",
+              "idShort": "DocumentClassifications",
+              "verified": "spec",
+              "required": false,
+              "cardinality": "0..1",
+              "typeValueListElement": "SubmodelElementCollection",
+              "children": [
+                {
+                  "t": "smc",
+                  "idShort": "DocumentClassification",
+                  "verified": "spec",
+                  "required": true,
+                  "cardinality": "1",
+                  "children": [
+                    {
+                      "t": "prop",
+                      "idShort": "ClassId",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "valueType": "xs:string",
+                      "semanticId": "0173-1#02-ABH996#003",
+                      "source": "IDTA 02004 v2.0 catalog",
+                      "exampleValue": "03-02"
+                    },
+                    {
+                      "t": "mlp",
+                      "idShort": "ClassName",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "semanticId": "0173-1#02-ABJ219#002",
+                      "source": "IDTA 02004 v2.0 catalog",
+                      "langs": [
+                        {
+                          "language": "en",
+                          "text": "Operation"
+                        }
+                      ]
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "ClassificationSystem",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "valueType": "xs:string",
+                      "semanticId": "0173-1#02-ABH997#003",
+                      "source": "IDTA 02004 v2.0 catalog",
+                      "exampleValue": "VDI2770 Blatt 1:2020"
+                    }
+                  ],
+                  "source": "IDTA 02004 v2.0 catalog"
+                }
+              ],
+              "semanticId": "0173-1#02-ABI502#003",
+              "semanticIdListElement": "0173-1#01-AHF581#003",
+              "source": "IDTA 02004 v2.0 catalog"
+            },
+            {
+              "t": "sml",
+              "idShort": "DocumentVersions",
+              "verified": "spec",
+              "required": false,
+              "cardinality": "0..1",
+              "typeValueListElement": "SubmodelElementCollection",
+              "children": [
+                {
+                  "t": "smc",
+                  "idShort": "DocumentVersion",
+                  "verified": "spec",
+                  "required": true,
+                  "cardinality": "1",
+                  "children": [
+                    {
+                      "t": "mlp",
+                      "idShort": "Title",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1",
+                      "semanticId": "0173-1#02-ABG940#003",
+                      "source": "IDTA 02004 v2.0 catalog",
+                      "langs": [
+                        {
+                          "language": "en",
+                          "text": "Operating Manual MX-200"
+                        }
+                      ]
+                    },
+                    {
+                      "t": "mlp",
+                      "idShort": "Description",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "semanticId": "0173-1#02-AAN466#004",
+                      "source": "IDTA 02004 v2.0 catalog",
+                      "langs": [
+                        {
+                          "language": "en",
+                          "text": "Installation, operation and maintenance"
+                        }
+                      ]
+                    },
+                    {
+                      "t": "prop",
+                      "idShort": "Version",
+                      "verified": "spec",
+                      "required": false,
+                      "cardinality": "0..1",
+                      "valueType": "xs:string",
+                      "semanticId": "0173-1#02-AAP003#005",
+                      "source": "IDTA 02004 v2.0 catalog",
+                      "exampleValue": "1.0"
+                    },
+                    {
+                      "t": "sml",
+                      "idShort": "DigitalFiles",
+                      "verified": "spec",
+                      "required": true,
+                      "cardinality": "1..*",
+                      "typeValueListElement": "File",
+                      "children": [
+                        {
+                          "t": "file",
+                          "idShort": "DigitalFile",
+                          "verified": "spec",
+                          "required": true,
+                          "cardinality": "1",
+                          "contentType": "application/pdf",
+                          "source": "IDTA 02004 v2.0 catalog",
+                          "exampleValue": "/aasx/files/mx200_operating_manual.pdf"
+                        }
+                      ],
+                      "semanticId": "0173-1#02-ABK126#002",
+                      "semanticIdListElement": "0173-1#02-ABK126#002",
+                      "source": "IDTA 02004 v2.0 catalog"
+                    }
+                  ],
+                  "source": "IDTA 02004 v2.0 catalog"
+                }
+              ],
+              "semanticId": "0173-1#02-ABI503#003",
+              "semanticIdListElement": "0173-1#01-AHF582#003",
+              "source": "IDTA 02004 v2.0 catalog"
+            }
+          ],
+          "source": "IDTA 02004 v2.0 catalog"
+        }
+      ],
+      "semanticId": "0173-1#02-ABI500#003",
+      "semanticIdListElement": "0173-1#01-AHF579#003",
+      "source": "IDTA 02004 v2.0 catalog"
+    }
+  ]
+}

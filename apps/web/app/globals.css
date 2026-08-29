@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+@import '@aas/ui/tokens.css';
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

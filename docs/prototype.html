@@ -1,0 +1,1277 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AAS Node Composer</title>
+</head>
+<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#E9ECF1; --grid:#C6CFDB; --surface:#FFFFFF; --surface-2:#F3F6F9; --surface-3:#E7ECF2;
+  --line:#C6D0DC; --line-soft:#DEE4EC;
+  --ink:#111823; --ink-2:#4C596A; --ink-3:#7A8798;
+  --accent:#A85400; --accent-ink:#FFFFFF; --accent-soft:#F5E5D2;
+  --wire:#3B7ABE; --wire-hi:#A85400;
+  --ok:#1B7350; --warn:#7F5900; --err:#A82920;
+  --ok-bg:#DCF0E6; --warn-bg:#F7EBCF; --err-bg:#F7DEDB;
+  --n-shell:#5E4A9E; --n-submodel:#1C6AAC; --n-smc:#0C7370; --n-sml:#3A712B;
+  --n-prop:#A85400; --n-mlp:#9A3A70; --n-range:#71621B; --n-file:#556577; --n-ref:#814527;
+  --sh:0 1px 2px rgba(16,24,36,.10),0 6px 16px rgba(16,24,36,.08);
+  --sh-hi:0 2px 4px rgba(16,24,36,.14),0 12px 28px rgba(16,24,36,.16);
+  --r:5px;
+  --sans:'IBM Plex Sans','IBM Plex Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F131A; --grid:#1F2833; --surface:#161C24; --surface-2:#1C232D; --surface-3:#232B36;
+    --line:#2B3542; --line-soft:#212933;
+    --ink:#DBE3EC; --ink-2:#98A5B5; --ink-3:#6A7889;
+    --accent:#E59A3E; --accent-ink:#1A1206; --accent-soft:#32240F;
+    --wire:#5CA1DF; --wire-hi:#E59A3E;
+    --ok:#4FC08D; --warn:#DEB24C; --err:#EE857C;
+    --ok-bg:#12291F; --warn-bg:#2C2410; --err-bg:#2E1614;
+    --n-shell:#A08EE0; --n-submodel:#5CA1DF; --n-smc:#3CB5B0; --n-sml:#77BC62;
+    --n-prop:#E59A3E; --n-mlp:#DB7CB2; --n-range:#C0AC4E; --n-file:#93A3B5; --n-ref:#C68259;
+    --sh:0 1px 2px rgba(0,0,0,.5),0 6px 16px rgba(0,0,0,.4);
+    --sh-hi:0 2px 4px rgba(0,0,0,.6),0 12px 28px rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F131A; --grid:#1F2833; --surface:#161C24; --surface-2:#1C232D; --surface-3:#232B36;
+  --line:#2B3542; --line-soft:#212933;
+  --ink:#DBE3EC; --ink-2:#98A5B5; --ink-3:#6A7889;
+  --accent:#E59A3E; --accent-ink:#1A1206; --accent-soft:#32240F;
+  --wire:#5CA1DF; --wire-hi:#E59A3E;
+  --ok:#4FC08D; --warn:#DEB24C; --err:#EE857C;
+  --ok-bg:#12291F; --warn-bg:#2C2410; --err-bg:#2E1614;
+  --n-shell:#A08EE0; --n-submodel:#5CA1DF; --n-smc:#3CB5B0; --n-sml:#77BC62;
+  --n-prop:#E59A3E; --n-mlp:#DB7CB2; --n-range:#C0AC4E; --n-file:#93A3B5; --n-ref:#C68259;
+  --sh:0 1px 2px rgba(0,0,0,.5),0 6px 16px rgba(0,0,0,.4);
+  --sh-hi:0 2px 4px rgba(0,0,0,.6),0 12px 28px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.app{display:flex;flex-direction:column;height:100vh;min-height:560px}
+
+/* ── top bar ───────────────────────────────────────── */
+.bar{display:flex;align-items:center;gap:14px;padding:0 14px;height:48px;flex:0 0 48px;
+  background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:9px;padding-right:12px;border-right:1px solid var(--line-soft)}
+.brand b{font-weight:700;letter-spacing:-.01em;font-size:14px}
+.brand span{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.04em}
+.tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;height:29px;padding:0 11px;border:1px solid var(--line);
+  background:var(--surface-2);border-radius:var(--r);cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap;
+  transition:background .12s,border-color .12s}
+.btn:hover{background:var(--surface-3);border-color:var(--ink-3)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.gh{background:transparent}
+.spacer{flex:1}
+.stat{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.02em;display:flex;gap:12px}
+.stat b{color:var(--ink-2);font-weight:600}
+
+/* ── shell layout ──────────────────────────────────── */
+.body{flex:1;display:grid;grid-template-columns:210px minmax(0,1fr) 288px;min-height:0}
+.rail,.insp{background:var(--surface);overflow-y:auto;min-height:0}
+.rail{border-right:1px solid var(--line)}
+.insp{border-left:1px solid var(--line)}
+.sec{padding:12px 12px 14px;border-bottom:1px solid var(--line-soft)}
+.sec:last-child{border-bottom:0}
+.eyebrow{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 9px}
+.hint{font-size:11px;color:var(--ink-3);line-height:1.55;margin:8px 0 0}
+
+/* palette chips */
+.chips{display:flex;flex-direction:column;gap:5px}
+.chip{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--surface-2);cursor:pointer;text-align:left;width:100%;transition:border-color .12s,background .12s}
+.chip:hover{border-color:var(--ink-3);background:var(--surface-3)}
+.chip .sw{width:3px;height:16px;border-radius:1px;flex:0 0 3px}
+.chip .cn{font-weight:500;font-size:12px}
+.chip .cm{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-left:auto}
+.tpl{display:block;width:100%;text-align:left;padding:7px 9px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--surface-2);cursor:pointer;margin-bottom:5px;transition:border-color .12s,background .12s}
+.tpl:hover{border-color:var(--accent);background:var(--surface-3)}
+.tpl b{display:block;font-size:12px;font-weight:600}
+.tpl i{display:block;font-family:var(--mono);font-size:9.5px;font-style:normal;color:var(--ink-3);margin-top:2px;letter-spacing:.02em}
+
+/* ── canvas ────────────────────────────────────────── */
+.stage{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg)}
+.vp{position:relative;flex:1;overflow:hidden;min-height:0;cursor:grab;touch-action:none;
+  background-image:radial-gradient(var(--grid) 1.1px,transparent 1.1px);background-size:22px 22px}
+.vp.panning{cursor:grabbing}
+.vp.wiring{cursor:crosshair}
+#layer{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+#wires{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none}
+#wires path{fill:none;stroke:var(--wire);stroke-width:1.6}
+#wires path.hot{stroke:var(--wire-hi);stroke-width:2.2;stroke-dasharray:5 4}
+
+.node{position:absolute;width:206px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh);user-select:none;transition:box-shadow .12s,border-color .12s}
+.node:hover{box-shadow:var(--sh-hi)}
+.node.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft),var(--sh-hi)}
+.node.bad{border-color:var(--err)}
+.nhead{display:flex;align-items:center;gap:6px;padding:5px 7px 5px 9px;border-bottom:1px solid var(--line-soft);
+  cursor:move;border-radius:var(--r) var(--r) 0 0;background:var(--surface-2)}
+.nstripe{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:var(--r) 0 0 var(--r)}
+.nkind{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.nx{margin-left:auto;border:0;background:transparent;color:var(--ink-3);cursor:pointer;font-size:14px;line-height:1;
+  padding:0 2px;border-radius:3px}
+.nx:hover{color:var(--err);background:var(--err-bg)}
+.nbody{padding:7px 9px 9px}
+.nname{font-weight:600;font-size:12.5px;word-break:break-all;line-height:1.35}
+.nsem{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-top:4px;word-break:break-all;line-height:1.4}
+.nval{font-family:var(--mono);font-size:11px;margin-top:5px;padding:3px 6px;background:var(--surface-3);
+  border-radius:3px;word-break:break-all;line-height:1.4}
+.nval em{font-style:normal;color:var(--ink-3)}
+/* 단자 — 확대율이 낮아도 손가락·마우스로 집을 수 있도록 역보정 스케일 + 넓은 히트 영역 */
+.port{position:absolute;width:11px;height:11px;background:var(--surface);border:1.8px solid var(--wire);
+  border-radius:3px;touch-action:none;transform:scale(var(--pz,1));transform-origin:center;
+  transition:box-shadow .12s,background .12s}
+.port::after{content:'';position:absolute;inset:-10px;border-radius:9px}
+.port.in{left:-7px;top:13px}
+.port.out{right:-7px;top:13px;cursor:crosshair;background:var(--wire)}
+.port.out:hover{box-shadow:0 0 0 4px var(--accent-soft)}
+.node.armed{border-color:var(--accent)}
+.node.armed .port.in{border-color:var(--accent);background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.node.wiresrc{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft),var(--sh-hi)}
+.hintbar{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:6px 14px;border-radius:5px;font-size:12px;font-weight:500;box-shadow:var(--sh-hi);z-index:6;
+  display:none;pointer-events:none;white-space:nowrap;max-width:92%}
+.vp.wiring .hintbar{display:block}
+
+.zoombar{position:absolute;right:12px;bottom:12px;display:flex;gap:4px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r);padding:3px;box-shadow:var(--sh)}
+.zoombar button{width:26px;height:24px;border:0;background:transparent;border-radius:3px;cursor:pointer;font-size:13px}
+.zoombar button:hover{background:var(--surface-3)}
+.zoombar span{display:flex;align-items:center;padding:0 6px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;pointer-events:none;color:var(--ink-3);text-align:center}
+.empty b{font-size:13px;color:var(--ink-2)}
+.empty span{font-size:11.5px;max-width:300px;line-height:1.6}
+
+/* ── drawer ────────────────────────────────────────── */
+.drawer{flex:0 0 auto;background:var(--surface);border-top:1px solid var(--line);display:flex;flex-direction:column}
+.dtabs{display:flex;align-items:center;gap:2px;padding:0 8px;height:34px;border-bottom:1px solid var(--line-soft);flex:0 0 34px}
+.dtab{border:0;background:transparent;padding:0 10px;height:34px;cursor:pointer;font-size:12px;font-weight:500;
+  color:var(--ink-2);border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px}
+.dtab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.count{font-family:var(--mono);font-size:9.5px;font-weight:600;padding:1px 5px;border-radius:8px;background:var(--surface-3);color:var(--ink-2)}
+.count.e{background:var(--err-bg);color:var(--err)}
+.count.w{background:var(--warn-bg);color:var(--warn)}
+.count.o{background:var(--ok-bg);color:var(--ok)}
+.dpanes{height:236px;overflow:auto;min-height:0}
+.drawer.min .dpanes{display:none}
+.pane{display:none;height:100%}
+.pane.on{display:block}
+#json{margin:0;padding:12px 14px;font-family:var(--mono);font-size:11.5px;line-height:1.65;white-space:pre;
+  color:var(--ink-2);tab-size:2}
+#json .k{color:var(--n-submodel)} #json .s{color:var(--ok)} #json .n{color:var(--n-prop)} #json .b{color:var(--n-mlp)}
+.issues{padding:8px 10px;display:flex;flex-direction:column;gap:5px}
+.iss{display:flex;gap:9px;align-items:flex-start;padding:7px 9px;border:1px solid var(--line-soft);border-radius:var(--r);
+  background:var(--surface-2);cursor:pointer;text-align:left;width:100%}
+.iss:hover{border-color:var(--ink-3)}
+.iss .sv{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.08em;padding:2px 5px;border-radius:3px;flex:0 0 auto;margin-top:1px}
+.iss .sv.E{background:var(--err-bg);color:var(--err)} .iss .sv.W{background:var(--warn-bg);color:var(--warn)}
+.iss p{margin:0;font-size:12px;line-height:1.5}
+.iss code{font-family:var(--mono);font-size:11px;background:var(--surface-3);padding:1px 4px;border-radius:3px}
+.clean{padding:26px;text-align:center;color:var(--ok);font-size:12.5px}
+
+/* ── inspector ─────────────────────────────────────── */
+.f{margin-bottom:10px}
+.f label{display:block;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.f input,.f select,.f textarea{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:4px;
+  background:var(--surface-2);font-size:12px}
+.f input,.f textarea{font-family:var(--mono);font-size:11.5px}
+.f textarea{resize:vertical;min-height:52px;line-height:1.5}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--accent);background:var(--surface)}
+.f .note{font-size:10.5px;color:var(--ink-3);margin-top:3px;line-height:1.45}
+.row{display:grid;grid-template-columns:64px 1fr auto;gap:5px;margin-bottom:5px;align-items:center}
+.row input{font-family:var(--mono);font-size:11.5px;padding:5px 7px;border:1px solid var(--line);border-radius:4px;background:var(--surface-2);width:100%}
+.row button{border:1px solid var(--line);background:var(--surface-2);border-radius:4px;cursor:pointer;width:24px;height:26px;color:var(--ink-3)}
+.row button:hover{color:var(--err);border-color:var(--err)}
+.mini{border:1px dashed var(--line);background:transparent;border-radius:4px;padding:4px 8px;cursor:pointer;
+  font-size:11px;color:var(--ink-2);width:100%}
+.mini:hover{border-color:var(--accent);color:var(--accent)}
+.idbadge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:3px;background:var(--surface-3)}
+.idbadge .sw{width:3px;height:11px;border-radius:1px}
+.nothing{padding:34px 16px;text-align:center;color:var(--ink-3);font-size:12px;line-height:1.65}
+.danger{border-color:var(--err);color:var(--err)}
+.danger:hover{background:var(--err-bg);border-color:var(--err)}
+
+/* ── toast ─────────────────────────────────────────── */
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(14px);opacity:0;
+  background:var(--ink);color:var(--bg);padding:8px 15px;border-radius:var(--r);font-size:12px;font-weight:500;
+  pointer-events:none;transition:opacity .18s,transform .18s;z-index:50;box-shadow:var(--sh-hi);max-width:88vw}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:1080px){
+  .body{grid-template-columns:180px minmax(0,1fr) 250px}
+}
+@media (max-width:860px){
+  .body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(240px,1fr) auto}
+  .rail{border-right:0;border-bottom:1px solid var(--line);max-height:180px}
+  .insp{border-left:0;border-top:1px solid var(--line);max-height:280px}
+}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <div class="brand"><b>AAS Node Composer</b><span>IEC 63278 · V3.0</span></div>
+    <div class="tools">
+      <button class="btn" id="b-sample">샘플 자산</button>
+      <button class="btn" id="b-import">JSON 가져오기</button>
+      <button class="btn" id="b-layout">자동 정렬</button>
+      <button class="btn gh danger" id="b-clear">전체 삭제</button>
+      <button class="btn pri" id="b-copy">JSON 복사</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="stat">
+      <span>SHELL <b id="s-shell">0</b></span>
+      <span>SUBMODEL <b id="s-sm">0</b></span>
+      <span>ELEMENT <b id="s-el">0</b></span>
+    </div>
+  </header>
+
+  <div class="body">
+    <!-- palette -->
+    <aside class="rail">
+      <div class="sec">
+        <p class="eyebrow">노드 추가</p>
+        <div class="chips" id="palette"></div>
+        <p class="hint"><b>연결하는 세 가지 방법</b><br>
+          ① 오른쪽 단자를 <b>끌어서</b> 대상 노드에 놓기<br>
+          ② 오른쪽 단자를 <b>한 번 클릭</b>한 뒤 대상 노드를 클릭 (Esc로 취소)<br>
+          ③ 대상 노드를 선택하고 인스펙터의 <b>상위 노드</b>에서 고르기<br>
+          연결 가능한 노드는 주황 테두리로 표시되며, AAS 규칙에 어긋나면 거부됩니다.</p>
+      </div>
+      <div class="sec">
+        <p class="eyebrow">IDTA 표준 서브모델</p>
+        <div id="templates"></div>
+        <p class="hint">템플릿을 누르면 해당 서브모델과 필수 요소가 semanticId까지 채워진 채 캔버스에 놓입니다.</p>
+      </div>
+    </aside>
+
+    <!-- canvas + drawer -->
+    <main class="stage">
+      <div class="vp" id="vp">
+        <div id="layer"><svg id="wires"></svg></div>
+        <div class="empty" id="empty">
+          <b>캔버스가 비어 있습니다</b>
+          <span>왼쪽에서 <b>AAS Shell</b>을 추가하거나, IDTA 표준 서브모델 템플릿을 눌러 시작하세요.</span>
+        </div>
+        <div class="hintbar" id="hintbar">연결할 노드를 클릭하세요 · Esc로 취소</div>
+        <div class="zoombar">
+          <button id="z-out" title="축소">−</button>
+          <span id="z-val">100%</span>
+          <button id="z-in" title="확대">+</button>
+          <button id="z-fit" title="전체 보기">⤢</button>
+        </div>
+      </div>
+
+      <div class="drawer" id="drawer">
+        <div class="dtabs" role="tablist">
+          <button class="dtab" role="tab" aria-selected="true" data-pane="p-json">출력 JSON</button>
+          <button class="dtab" role="tab" aria-selected="false" data-pane="p-val">검증 <span class="count o" id="c-val">0</span></button>
+          <div class="spacer"></div>
+          <button class="btn gh" id="b-min">패널 접기</button>
+        </div>
+        <div class="dpanes">
+          <div class="pane on" id="p-json"><pre id="json"></pre></div>
+          <div class="pane" id="p-val"><div class="issues" id="issues"></div></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- inspector -->
+    <aside class="insp" id="insp"></aside>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ══════════════════════════════════════════════════════════════
+   1. 메타모델 정의 — IEC 63278-1 (AAS Part 1) V3.0
+   ══════════════════════════════════════════════════════════════ */
+var ELEMENTS = ['prop','mlp','range','smc','sml','file','ref'];
+var TYPES = {
+  shell   :{label:'AAS Shell',    kind:'AssetAdministrationShell',  hue:'--n-shell',    accepts:['submodel'], identifiable:true},
+  submodel:{label:'Submodel',     kind:'Submodel',                  hue:'--n-submodel', accepts:ELEMENTS,     identifiable:true},
+  smc     :{label:'Collection',   kind:'SubmodelElementCollection', hue:'--n-smc',      accepts:ELEMENTS},
+  sml     :{label:'List',         kind:'SubmodelElementList',       hue:'--n-sml',      accepts:ELEMENTS},
+  prop    :{label:'Property',     kind:'Property',                  hue:'--n-prop',     accepts:[]},
+  mlp     :{label:'MultiLang',    kind:'MultiLanguageProperty',     hue:'--n-mlp',      accepts:[]},
+  range   :{label:'Range',        kind:'Range',                     hue:'--n-range',    accepts:[]},
+  file    :{label:'File',         kind:'File',                      hue:'--n-file',     accepts:[]},
+  ref     :{label:'Reference',    kind:'ReferenceElement',          hue:'--n-ref',      accepts:[]}
+};
+var VALUE_TYPES = ['xs:string','xs:double','xs:float','xs:decimal','xs:integer','xs:int','xs:long',
+  'xs:boolean','xs:dateTime','xs:date','xs:time','xs:anyURI','xs:byte','xs:unsignedInt'];
+
+/* semanticId 참조값 — IEC CDD IRDI(주) / eCl@ss IRDI(보조) / IDTA IRI.
+   각 템플릿은 해당 IDTA 사양서 카탈로그에서 확인한 값입니다. */
+var TEMPLATES = {
+  nameplate:{
+    name:'Digital Nameplate', spec:'IDTA 02006-3-0 (2024-11)',
+    sm:{idShort:'Nameplate', id:'https://example.com/ids/sm/nameplate/1',
+        sem:'https://admin-shell.io/idta/nameplate/3/0/Nameplate'},
+    kids:[
+      {t:'prop',idShort:'URIOfTheProduct',vt:'xs:anyURI',v:'https://example.com/products/MX-200/0001',
+       sem:'0112/2///61987#ABN590#002', sup:'0173-1#02-ABH173#003'},
+      {t:'mlp', idShort:'ManufacturerName',langs:[{language:'en',text:'ACME Machinery'},{language:'ko',text:'에이스머시너리'}],
+       sem:'0112/2///61987#ABA565#009', sup:'0173-1#02-AAO677#004'},
+      {t:'mlp', idShort:'ManufacturerProductDesignation',langs:[{language:'en',text:'CNC Milling Center MX-200'}],
+       sem:'0112/2///61987#ABA567#009', sup:'0173-1#02-AAW338#003'},
+      {t:'smc', idShort:'AddressInformation',
+       sem:'https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/AddressInformation',
+       sup:'0112/2///61360_7#AAS002#001 0173-1#02-AAQ837#008',
+       kids:[
+         {t:'mlp',idShort:'Street',langs:[{language:'ko',text:'과학산단로 123'}],sem:'0173-1#02-AAO128#002'},
+         {t:'mlp',idShort:'Zipcode',langs:[{language:'ko',text:'46744'}],sem:'0173-1#02-AAO129#002'},
+         {t:'mlp',idShort:'CityTown',langs:[{language:'ko',text:'부산'}],sem:'0173-1#02-AAO132#002'},
+         {t:'mlp',idShort:'NationalCode',langs:[{language:'en',text:'KR'}],sem:'0173-1#02-AAO134#002'}
+       ]},
+      {t:'mlp', idShort:'ManufacturerProductRoot',langs:[{language:'en',text:'Milling machine'}],
+       sem:'0112/2///61360_7#AAS011#001', sup:'0173-1#02-AAU732#003'},
+      {t:'mlp', idShort:'ManufacturerProductFamily',langs:[{language:'en',text:'MX series'}],
+       sem:'0112/2///61987#ABP464#002', sup:'0173-1#02-AAU731#003'},
+      {t:'prop',idShort:'ManufacturerProductType',vt:'xs:string',v:'MX-200',
+       sem:'0112/2///61987#ABA300#008', sup:'0173-1#02-AAO057#004'},
+      {t:'prop',idShort:'OrderCodeOfManufacturer',vt:'xs:string',v:'MX200-KR-2026',
+       sem:'0112/2///61987#ABA950#008', sup:'0173-1#02-AAO227#004'},
+      {t:'prop',idShort:'ProductArticleNumberOfManufacturer',vt:'xs:string',v:'MX-200-STD',
+       sem:'0112/2///61987#ABA581#007', sup:'0173-1#02-AAO676#005'},
+      {t:'prop',idShort:'SerialNumber',vt:'xs:string',v:'SN-2026-000187',
+       sem:'0112/2///61987#ABA951#009', sup:'0173-1#02-AAM556#004'},
+      {t:'prop',idShort:'YearOfConstruction',vt:'xs:string',v:'2026',
+       sem:'0112/2///61987#ABP000#002', sup:'0173-1#02-AAP906#003'},
+      {t:'prop',idShort:'DateOfManufacture',vt:'xs:date',v:'2026-03-14',
+       sem:'0112/2///61987#ABB757#007', sup:'0173-1#02-AAR972#004'},
+      {t:'prop',idShort:'CountryOfOrigin',vt:'xs:string',v:'KR',
+       sem:'0112/2///61987#ABP462#001', sup:'0173-1#02-AAO259#007'},
+      {t:'file',idShort:'CompanyLogo',ct:'image/png',v:'/aasx/files/acme_logo.png',
+       sem:'0112/2///61987#ABP463#001', sup:'0173-1#02-ABI776#002'}
+    ]},
+  technical:{
+    name:'Technical Data', spec:'IDTA 02003-1-2 (2022-10)',
+    sm:{idShort:'TechnicalData', id:'https://example.com/ids/sm/technicaldata/1',
+        sem:'https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2'},
+    kids:[
+      {t:'smc',idShort:'GeneralInformation',sem:'https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1',
+       kids:[
+         {t:'prop',idShort:'ManufacturerName',vt:'xs:string',v:'ACME Machinery',sem:'0173-1#02-AAO677#002'},
+         {t:'prop',idShort:'ManufacturerArticleNumber',vt:'xs:string',v:'MX-200-STD',sem:'0173-1#02-AAO676#003'},
+         {t:'prop',idShort:'ManufacturerOrderCode',vt:'xs:string',v:'MX200-KR-2026',sem:'0173-1#02-AAO227#002'}
+       ]},
+      {t:'smc',idShort:'ProductClassifications',sem:'https://admin-shell.io/ZVEI/TechnicalData/ProductClassifications/1/1',
+       kids:[
+         {t:'prop',idShort:'ClassificationSystem',vt:'xs:string',v:'ECLASS',sem:'https://admin-shell.io/ZVEI/TechnicalData/ClassificationSystem/1/1'},
+         {t:'prop',idShort:'ProductClassId',vt:'xs:string',v:'27-02-26-01',sem:'https://admin-shell.io/ZVEI/TechnicalData/ProductClassId/1/1'}
+       ]},
+      {t:'smc',idShort:'TechnicalProperties',sem:'https://admin-shell.io/ZVEI/TechnicalData/TechnicalProperties/1/1',
+       kids:[
+         {t:'prop',idShort:'RatedPower',vt:'xs:double',v:'15.0',sem:'0173-1#02-AAF018#003'},
+         {t:'prop',idShort:'MaxSpindleSpeed',vt:'xs:double',v:'12000',sem:'0173-1#02-BAF161#004'},
+         {t:'range',idShort:'AmbientTemperature',vt:'xs:double',min:'5',max:'40',sem:'0173-1#02-BAA120#008'}
+       ]}
+    ]},
+  handover:{
+    name:'Handover Documentation', spec:'IDTA 02004-2-0 (2025-07)',
+    sm:{idShort:'HandoverDocumentation', id:'https://example.com/ids/sm/handover/1',
+        sem:'0173-1#01-AHF578#003'},
+    kids:[
+      {t:'sml',idShort:'Documents',listType:'SubmodelElementCollection',
+       sem:'0173-1#02-ABI500#003', listSem:'0173-1#01-AHF579#003',
+       kids:[
+         {t:'smc',idShort:'Document',kids:[
+           {t:'sml',idShort:'DocumentIds',listType:'SubmodelElementCollection',
+            sem:'0173-1#02-ABI501#003', listSem:'0173-1#01-AHF580#003',
+            kids:[
+              {t:'smc',idShort:'DocumentId',kids:[
+                {t:'prop',idShort:'DocumentDomainId',vt:'xs:string',v:'ACME',sem:'0173-1#02-ABH994#003'},
+                {t:'prop',idShort:'DocumentIdentifier',vt:'xs:string',v:'DOC-MX200-OPM-01',sem:'0173-1#02-AAO099#004'},
+                {t:'prop',idShort:'DocumentIsPrimary',vt:'xs:boolean',v:'true',sem:'0173-1#02-ABH995#003'}
+              ]}
+            ]},
+           {t:'sml',idShort:'DocumentClassifications',listType:'SubmodelElementCollection',
+            sem:'0173-1#02-ABI502#003', listSem:'0173-1#01-AHF581#003',
+            kids:[
+              {t:'smc',idShort:'DocumentClassification',kids:[
+                {t:'prop',idShort:'ClassId',vt:'xs:string',v:'03-02',sem:'0173-1#02-ABH996#003'},
+                {t:'mlp', idShort:'ClassName',langs:[{language:'en',text:'Operation'}],sem:'0173-1#02-ABJ219#002'},
+                {t:'prop',idShort:'ClassificationSystem',vt:'xs:string',v:'VDI2770 Blatt 1:2020',sem:'0173-1#02-ABH997#003'}
+              ]}
+            ]},
+           {t:'sml',idShort:'DocumentVersions',listType:'SubmodelElementCollection',
+            sem:'0173-1#02-ABI503#003', listSem:'0173-1#01-AHF582#003',
+            kids:[
+              {t:'smc',idShort:'DocumentVersion',kids:[
+                {t:'mlp', idShort:'Title',langs:[{language:'en',text:'Operating Manual MX-200'}],sem:'0173-1#02-ABG940#003'},
+                {t:'mlp', idShort:'Description',langs:[{language:'en',text:'Installation, operation and maintenance'}],sem:'0173-1#02-AAN466#004'},
+                {t:'prop',idShort:'Version',vt:'xs:string',v:'1.0',sem:'0173-1#02-AAP003#005'},
+                {t:'sml', idShort:'DigitalFiles',listType:'File',sem:'0173-1#02-ABK126#002',
+                 listSem:'0173-1#02-ABK126#002',
+                 kids:[ {t:'file',idShort:'DigitalFile',ct:'application/pdf',v:'/aasx/files/mx200_operating_manual.pdf'} ]}
+              ]}
+            ]}
+         ]}
+       ]}
+    ]},
+  timeseries:{
+    name:'Time Series Data', spec:'IDTA 02008-1-1 (2023-03)',
+    sm:{idShort:'TimeSeries', id:'https://example.com/ids/sm/timeseries/1',
+        sem:'https://admin-shell.io/idta/TimeSeries/1/1'},
+    kids:[
+      {t:'smc',idShort:'Metadata',sem:'https://admin-shell.io/idta/TimeSeries/Metadata/1/1',kids:[
+        {t:'mlp',idShort:'Name',langs:[{language:'en',text:'Spindle temperature series'}],sem:'https://admin-shell.io/idta/TimeSeries/Metadata/Name/1/1'},
+        {t:'prop',idShort:'RecordCount',vt:'xs:long',v:'8640',sem:'https://admin-shell.io/idta/TimeSeries/Segment/RecordCount/1/1'}
+      ]},
+      {t:'smc',idShort:'Segments',sem:'https://admin-shell.io/idta/TimeSeries/Segments/1/1',kids:[
+        {t:'prop',idShort:'StartTime',vt:'xs:dateTime',v:'2026-08-26T00:00:00+09:00',sem:'https://admin-shell.io/idta/TimeSeries/Segment/StartTime/1/1'},
+        {t:'prop',idShort:'EndTime',vt:'xs:dateTime',v:'2026-08-26T23:59:59+09:00',sem:'https://admin-shell.io/idta/TimeSeries/Segment/EndTime/1/1'},
+        {t:'prop',idShort:'SamplingInterval',vt:'xs:double',v:'10.0',sem:'https://admin-shell.io/idta/TimeSeries/Segment/SamplingInterval/1/1'}
+      ]}
+    ]},
+  carbon:{
+    name:'Carbon Footprint', spec:'IDTA 02023 v1.0 (2025-03)',
+    sm:{idShort:'CarbonFootprint', id:'https://example.com/ids/sm/carbonfootprint/1',
+        sem:'https://admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0'},
+    kids:[
+      {t:'sml',idShort:'ProductCarbonFootprints',listType:'SubmodelElementCollection',
+       sem:'https://admin-shell.io/idta/CarbonFootprint/ProductCarbonFootprints/1/0',
+       listSem:'https://admin-shell.io/idta/CarbonFootprint/ProductCarbonFootprint/1/0',
+       kids:[
+         {t:'smc',idShort:'ProductCarbonFootprint',
+          sem:'https://admin-shell.io/idta/CarbonFootprint/ProductCarbonFootprint/1/0',
+          kids:[
+            {t:'prop',idShort:'PcfCalculationMethod',vt:'xs:string',v:'ISO 14067',sem:'0173-1#02-ABG854#003'},
+            {t:'prop',idShort:'PcfCO2eq',vt:'xs:double',v:'1842.5',sem:'0173-1#02-ABG855#003'},
+            {t:'prop',idShort:'ReferenceImpactUnitForCalculation',vt:'xs:string',v:'piece',sem:'0173-1#02-ABG856#003'},
+            {t:'prop',idShort:'QuantityOfMeasureForCalculation',vt:'xs:double',v:'1.0',sem:'0173-1#02-ABG857#003'},
+            {t:'sml', idShort:'LifeCyclePhases',listType:'Property',
+             sem:'https://admin-shell.io/idta/CarbonFootprint/LifeCyclePhases/1/0',
+             listSem:'0173-1#02-ABG858#003',
+             kids:[ {t:'prop',idShort:'LifeCyclePhase',vt:'xs:string',v:'A3 - production'} ]},
+            {t:'prop',idShort:'PublicationDate',vt:'xs:dateTime',v:'2026-03-14T00:00:00+09:00',
+             sem:'https://admin-shell.io/idta/CarbonFootprint/PublicationDate/1/0'},
+            {t:'prop',idShort:'ExpirationDate',vt:'xs:dateTime',v:'2027-03-14T00:00:00+09:00',
+             sem:'https://admin-shell.io/idta/CarbonFootprint/ExpirationDate/1/0'}
+          ]}
+       ]}
+    ]},
+  operational:{
+    name:'Operational Data', spec:'사내 정의 · 첨부 문서 기준',
+    sm:{idShort:'OperationalData', id:'https://example.com/ids/sm/operational_data_001',
+        sem:'https://admin-shell.io/idta/OperationalData/1/0'},
+    kids:[
+      {t:'prop',idShort:'CurrentTemperature',vt:'xs:double',v:'45.2',sem:'0173-1#02-BAA092#002'},
+      {t:'prop',idShort:'RotationSpeed',vt:'xs:double',v:'1450',sem:'0173-1#02-BAF161#004'},
+      {t:'prop',idShort:'OperatingHours',vt:'xs:double',v:'12874.5',sem:'0173-1#02-AAH252#003'},
+      {t:'prop',idShort:'MachineState',vt:'xs:string',v:'Running',sem:'0173-1#02-ABH789#001'},
+      {t:'prop',idShort:'Timestamp',vt:'xs:dateTime',v:'2026-08-26T09:30:00+09:00',sem:'https://admin-shell.io/idta/TimeSeries/UtcTime/1/1'}
+    ]}
+};
+
+/* ══════════════════════════════════════════════════════════════
+   2. 상태
+   ══════════════════════════════════════════════════════════════ */
+var S = {nodes:{}, edges:[], sel:null, seq:1, pan:{x:40,y:30}, zoom:1};
+var LS = 'aas-node-composer/v1';
+
+function uid(p){ return p + (S.seq++); }
+function parentOf(id){ for(var i=0;i<S.edges.length;i++) if(S.edges[i].to===id) return S.edges[i].from; return null; }
+function childrenOf(id){ return S.edges.filter(function(e){return e.from===id;}).map(function(e){return e.to;}); }
+
+function makeNode(type, patch){
+  var n = {id:uid('n'), type:type, x:0, y:0, idShort:'', sem:'', sup:'', desc:''};
+  if(type==='shell'){ n.id_=''; n.assetKind='Instance'; n.globalAssetId=''; }
+  if(type==='submodel'){ n.id_=''; n.smKind='Instance'; }
+  if(type==='prop'){ n.vt='xs:string'; n.v=''; }
+  if(type==='range'){ n.vt='xs:double'; n.min=''; n.max=''; }
+  if(type==='mlp'){ n.langs=[{language:'en',text:''}]; }
+  if(type==='file'){ n.ct='application/pdf'; n.v=''; }
+  if(type==='ref'){ n.refValue=''; }
+  if(type==='sml'){ n.listType='Property'; n.listSem=''; }
+  if(patch) for(var k in patch) n[k]=patch[k];
+  S.nodes[n.id]=n; return n;
+}
+
+function addNode(type){
+  var n = makeNode(type);
+  var seed = {shell:'MyAsset_AAS', submodel:'MySubmodel', smc:'MyCollection', sml:'MyList',
+              prop:'MyProperty', mlp:'MyText', range:'MyRange', file:'MyDocument', ref:'MyReference'};
+  n.idShort = uniqueShort(seed[type]);
+  if(type==='shell'){ n.id_='https://example.com/ids/aas/'+n.idShort.toLowerCase(); n.globalAssetId='https://example.com/ids/asset/'+n.idShort.toLowerCase(); }
+  if(type==='submodel'){ n.id_='https://example.com/ids/sm/'+n.idShort.toLowerCase(); }
+  var c = centerOfView(); n.x = c.x - 103; n.y = c.y - 30;
+  S.sel = n.id; render(); return n;
+}
+
+function uniqueShort(base){
+  var taken={}, k; for(k in S.nodes) taken[S.nodes[k].idShort]=1;
+  if(!taken[base]) return base;
+  var i=2; while(taken[base+'_'+i]) i++; return base+'_'+i;
+}
+
+function removeNode(id){
+  var kids = childrenOf(id);
+  kids.forEach(removeNode);
+  delete S.nodes[id];
+  S.edges = S.edges.filter(function(e){ return e.from!==id && e.to!==id; });
+  if(S.sel===id) S.sel=null;
+}
+
+function connect(from,to){
+  if(from===to) return '같은 노드끼리는 연결할 수 없습니다.';
+  var pt = S.nodes[from].type, ct = S.nodes[to].type;
+  if(TYPES[pt].accepts.indexOf(ct)<0) return TYPES[pt].label+' 안에는 '+TYPES[ct].label+'을(를) 넣을 수 없습니다.';
+  if(parentOf(to)) return '이미 다른 노드에 포함된 요소입니다. 기존 연결을 먼저 끊으세요.';
+  var p=from; while(p){ if(p===to) return '순환 참조는 만들 수 없습니다.'; p=parentOf(p); }
+  S.edges.push({from:from,to:to}); return null;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3. 직렬화 — AAS Part 1 V3.0 JSON
+   ══════════════════════════════════════════════════════════════ */
+function extRef(v){ return {type:'ExternalReference', keys:[{type:'GlobalReference', value:v}]}; }
+function modelRef(kind,v){ return {type:'ModelReference', keys:[{type:kind, value:v}]}; }
+function desc(n){ return n.desc ? [{language:'ko', text:n.desc}] : null; }
+
+/* supplementalSemanticIds — 공백·쉼표·세미콜론으로 여러 개 구분 */
+function supRefs(n){
+  return (n.sup||'').split(/[\s,;]+/).filter(Boolean).map(extRef);
+}
+/* AASd-120: SubmodelElementList의 직속 자식은 idShort를 가질 수 없다 */
+function inList(id){ var p=parentOf(id); return !!p && S.nodes[p].type==='sml'; }
+
+function serializeElement(id){
+  var n = S.nodes[id], o = {modelType:TYPES[n.type].kind};
+  if(!inList(id)) o.idShort = n.idShort;
+  if(n.desc) o.description = desc(n);
+  if(n.sem) o.semanticId = extRef(n.sem);
+  var sup = supRefs(n); if(sup.length) o.supplementalSemanticIds = sup;
+  switch(n.type){
+    case 'prop':  o.valueType=n.vt; o.value=n.v; break;
+    case 'range': o.valueType=n.vt; o.min=n.min; o.max=n.max; break;
+    case 'mlp':   o.value=(n.langs||[]).filter(function(l){return l.text;}); break;
+    case 'file':  o.contentType=n.ct; o.value=n.v; break;
+    case 'ref':   o.value=extRef(n.refValue); break;
+    case 'smc':   o.value=childrenOf(id).map(serializeElement); break;
+    case 'sml':   o.typeValueListElement=n.listType; o.orderRelevant=true;
+                  if(n.listSem) o.semanticIdListElement = extRef(n.listSem);
+                  o.value=childrenOf(id).map(serializeElement); break;
+  }
+  return o;
+}
+
+function serialize(){
+  var out = {assetAdministrationShells:[], submodels:[], conceptDescriptions:[]}, k;
+  for(k in S.nodes){
+    var n = S.nodes[k];
+    if(n.type==='shell'){
+      var sh = {modelType:'AssetAdministrationShell', id:n.id_, idShort:n.idShort};
+      if(n.desc) sh.description = desc(n);
+      sh.assetInformation = {assetKind:n.assetKind, globalAssetId:n.globalAssetId};
+      sh.submodels = childrenOf(k).map(function(c){ return modelRef('Submodel', S.nodes[c].id_); });
+      if(!sh.submodels.length) delete sh.submodels;
+      out.assetAdministrationShells.push(sh);
+    }
+    if(n.type==='submodel'){
+      var sm = {modelType:'Submodel', id:n.id_, idShort:n.idShort, kind:n.smKind};
+      if(n.desc) sm.description = desc(n);
+      if(n.sem) sm.semanticId = extRef(n.sem);
+      var smSup = supRefs(n); if(smSup.length) sm.supplementalSemanticIds = smSup;
+      sm.submodelElements = childrenOf(k).map(serializeElement);
+      out.submodels.push(sm);
+    }
+  }
+  if(!out.conceptDescriptions.length) delete out.conceptDescriptions;
+  return out;
+}
+
+/* ── 역직렬화 (가져오기) ─────────────────────────────── */
+function semOf(o){
+  try{ return o.semanticId.keys[0].value; }catch(e){ return ''; }
+}
+function descOf(o){
+  try{ return o.description[0].text || ''; }catch(e){ return ''; }
+}
+function supOf(o){
+  try{ return (o.supplementalSemanticIds||[]).map(function(r){ return r.keys[0].value; }).join(' '); }
+  catch(e){ return ''; }
+}
+function listSemOf(o){
+  try{ return o.semanticIdListElement.keys[0].value; }catch(e){ return ''; }
+}
+function importJson(txt){
+  var d = JSON.parse(txt);
+  S.nodes={}; S.edges=[]; S.sel=null; S.seq=1;
+  var byId = {};
+  (d.submodels||[]).forEach(function(sm){
+    var n = makeNode('submodel',{idShort:sm.idShort||'Submodel', id_:sm.id||'', smKind:sm.kind||'Instance',
+      sem:semOf(sm), sup:supOf(sm), desc:descOf(sm)});
+    byId[sm.id]=n.id;
+    (sm.submodelElements||[]).forEach(function(el){ walkEl(el, n.id, 'submodel'); });
+  });
+  (d.assetAdministrationShells||[]).forEach(function(sh){
+    var ai = sh.assetInformation||{};
+    var n = makeNode('shell',{idShort:sh.idShort||'AAS', id_:sh.id||'', desc:descOf(sh),
+      assetKind:ai.assetKind||'Instance', globalAssetId:ai.globalAssetId||''});
+    (sh.submodels||[]).forEach(function(r){
+      try{ var t = byId[r.keys[0].value]; if(t) S.edges.push({from:n.id,to:t}); }catch(e){}
+    });
+  });
+  autoLayout(); fit(); render();
+}
+function walkEl(el, parent, parentType){
+  var mt = el.modelType, map = {Property:'prop', MultiLanguageProperty:'mlp', Range:'range',
+    File:'file', ReferenceElement:'ref', SubmodelElementCollection:'smc', SubmodelElementList:'sml'};
+  var t = map[mt]; if(!t) return;
+  var label = el.idShort || (parentType==='sml' ? TYPES[t].label.replace(/[^A-Za-z]/g,'')+'Item' : 'Element');
+  var p = {idShort:label, sem:semOf(el), sup:supOf(el), desc:descOf(el)};
+  if(t==='prop'){ p.vt=el.valueType||'xs:string'; p.v=(el.value==null?'':String(el.value)); }
+  if(t==='range'){ p.vt=el.valueType||'xs:double'; p.min=el.min||''; p.max=el.max||''; }
+  if(t==='mlp'){ p.langs=(el.value&&el.value.length)?el.value:[{language:'en',text:''}]; }
+  if(t==='file'){ p.ct=el.contentType||''; p.v=el.value||''; }
+  if(t==='ref'){ try{ p.refValue=el.value.keys[0].value; }catch(e){ p.refValue=''; } }
+  if(t==='sml'){ p.listType=el.typeValueListElement||'Property'; p.listSem=listSemOf(el); }
+  var n = makeNode(t,p);
+  S.edges.push({from:parent,to:n.id});
+  if((t==='smc'||t==='sml') && Array.isArray(el.value)) el.value.forEach(function(c){ walkEl(c, n.id, t); });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. 검증
+   ══════════════════════════════════════════════════════════════ */
+var ID_SHORT = /^[a-zA-Z][a-zA-Z0-9_]{0,127}$/;
+function numeric(vt){ return /double|float|decimal|integer|^xs:int$|long|byte|unsigned/.test(vt); }
+function validate(){
+  var out=[], ids={}, k;
+  for(k in S.nodes){
+    var n=S.nodes[k], T=TYPES[n.type], where=T.label+' “'+(n.idShort||'이름 없음')+'”';
+    var listChild = inList(k);
+    if(!listChild){
+      if(!n.idShort) out.push({s:'E',n:k,m:where+'에 idShort가 없습니다.'});
+      else if(!ID_SHORT.test(n.idShort)) out.push({s:'E',n:k,m:where+'의 idShort는 영문자로 시작하고 영문·숫자·밑줄만 쓸 수 있습니다.'});
+    }
+    (n.sup||'').split(/[\s,;]+/).filter(Boolean).forEach(function(v){
+      if(v===n.sem) out.push({s:'W',n:k,m:where+'의 보조 semanticId가 주 semanticId와 같습니다: '+v});
+    });
+    if(n.type==='sml' && !n.listType)
+      out.push({s:'E',n:k,m:where+'에 typeValueListElement가 없습니다. 목록이 담을 요소 종류를 지정하세요.'});
+    if(n.type==='sml'){
+      var kinds={};
+      childrenOf(k).forEach(function(c){ kinds[TYPES[S.nodes[c].type].kind]=1; });
+      Object.keys(kinds).forEach(function(kk){
+        if(kk!==n.listType) out.push({s:'E',n:k,m:where+'는 '+n.listType+' 목록인데 '+kk+' 요소가 들어 있습니다. (AASd-108)'});
+      });
+    }
+
+    if(T.identifiable){
+      if(!n.id_) out.push({s:'E',n:k,m:where+'에 전역 식별자(id)가 없습니다. IRI를 입력하세요.'});
+      else if(ids[n.id_]) out.push({s:'E',n:k,m:'전역 식별자가 중복됩니다: '+n.id_});
+      else ids[n.id_]=1;
+    }
+    if(n.type==='shell'){
+      if(!n.globalAssetId) out.push({s:'W',n:k,m:where+'에 globalAssetId가 비어 있습니다. 자산을 식별할 수 없습니다.'});
+      if(!childrenOf(k).length) out.push({s:'W',n:k,m:where+'에 연결된 서브모델이 없습니다.'});
+    }
+    if(n.type!=='shell' && !n.sem){
+      var pid=parentOf(k);
+      var coveredByList = listChild && pid && S.nodes[pid].listSem;
+      if(!coveredByList) out.push({s:'W',n:k,m:where+'에 semanticId가 없습니다. 의미론적 상호운용성이 보장되지 않습니다.'});
+    }
+    if(ELEMENTS.indexOf(n.type)>=0 && !parentOf(k))
+      out.push({s:'E',n:k,m:where+'이(가) 어느 Submodel에도 포함되어 있지 않습니다.'});
+    if(n.type==='submodel' && !parentOf(k))
+      out.push({s:'W',n:k,m:where+'이(가) Shell에 연결되지 않았습니다. 독립 서브모델로 출력됩니다.'});
+    if(n.type==='prop' && n.v!==''){
+      if(numeric(n.vt) && !isFinite(Number(n.v))) out.push({s:'E',n:k,m:where+'의 값 “'+n.v+'”은(는) '+n.vt+' 형식이 아닙니다.'});
+      if(n.vt==='xs:boolean' && ['true','false'].indexOf(String(n.v).toLowerCase())<0)
+        out.push({s:'E',n:k,m:where+'의 값은 true 또는 false여야 합니다.'});
+      if(n.vt==='xs:dateTime' && isNaN(Date.parse(n.v))) out.push({s:'E',n:k,m:where+'의 값이 ISO 8601 일시 형식이 아닙니다.'});
+      if(n.vt==='xs:date' && !/^\d{4}-\d{2}-\d{2}$/.test(n.v)) out.push({s:'E',n:k,m:where+'의 값은 YYYY-MM-DD 형식이어야 합니다.'});
+    }
+    if(n.type==='mlp' && !(n.langs||[]).some(function(l){return l.text;}))
+      out.push({s:'W',n:k,m:where+'에 입력된 다국어 텍스트가 없습니다.'});
+    if(n.type==='range' && numeric(n.vt) && n.min!=='' && n.max!=='' && Number(n.min)>Number(n.max))
+      out.push({s:'E',n:k,m:where+'의 min이 max보다 큽니다.'});
+
+    if(n.type!=='sml'){
+      var seen={};
+      childrenOf(k).forEach(function(c){
+        var s=S.nodes[c].idShort;
+        if(s && seen[s]) out.push({s:'E',n:c,m:'같은 부모 안에 idShort “'+s+'”이(가) 중복됩니다.'});
+        seen[s]=1;
+      });
+    }
+  }
+  out.sort(function(a,b){ return a.s===b.s?0:(a.s==='E'?-1:1); });
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. 렌더링
+   ══════════════════════════════════════════════════════════════ */
+var vp=document.getElementById('vp'), layer=document.getElementById('layer'),
+    wires=document.getElementById('wires'), insp=document.getElementById('insp');
+
+function render(){ renderNodes(); renderWires(); renderInspector(); renderOutput(); applyTransform(); save(); }
+
+function renderNodes(){
+  var keep={}, k;
+  for(k in S.nodes){
+    var n=S.nodes[k], el=document.getElementById('nd-'+k);
+    if(!el){ el = buildNode(n); layer.appendChild(el); }
+    paintNode(el,n);
+    keep[k]=1;
+  }
+  var all = layer.querySelectorAll('.node');
+  for(var i=all.length-1;i>=0;i--){
+    var id = all[i].dataset.id;
+    if(!keep[id]) all[i].remove();
+  }
+  document.getElementById('empty').style.display = Object.keys(S.nodes).length ? 'none' : 'flex';
+  var c={shell:0,sm:0,el:0};
+  for(k in S.nodes){ var t=S.nodes[k].type; if(t==='shell')c.shell++; else if(t==='submodel')c.sm++; else c.el++; }
+  document.getElementById('s-shell').textContent=c.shell;
+  document.getElementById('s-sm').textContent=c.sm;
+  document.getElementById('s-el').textContent=c.el;
+}
+
+function buildNode(n){
+  var el=document.createElement('div');
+  el.className='node'; el.id='nd-'+n.id; el.dataset.id=n.id;
+  el.innerHTML='<div class="nstripe"></div>'+
+    '<div class="nhead"><span class="nkind"></span><button class="nx" title="삭제">×</button></div>'+
+    '<div class="nbody"><div class="nname"></div><div class="nsem"></div><div class="nval"></div></div>'+
+    '<div class="port in" title="상위 노드에서 연결"></div>'+
+    '<div class="port out" title="끌어서 하위 노드에 연결"></div>';
+  el.querySelector('.nhead').addEventListener('pointerdown', function(e){
+    if(e.target.closest('.nx')) return;
+    startDrag(e,n.id);
+  });
+  el.querySelector('.nx').addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+  el.querySelector('.nx').addEventListener('click', function(e){
+    e.stopPropagation(); removeNode(n.id); render();
+  });
+  el.querySelector('.port.out').addEventListener('pointerdown', function(e){ startWire(e,n.id); });
+  el.addEventListener('pointerdown', function(){
+    if(WIRE.on) return;
+    S.sel=n.id; renderNodes(); renderInspector();
+  });
+  return el;
+}
+
+function paintNode(el,n){
+  var T=TYPES[n.type], hue='var('+T.hue+')';
+  el.style.left=n.x+'px'; el.style.top=n.y+'px';
+  el.classList.toggle('sel', S.sel===n.id);
+  el.querySelector('.nstripe').style.background=hue;
+  var kind=el.querySelector('.nkind'); kind.textContent=T.label; kind.style.color=hue;
+  el.querySelector('.nname').textContent = inList(n.id) ? '· '+(n.idShort||'항목') : (n.idShort || '(idShort 없음)');
+  var sem=el.querySelector('.nsem'), supN=(n.sup||'').split(/[\s,;]+/).filter(Boolean).length;
+  sem.textContent = (n.sem ? shortSem(n.sem) : (n.type==='shell' ? (n.globalAssetId||'') : '⚠ semanticId 없음'))
+    + (supN ? '   +보조 '+supN : '');
+  var val=el.querySelector('.nval'), txt='';
+  if(n.type==='prop') txt = n.vt.replace('xs:','')+' = '+(n.v||'—');
+  else if(n.type==='range') txt = n.vt.replace('xs:','')+' ['+(n.min||'—')+' … '+(n.max||'—')+']';
+  else if(n.type==='mlp') txt = (n.langs||[]).filter(function(l){return l.text;}).map(function(l){return l.language+': '+l.text;}).join('  ·  ');
+  else if(n.type==='file') txt = n.v||'—';
+  else if(n.type==='ref') txt = n.refValue||'—';
+  else if(n.type==='smc') txt = childrenOf(n.id).length+'개 요소';
+  else if(n.type==='sml') txt = n.listType+' × '+childrenOf(n.id).length;
+  else if(n.type==='submodel') txt = n.id_||'—';
+  else if(n.type==='shell') txt = n.assetKind+' · '+childrenOf(n.id).length+'개 서브모델';
+  val.textContent = txt; val.style.display = txt ? 'block' : 'none';
+  el.querySelector('.port.out').style.display = T.accepts.length ? 'block' : 'none';
+  el.querySelector('.port.in').style.display = (n.type==='shell') ? 'none' : 'block';
+  el.querySelector('.port.out').style.borderColor=hue;
+  el.querySelector('.port.out').style.background=hue;
+}
+function shortSem(s){ return s.length>34 ? s.slice(0,16)+'…'+s.slice(-16) : s; }
+
+function renderWires(){
+  var d='';
+  S.edges.forEach(function(e){
+    var a=document.getElementById('nd-'+e.from), b=document.getElementById('nd-'+e.to);
+    if(!a||!b) return;
+    var x1=S.nodes[e.from].x+a.offsetWidth, y1=S.nodes[e.from].y+18.5;
+    var x2=S.nodes[e.to].x, y2=S.nodes[e.to].y+18.5;
+    d += curve(x1,y1,x2,y2);
+  });
+  wires.innerHTML = '<path d="'+d+'"></path>' + (WIRE.on ? '<path class="hot" d="'+WIRE.d+'"></path>' : '');
+}
+function curve(x1,y1,x2,y2){
+  var dx = Math.max(36, Math.abs(x2-x1)*0.45);
+  return 'M'+x1+','+y1+'C'+(x1+dx)+','+y1+' '+(x2-dx)+','+y2+' '+x2+','+y2+' ';
+}
+
+function renderOutput(){
+  document.getElementById('json').innerHTML = highlight(JSON.stringify(serialize(), null, 2));
+  var issues = validate(), box=document.getElementById('issues'), badge=document.getElementById('c-val');
+  var errs = issues.filter(function(i){return i.s==='E';}).length;
+  badge.textContent = issues.length;
+  badge.className = 'count ' + (errs ? 'e' : issues.length ? 'w' : 'o');
+  for(var k in S.nodes){
+    var el=document.getElementById('nd-'+k); if(el) el.classList.remove('bad');
+  }
+  issues.forEach(function(i){ if(i.s==='E'){ var el=document.getElementById('nd-'+i.n); if(el) el.classList.add('bad'); } });
+  if(!issues.length){
+    box.innerHTML = Object.keys(S.nodes).length
+      ? '<p class="clean">✓ 모든 검사를 통과했습니다. IEC 63278 V3.0 JSON으로 내보낼 수 있습니다.</p>'
+      : '<p class="clean" style="color:var(--ink-3)">노드를 추가하면 검증이 시작됩니다.</p>';
+    return;
+  }
+  box.innerHTML='';
+  issues.forEach(function(i){
+    var b=document.createElement('button'); b.className='iss';
+    b.innerHTML='<span class="sv '+i.s+'">'+(i.s==='E'?'ERROR':'WARN')+'</span><p></p>';
+    b.querySelector('p').textContent=i.m;
+    b.addEventListener('click', function(){ S.sel=i.n; focusNode(i.n); renderNodes(); renderInspector(); });
+    box.appendChild(b);
+  });
+}
+function highlight(s){
+  return s.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})
+   .replace(/"([^"]+)":/g,'"<span class="k">$1</span>":')
+   .replace(/: "([^"]*)"/g,': "<span class="s">$1</span>"')
+   .replace(/: (-?\d+\.?\d*)/g,': <span class="n">$1</span>')
+   .replace(/: (true|false|null)/g,': <span class="b">$1</span>');
+}
+
+/* ── 인스펙터 ──────────────────────────────────────── */
+function fld(label,note,inner){
+  return '<div class="f"><label>'+label+'</label>'+inner+(note?'<p class="note">'+note+'</p>':'')+'</div>';
+}
+function esc(v){ return String(v==null?'':v).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function inp(key,val,ph){ return '<input data-k="'+key+'" value="'+esc(val)+'" placeholder="'+(ph||'')+'">'; }
+function sel(key,val,opts){
+  return '<select data-k="'+key+'">'+opts.map(function(o){
+    return '<option'+(o===val?' selected':'')+'>'+o+'</option>';}).join('')+'</select>';
+}
+
+function renderInspector(){
+  if(!S.sel || !S.nodes[S.sel]){
+    insp.innerHTML='<div class="nothing">노드를 선택하면 여기에서<br>속성과 semanticId를 편집합니다.</div>';
+    return;
+  }
+  var n=S.nodes[S.sel], T=TYPES[n.type], h='';
+  h += '<div class="sec"><p class="eyebrow">선택된 노드</p>'+
+       '<span class="idbadge"><i class="sw" style="background:var('+T.hue+')"></i>'+T.kind+'</span></div>';
+  h += '<div class="sec">';
+  h += inList(S.sel)
+    ? fld('idShort (캔버스 표시용)','이 노드는 List의 직속 자식이라 JSON에는 idShort가 출력되지 않습니다 (AASd-120). 여기 적은 이름은 화면에서 구분하기 위한 것입니다.', inp('idShort',n.idShort,'Item'))
+    : fld('idShort','기계가 읽는 짧은 이름. 영문자로 시작, 형제 노드 안에서 유일해야 합니다.', inp('idShort',n.idShort,'MyProperty'));
+  if(T.identifiable)
+    h += fld('id (전역 식별자 IRI)','전 세계에서 유일한 IRI. 조직 도메인을 접두어로 쓰는 것을 권장합니다.', inp('id_',n.id_,'https://example.com/ids/…'));
+  if(n.type==='shell'){
+    h += fld('assetKind', null, sel('assetKind',n.assetKind,['Instance','Type','NotApplicable']));
+    h += fld('globalAssetId','물리 자산 자체의 전역 식별자.', inp('globalAssetId',n.globalAssetId,'https://example.com/ids/asset/…'));
+  }
+  if(n.type==='submodel') h += fld('kind', null, sel('smKind',n.smKind,['Instance','Template']));
+  if(n.type!=='shell'){
+    h += fld('semanticId','주 식별자 하나. IEC CDD IRDI(0112/2///…), eCl@ss IRDI(0173-1#02-…) 또는 IDTA IRI.',
+             inp('sem',n.sem,'0112/2///61987#ABA565#009'));
+    h += fld('supplementalSemanticIds','보조 식별자. 여러 개는 공백이나 쉼표로 구분합니다. IDTA는 주 식별자에 IEC CDD를, 보조에 eCl@ss를 다는 방식을 씁니다.',
+             '<textarea data-k="sup" placeholder="0173-1#02-AAO677#004">'+esc(n.sup)+'</textarea>');
+  }
+  h += '</div><div class="sec"><p class="eyebrow">값</p>';
+  if(n.type==='prop'){
+    h += fld('valueType', null, sel('vt',n.vt,VALUE_TYPES));
+    h += fld('value', null, inp('v',n.v,'45.2'));
+  }
+  if(n.type==='range'){
+    h += fld('valueType', null, sel('vt',n.vt,VALUE_TYPES));
+    h += fld('min', null, inp('min',n.min,'0'));
+    h += fld('max', null, inp('max',n.max,'100'));
+  }
+  if(n.type==='file'){
+    h += fld('contentType', null, inp('ct',n.ct,'application/pdf'));
+    h += fld('value (경로 또는 URL)', null, inp('v',n.v,'/aasx/docs/manual.pdf'));
+  }
+  if(n.type==='ref'){
+    h += fld('참조 대상 값', null, inp('refValue',n.refValue,'https://example.com/ids/…'));
+  }
+  if(n.type==='sml'){
+    h += fld('typeValueListElement','이 목록이 담을 요소 종류. 다른 종류를 넣으면 오류로 표시됩니다.', sel('listType',n.listType,
+      ['Property','MultiLanguageProperty','Range','File','ReferenceElement','SubmodelElementCollection','SubmodelElementList']));
+    h += fld('semanticIdListElement','목록 안 요소들이 공통으로 갖는 의미. 자식마다 붙이지 않고 여기 한 번만 적습니다.',
+      inp('listSem',n.listSem,'0173-1#01-AHF579#003'));
+  }
+  if(n.type==='mlp'){
+    h += '<div class="f"><label>다국어 값</label><div id="langs">';
+    (n.langs||[]).forEach(function(l,i){
+      h += '<div class="row"><input data-lang="'+i+'" data-p="language" value="'+esc(l.language)+'" placeholder="ko">'+
+           '<input data-lang="'+i+'" data-p="text" value="'+esc(l.text)+'" placeholder="텍스트">'+
+           '<button data-del="'+i+'" title="삭제">×</button></div>';
+    });
+    h += '</div><button class="mini" id="add-lang">+ 언어 추가</button></div>';
+  }
+  if(n.type==='smc'||n.type==='sml'||n.type==='submodel'||n.type==='shell'){
+    var cs = childrenOf(n.id);
+    h += '<p class="hint" style="margin-top:0">'+(cs.length?cs.length+'개의 하위 노드가 연결되어 있습니다.':'하위 노드가 없습니다. 오른쪽 단자를 끌어 연결하세요.')+'</p>';
+  }
+  h += fld('description (ko)', null, '<textarea data-k="desc" placeholder="사람이 읽는 설명">'+esc(n.desc)+'</textarea>');
+  h += '</div><div class="sec">';
+  if(n.type!=='shell'){
+    var pcur = parentOf(n.id) || '';
+    var opts = '<option value="">— 연결 안 됨 —</option>';
+    Object.keys(S.nodes).forEach(function(k){
+      if(k===n.id) return;
+      if(TYPES[S.nodes[k].type].accepts.indexOf(n.type)<0) return;
+      var a=k, cyc=false; while(a){ if(a===n.id){cyc=true;break;} a=parentOf(a); }
+      if(cyc) return;
+      opts += '<option value="'+k+'"'+(k===pcur?' selected':'')+'>'+
+              TYPES[S.nodes[k].type].label+' · '+esc(S.nodes[k].idShort||'(이름 없음)')+'</option>';
+    });
+    h += fld('상위 노드','캔버스에서 끌지 않고 여기서 바로 바꿀 수 있습니다.',
+             '<select id="reparent">'+opts+'</select>');
+  }
+  h += '<button class="btn gh danger" id="del" style="width:100%;justify-content:center">이 노드 삭제</button></div>';
+  insp.innerHTML=h;
+
+  insp.querySelectorAll('[data-k]').forEach(function(el){
+    el.addEventListener('input', function(){
+      S.nodes[S.sel][el.dataset.k]=el.value;
+      renderNodes(); renderWires(); renderOutput(); save();
+    });
+  });
+  insp.querySelectorAll('[data-lang]').forEach(function(el){
+    el.addEventListener('input', function(){
+      S.nodes[S.sel].langs[+el.dataset.lang][el.dataset.p]=el.value;
+      renderNodes(); renderOutput(); save();
+    });
+  });
+  insp.querySelectorAll('[data-del]').forEach(function(el){
+    el.addEventListener('click', function(){
+      S.nodes[S.sel].langs.splice(+el.dataset.del,1); render();
+    });
+  });
+  var al=insp.querySelector('#add-lang');
+  if(al) al.addEventListener('click', function(){ S.nodes[S.sel].langs.push({language:'ko',text:''}); render(); });
+  var rp=insp.querySelector('#reparent');
+  if(rp) rp.addEventListener('change', function(){
+    var cur=S.sel;
+    S.edges=S.edges.filter(function(e){ return e.to!==cur; });
+    if(rp.value){
+      var err=connect(rp.value, cur);
+      if(err) toast(err);
+    }
+    render();
+  });
+  insp.querySelector('#del').addEventListener('click', function(){ removeNode(S.sel); render(); });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6. 캔버스 상호작용
+   ══════════════════════════════════════════════════════════════ */
+function applyTransform(){
+  layer.style.transform='translate('+S.pan.x+'px,'+S.pan.y+'px) scale('+S.zoom+')';
+  /* 확대율이 낮아도 단자가 화면상 일정 크기 이상 유지되도록 역보정 */
+  layer.style.setProperty('--pz', Math.min(2.6, Math.max(1, 1/S.zoom)).toFixed(2));
+  vp.style.backgroundSize=(22*S.zoom)+'px '+(22*S.zoom)+'px';
+  vp.style.backgroundPosition=S.pan.x+'px '+S.pan.y+'px';
+  document.getElementById('z-val').textContent=Math.round(S.zoom*100)+'%';
+}
+function toLayer(e){
+  var r=vp.getBoundingClientRect();
+  return {x:(e.clientX-r.left-S.pan.x)/S.zoom, y:(e.clientY-r.top-S.pan.y)/S.zoom};
+}
+function centerOfView(){
+  var r=vp.getBoundingClientRect();
+  return {x:(r.width/2-S.pan.x)/S.zoom, y:(r.height/2-S.pan.y)/S.zoom};
+}
+
+var DRAG=null, PAN=null, WIRE={on:false,d:'',from:null,moved:false,sticky:false,sx:0,sy:0};
+
+function startDrag(e,id){
+  if(e.button!==0 && e.pointerType==='mouse') return;
+  e.stopPropagation(); e.preventDefault();
+  try{ e.currentTarget.setPointerCapture(e.pointerId); }catch(err){}
+  var p=toLayer(e); DRAG={id:id, dx:p.x-S.nodes[id].x, dy:p.y-S.nodes[id].y};
+  S.sel=id; renderNodes(); renderInspector();
+}
+
+/* 연결 시작 — 끌어서 놓기와 클릭-클릭 두 방식을 모두 지원한다 */
+function startWire(e,id){
+  if(e.button!==0 && e.pointerType==='mouse') return;
+  e.stopPropagation(); e.preventDefault();
+  try{ e.currentTarget.setPointerCapture(e.pointerId); }catch(err){}
+  WIRE={on:true, from:id, d:'', moved:false, sticky:false, sx:e.clientX, sy:e.clientY};
+  vp.classList.add('wiring');
+  armTargets(id);
+}
+function armTargets(id){
+  var src=S.nodes[id];
+  Object.keys(S.nodes).forEach(function(k){
+    var el=document.getElementById('nd-'+k); if(!el) return;
+    if(k===id){ el.classList.add('wiresrc'); return; }
+    if(TYPES[src.type].accepts.indexOf(S.nodes[k].type)>=0 && !parentOf(k)) el.classList.add('armed');
+  });
+}
+function endWire(){
+  WIRE={on:false,d:'',from:null,moved:false,sticky:false,sx:0,sy:0};
+  vp.classList.remove('wiring');
+  layer.querySelectorAll('.armed,.wiresrc').forEach(function(el){
+    el.classList.remove('armed'); el.classList.remove('wiresrc');
+  });
+  render();
+}
+function dropWire(e){
+  var el=document.elementFromPoint(e.clientX, e.clientY);
+  var tgt=el && el.closest ? el.closest('.node') : null;
+  if(tgt && tgt.dataset.id!==WIRE.from){
+    var err=connect(WIRE.from, tgt.dataset.id);
+    toast(err || (S.nodes[WIRE.from].idShort+' → '+S.nodes[tgt.dataset.id].idShort+' 연결됨'));
+  } else if(!tgt){
+    toast('연결을 취소했습니다.');
+  }
+  endWire();
+}
+
+vp.addEventListener('pointerdown', function(e){
+  if(WIRE.on && WIRE.sticky) return;           /* 문서 캡처 핸들러가 처리 */
+  if((e.button!==0 && e.pointerType==='mouse') || e.target.closest('.node') || e.target.closest('.zoombar')) return;
+  try{ vp.setPointerCapture(e.pointerId); }catch(err){}
+  PAN={x:e.clientX-S.pan.x, y:e.clientY-S.pan.y};
+  vp.classList.add('panning');
+  S.sel=null; renderNodes(); renderInspector();
+});
+
+/* 클릭-클릭 모드: 두 번째 클릭을 어떤 핸들러보다 먼저 가로챈다 */
+document.addEventListener('pointerdown', function(e){
+  if(!(WIRE.on && WIRE.sticky)) return;
+  e.preventDefault(); e.stopPropagation();
+  dropWire(e);
+}, true);
+
+window.addEventListener('pointermove', function(e){
+  if(DRAG){
+    var p=toLayer(e), n=S.nodes[DRAG.id];
+    n.x=Math.round(p.x-DRAG.dx); n.y=Math.round(p.y-DRAG.dy);
+    paintNode(document.getElementById('nd-'+n.id), n); renderWires();
+  } else if(PAN){
+    S.pan.x=e.clientX-PAN.x; S.pan.y=e.clientY-PAN.y; applyTransform();
+  } else if(WIRE.on){
+    if(!WIRE.sticky && Math.abs(e.clientX-WIRE.sx)+Math.abs(e.clientY-WIRE.sy) > 5) WIRE.moved=true;
+    var a=document.getElementById('nd-'+WIRE.from), q=toLayer(e);
+    if(a) WIRE.d = curve(S.nodes[WIRE.from].x+a.offsetWidth, S.nodes[WIRE.from].y+18.5, q.x, q.y);
+    renderWires();
+  }
+});
+
+window.addEventListener('pointerup', function(e){
+  if(DRAG){ DRAG=null; save(); }
+  if(PAN){ PAN=null; vp.classList.remove('panning'); }
+  if(WIRE.on && !WIRE.sticky){
+    if(WIRE.moved) dropWire(e);
+    else { WIRE.sticky=true; }                 /* 그냥 클릭 → 대기 모드 유지 */
+  }
+});
+window.addEventListener('pointercancel', function(){
+  if(DRAG){ DRAG=null; }
+  if(PAN){ PAN=null; vp.classList.remove('panning'); }
+  if(WIRE.on && !WIRE.sticky) endWire();
+});
+vp.addEventListener('wheel', function(e){
+  e.preventDefault();
+  var r=vp.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+  var z=Math.min(2.2, Math.max(0.3, S.zoom * (e.deltaY<0 ? 1.1 : 0.9)));
+  S.pan.x = mx-(mx-S.pan.x)*(z/S.zoom); S.pan.y = my-(my-S.pan.y)*(z/S.zoom);
+  S.zoom=z; applyTransform();
+},{passive:false});
+
+function zoomBy(f){
+  var r=vp.getBoundingClientRect(), mx=r.width/2, my=r.height/2;
+  var z=Math.min(2.2, Math.max(0.3, S.zoom*f));
+  S.pan.x=mx-(mx-S.pan.x)*(z/S.zoom); S.pan.y=my-(my-S.pan.y)*(z/S.zoom);
+  S.zoom=z; applyTransform();
+}
+function fit(){
+  var ks=Object.keys(S.nodes); if(!ks.length){ S.pan={x:40,y:30}; S.zoom=1; applyTransform(); return; }
+  var x1=1e9,y1=1e9,x2=-1e9,y2=-1e9;
+  ks.forEach(function(k){ var n=S.nodes[k], el=document.getElementById('nd-'+k);
+    var w=el?el.offsetWidth:206, h=el?el.offsetHeight:80;
+    x1=Math.min(x1,n.x); y1=Math.min(y1,n.y); x2=Math.max(x2,n.x+w); y2=Math.max(y2,n.y+h); });
+  var r=vp.getBoundingClientRect(), pad=44;
+  var z=Math.min(1.25,(r.width-pad*2)/(x2-x1||1),(r.height-pad*2)/(y2-y1||1));
+  S.zoom=Math.max(0.3,z);
+  S.pan.x=(r.width-(x2-x1)*S.zoom)/2-x1*S.zoom;
+  S.pan.y=(r.height-(y2-y1)*S.zoom)/2-y1*S.zoom;
+  applyTransform();
+}
+function focusNode(id){
+  var n=S.nodes[id]; if(!n) return;
+  var r=vp.getBoundingClientRect();
+  S.pan.x=r.width/2-(n.x+103)*S.zoom; S.pan.y=r.height/2-(n.y+40)*S.zoom;
+  applyTransform();
+}
+function autoLayout(){
+  var COL=268, ROW=118, cursor=40;
+  var roots=Object.keys(S.nodes).filter(function(k){ return !parentOf(k); });
+  roots.sort(function(a,b){ return (S.nodes[a].type==='shell'?0:1)-(S.nodes[b].type==='shell'?0:1); });
+  function place(id,d){
+    var kids=childrenOf(id), n=S.nodes[id];
+    n.x=40+d*COL;
+    if(!kids.length){ n.y=cursor; cursor+=ROW; return n.y; }
+    var ys=kids.map(function(k){ return place(k,d+1); });
+    n.y=Math.round((ys[0]+ys[ys.length-1])/2);
+    return n.y;
+  }
+  roots.forEach(function(r){ place(r,0); cursor+=30; });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   7. 템플릿 · 저장 · 명령
+   ══════════════════════════════════════════════════════════════ */
+function insertTemplate(key){
+  var T=TEMPLATES[key];
+  var sm=makeNode('submodel',{idShort:uniqueShort(T.sm.idShort), id_:T.sm.id, sem:T.sm.sem, smKind:'Instance'});
+  function put(spec,parent){
+    var p={idShort:spec.idShort, sem:spec.sem||'', sup:spec.sup||''};
+    if(spec.listType) p.listType=spec.listType;
+    if(spec.listSem) p.listSem=spec.listSem;
+    if(spec.vt) p.vt=spec.vt;
+    if(spec.v!==undefined) p.v=spec.v;
+    if(spec.min!==undefined) p.min=spec.min;
+    if(spec.max!==undefined) p.max=spec.max;
+    if(spec.langs) p.langs=JSON.parse(JSON.stringify(spec.langs));
+    if(spec.ct) p.ct=spec.ct;
+    var n=makeNode(spec.t,p);
+    S.edges.push({from:parent,to:n.id});
+    (spec.kids||[]).forEach(function(c){ put(c,n.id); });
+  }
+  T.kids.forEach(function(c){ put(c,sm.id); });
+  var shells=Object.keys(S.nodes).filter(function(k){ return S.nodes[k].type==='shell'; });
+  if(shells.length===1) S.edges.push({from:shells[0],to:sm.id});
+  autoLayout(); S.sel=sm.id; render(); focusNode(sm.id);
+  toast(T.name+' 서브모델을 추가했습니다. (' + T.spec + ')');
+}
+
+function loadSample(){
+  S.nodes={}; S.edges=[]; S.seq=1;
+  makeNode('shell',{idShort:'Machine_001_AAS', id_:'https://example.com/ids/aas/machine_001',
+    assetKind:'Instance', globalAssetId:'https://example.com/ids/asset/machine_001',
+    desc:'스마트공장 CNC 가공기 1호기'});
+  insertTemplate('operational');
+  fit();
+}
+
+function save(){
+  try{ localStorage.setItem(LS, JSON.stringify({nodes:S.nodes,edges:S.edges,seq:S.seq,pan:S.pan,zoom:S.zoom})); }catch(e){}
+}
+function restore(){
+  try{
+    var raw=localStorage.getItem(LS); if(!raw) return false;
+    var d=JSON.parse(raw);
+    if(!d||!d.nodes||!Object.keys(d.nodes).length) return false;
+    S.nodes=d.nodes; S.edges=d.edges||[]; S.seq=d.seq||1;
+    S.pan=d.pan||{x:40,y:30}; S.zoom=d.zoom||1;
+    return true;
+  }catch(e){ return false; }
+}
+
+var toastT;
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('on');
+  clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove('on'); }, 2600);
+}
+function copyOut(){
+  var txt=JSON.stringify(serialize(), null, 2);
+  function ok(){ toast('AAS JSON을 클립보드에 복사했습니다 ('+txt.length.toLocaleString()+'자).'); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(ok, fallback);
+  } else fallback();
+  function fallback(){
+    var ta=document.createElement('textarea'); ta.value=txt;
+    ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); ok(); }
+    catch(e){ toast('복사에 실패했습니다. 아래 JSON 패널에서 직접 선택해 주세요.'); }
+    ta.remove();
+  }
+}
+
+/* ── 팔레트 · 템플릿 UI 구성 ─────────────────────────── */
+(function buildPalette(){
+  var box=document.getElementById('palette');
+  Object.keys(TYPES).forEach(function(t){
+    var T=TYPES[t], b=document.createElement('button');
+    b.className='chip';
+    b.innerHTML='<i class="sw" style="background:var('+T.hue+')"></i><span class="cn">'+T.label+'</span>'+
+                '<span class="cm">'+(t==='shell'?'AAS':t==='submodel'?'SM':'SME')+'</span>';
+    b.addEventListener('click', function(){ addNode(t); });
+    box.appendChild(b);
+  });
+  var tb=document.getElementById('templates');
+  Object.keys(TEMPLATES).forEach(function(k){
+    var T=TEMPLATES[k], b=document.createElement('button');
+    b.className='tpl'; b.innerHTML='<b>'+T.name+'</b><i>'+T.spec+'</i>';
+    b.addEventListener('click', function(){ insertTemplate(k); });
+    tb.appendChild(b);
+  });
+})();
+
+document.getElementById('b-copy').addEventListener('click', copyOut);
+document.getElementById('b-layout').addEventListener('click', function(){ autoLayout(); render(); fit(); });
+document.getElementById('b-sample').addEventListener('click', loadSample);
+document.getElementById('b-clear').addEventListener('click', function(){
+  S.nodes={}; S.edges=[]; S.sel=null; S.seq=1; render(); toast('캔버스를 비웠습니다.');
+});
+document.getElementById('b-import').addEventListener('click', function(){
+  var i=document.createElement('input'); i.type='file'; i.accept='.json,application/json';
+  i.addEventListener('change', function(){
+    var f=i.files[0]; if(!f) return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{ importJson(r.result); toast(f.name+' 을(를) 불러왔습니다.'); }
+      catch(err){ toast('JSON을 해석할 수 없습니다: '+err.message); }
+    };
+    r.readAsText(f);
+  });
+  i.click();
+});
+document.getElementById('z-in').addEventListener('click', function(){ zoomBy(1.15); });
+document.getElementById('z-out').addEventListener('click', function(){ zoomBy(1/1.15); });
+document.getElementById('z-fit').addEventListener('click', fit);
+document.getElementById('b-min').addEventListener('click', function(){
+  var d=document.getElementById('drawer'); d.classList.toggle('min');
+  this.textContent = d.classList.contains('min') ? '패널 펼치기' : '패널 접기';
+});
+document.querySelectorAll('.dtab').forEach(function(t){
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.dtab').forEach(function(x){ x.setAttribute('aria-selected','false'); });
+    t.setAttribute('aria-selected','true');
+    document.querySelectorAll('.pane').forEach(function(p){ p.classList.remove('on'); });
+    document.getElementById(t.dataset.pane).classList.add('on');
+    document.getElementById('drawer').classList.remove('min');
+    document.getElementById('b-min').textContent='패널 접기';
+  });
+});
+window.addEventListener('keydown', function(e){
+  if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+  if((e.key==='Delete'||e.key==='Backspace') && S.sel){ e.preventDefault(); removeNode(S.sel); render(); }
+  if(e.key==='Escape'){
+    if(WIRE.on){ endWire(); toast('연결을 취소했습니다.'); return; }
+    S.sel=null; renderNodes(); renderInspector();
+  }
+});
+
+if(!restore()) loadSample(); else { render(); fit(); }
+</script>
+
+</body>
+</html>
