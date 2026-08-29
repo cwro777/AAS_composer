@@ -165,13 +165,21 @@ export function checkConformance(doc: AasDoc, submodelId: NodeId): Conformance[]
   const byShort = (parent: NodeId): Map<string, NodeId> =>
     new Map((doc.order[parent] ?? []).map((c) => [doc.nodes[c]?.idShort ?? '', c]));
 
+  /* idShort를 바꿔 쓰는 요소는 semanticId로 대조한다 (템플릿의 editableIdShort). */
+  const bySemantic = (parent: NodeId, semanticId: string): NodeId | undefined =>
+    (doc.order[parent] ?? []).find((c) => doc.nodes[c]?.semanticId === semanticId);
+
   const walk = (els: ElementDef[], parent: NodeId, prefix: string): void => {
     /* List 직속 자식은 idShort가 없다(AASd-120). 이름 대신 위치로 대조한다. */
     const parentIsList = doc.nodes[parent]?.t === 'sml';
     const present = parentIsList ? new Map<string, NodeId>() : byShort(parent);
     const positional = doc.order[parent] ?? [];
     for (const [i, e] of els.entries()) {
-      const id = parentIsList ? positional[i] : present.get(e.idShort);
+      const id = parentIsList
+        ? positional[i]
+        : e.editableIdShort && e.semanticId
+          ? bySemantic(parent, e.semanticId)
+          : present.get(e.idShort);
       const path = `${prefix}/${e.idShort}`;
       if (!id) {
         if (e.required) {

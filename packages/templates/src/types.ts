@@ -37,6 +37,15 @@ export interface ElementDef {
   autoInsert?: boolean;
   /** Entity 전용. SelfManagedEntity는 globalAssetId나 specificAssetId가 필수다(AASd-014). */
   entityType?: 'CoManagedEntity' | 'SelfManagedEntity';
+  /**
+   * idShort를 사용자가 바꿔 쓰는 요소인가. 기본 false.
+   *
+   * 공식 템플릿의 `EditIdShort=True`에 대응한다. BoM의 Node가 대표적이다 —
+   * 이름이 InjectionUnit·ClampingUnit이 되는 것이 정상이다.
+   * 이 표시가 있으면 적합성 검사가 **idShort가 아니라 semanticId로 대조**한다.
+   * 없으면 이름을 바꾸는 순간 T-001(필수 요소 누락)이 뜬다.
+   */
+  editableIdShort?: boolean;
   valueType?: string;
   exampleValue?: string;
   langs?: LangText[];

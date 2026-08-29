@@ -1,0 +1,1673 @@
+{
+  "assetAdministrationShells": [
+    {
+      "modelType": "AssetAdministrationShell",
+      "idShort": "IMM_150E_002_AAS",
+      "description": [
+        {
+          "language": "ko",
+          "text": "2공장 라인2 전동식 사출성형기 2호기"
+        },
+        {
+          "language": "en",
+          "text": "All-electric injection moulding machine, plant 2 line 2"
+        }
+      ],
+      "id": "https://bnb.co.kr/ids/aas/imm-150e-002",
+      "administration": {
+        "version": "1",
+        "revision": "0"
+      },
+      "assetInformation": {
+        "assetKind": "Instance",
+        "globalAssetId": "https://bnb.co.kr/ids/asset/imm-150e-002",
+        "specificAssetIds": [
+          {
+            "name": "EquipmentNo",
+            "value": "IMM-02"
+          },
+          {
+            "name": "MesResourceId",
+            "value": "RES-2201"
+          }
+        ]
+      },
+      "submodels": [
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/imm-150e-002/nameplate"
+            }
+          ]
+        },
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/imm-150e-002/technicaldata"
+            }
+          ]
+        },
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/imm-150e-002/hierarchicalstructures"
+            }
+          ]
+        },
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/imm-150e-002/interfaces"
+            }
+          ]
+        },
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/imm-150e-002/operational"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "submodels": [
+    {
+      "modelType": "Submodel",
+      "idShort": "Nameplate",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/nameplate/3/0/Nameplate"
+          }
+        ]
+      },
+      "id": "https://bnb.co.kr/ids/sm/imm-150e-002/nameplate",
+      "kind": "Instance",
+      "submodelElements": [
+        {
+          "modelType": "Property",
+          "idShort": "URIOfTheProduct",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABN590#002"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-ABH173#003"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:anyURI",
+          "value": "https://acme-plastics.example/products/IM-150E/004417"
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerName",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA565#009"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO677#004"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "ACME Plastics Machinery"
+            },
+            {
+              "language": "ko",
+              "text": "에이스플라스틱기계"
+            }
+          ]
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerProductDesignation",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA567#009"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAW338#003"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "All-electric injection moulding machine IM-150E"
+            },
+            {
+              "language": "ko",
+              "text": "전동식 사출성형기 IM-150E"
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "AddressInformation",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/AddressInformation"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0112/2///61360_7#AAS002#001"
+                }
+              ]
+            },
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAQ837#008"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "Street",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO128#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "ko",
+                  "text": "과학산단로 123"
+                }
+              ]
+            },
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "Zipcode",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO129#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "ko",
+                  "text": "46744"
+                }
+              ]
+            },
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "CityTown",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO132#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "ko",
+                  "text": "부산"
+                }
+              ]
+            },
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "NationalCode",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO134#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "en",
+                  "text": "KR"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerProductRoot",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61360_7#AAS011#001"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAU732#003"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "Injection moulding machine"
+            }
+          ]
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerProductFamily",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP464#002"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAU731#003"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "IM series"
+            }
+          ]
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ManufacturerProductType",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA300#008"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO057#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "IM-150E"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "OrderCodeOfManufacturer",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA950#008"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO227#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "IM150E-KR-2026"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ProductArticleNumberOfManufacturer",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA581#007"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO676#005"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "IM-150E-STD"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "SerialNumber",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA951#009"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAM556#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "SN-IM150E-004417"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "YearOfConstruction",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP000#002"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAP906#003"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "2025"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "DateOfManufacture",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABB757#007"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAR972#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:date",
+          "value": "2025-11-08"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "CountryOfOrigin",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP462#001"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO259#007"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "KR"
+        },
+        {
+          "modelType": "File",
+          "idShort": "CompanyLogo",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP463#001"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-ABI776#002"
+                }
+              ]
+            }
+          ],
+          "contentType": "image/png",
+          "value": "/aasx/files/acme_plastics_logo.png"
+        }
+      ]
+    },
+    {
+      "modelType": "Submodel",
+      "idShort": "TechnicalData",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2"
+          }
+        ]
+      },
+      "id": "https://bnb.co.kr/ids/sm/imm-150e-002/technicaldata",
+      "kind": "Instance",
+      "submodelElements": [
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "GeneralInformation",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1"
+              }
+            ]
+          },
+          "value": [
+            {
+              "modelType": "Property",
+              "idShort": "ManufacturerName",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO677#002"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "ACME Plastics Machinery"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "ManufacturerArticleNumber",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO676#003"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "IM-150E-STD"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "ManufacturerOrderCode",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO227#002"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "IM150E-KR-2026"
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "ProductClassifications",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassifications/1/1"
+              }
+            ]
+          },
+          "value": [
+            {
+              "modelType": "SubmodelElementCollection",
+              "idShort": "ProductClassificationItem",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassificationItem/1/1"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "modelType": "Property",
+                  "idShort": "ProductClassificationSystem",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassificationSystem/1/1"
+                      }
+                    ]
+                  },
+                  "valueType": "xs:string",
+                  "value": "ECLASS"
+                },
+                {
+                  "modelType": "Property",
+                  "idShort": "ClassificationSystemVersion",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/ZVEI/TechnicalData/ClassificationSystemVersion/1/1"
+                      }
+                    ]
+                  },
+                  "valueType": "xs:string",
+                  "value": "14.0 (BASIC)"
+                },
+                {
+                  "modelType": "Property",
+                  "idShort": "ProductClassId",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/ZVEI/TechnicalData/ProductClassId/1/1"
+                      }
+                    ]
+                  },
+                  "valueType": "xs:string",
+                  "value": "21-03-01-01"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "TechnicalProperties",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/ZVEI/TechnicalData/TechnicalProperties/1/1"
+              }
+            ]
+          },
+          "value": [
+            {
+              "modelType": "Property",
+              "idShort": "RatedPower",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAF018#003"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "22"
+            },
+            {
+              "modelType": "Range",
+              "idShort": "AmbientTemperature",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-BAA120#008"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "min": "10",
+              "max": "35"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "ClampingForce",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/ClampingForce/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "1471"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "ScrewDiameter",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/ScrewDiameter/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "45"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "ShotWeightPS",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/ShotWeightPS/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "320"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "MaxInjectionPressure",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/MaxInjectionPressure/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "200"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "TieBarDistanceH",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/TieBarDistanceHorizontal/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "470"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "TieBarDistanceV",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/TieBarDistanceVertical/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "470"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "BarrelHeatingZones",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/BarrelHeatingZones/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:int",
+              "value": "5"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "DriveType",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/DriveType/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "AllElectric"
+            },
+            {
+              "modelType": "Range",
+              "idShort": "MoldHeight",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/MoldHeight/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "min": "150",
+              "max": "450"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelType": "Submodel",
+      "idShort": "HierarchicalStructures",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/HierarchicalStructures/1/1/Submodel"
+          }
+        ]
+      },
+      "id": "https://bnb.co.kr/ids/sm/imm-150e-002/hierarchicalstructures",
+      "kind": "Instance",
+      "submodelElements": [
+        {
+          "modelType": "Entity",
+          "idShort": "EntryNode",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/HierarchicalStructures/EntryNode/1/0"
+              }
+            ]
+          },
+          "entityType": "CoManagedEntity",
+          "statements": [
+            {
+              "modelType": "Entity",
+              "idShort": "InjectionUnit",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/HierarchicalStructures/Node/1/0"
+                  }
+                ]
+              },
+              "entityType": "CoManagedEntity",
+              "statements": [
+                {
+                  "modelType": "Property",
+                  "idShort": "BulkCount",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/HierarchicalStructures/BulkCount/1/0"
+                      }
+                    ]
+                  },
+                  "valueType": "xs:unsignedLong",
+                  "value": "4"
+                }
+              ]
+            },
+            {
+              "modelType": "Entity",
+              "idShort": "ClampingUnit",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/HierarchicalStructures/Node/1/0"
+                  }
+                ]
+              },
+              "entityType": "CoManagedEntity"
+            },
+            {
+              "modelType": "Entity",
+              "idShort": "ControlCabinet",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/HierarchicalStructures/Node/1/0"
+                  }
+                ]
+              },
+              "entityType": "CoManagedEntity"
+            },
+            {
+              "modelType": "Entity",
+              "idShort": "Mold",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/HierarchicalStructures/Node/1/0"
+                  }
+                ]
+              },
+              "entityType": "CoManagedEntity"
+            }
+          ]
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ArcheType",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/HierarchicalStructures/ArcheType/1/0"
+              }
+            ]
+          },
+          "valueType": "xs:string",
+          "value": "OneDown"
+        }
+      ]
+    },
+    {
+      "modelType": "Submodel",
+      "idShort": "AssetInterfacesDescription",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/1/Submodel"
+          }
+        ]
+      },
+      "id": "https://bnb.co.kr/ids/sm/imm-150e-002/interfaces",
+      "kind": "Instance",
+      "submodelElements": [
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "InterfaceOPCUA",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/Interface"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "https://www.w3.org/2019/wot/td"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "modelType": "Property",
+              "idShort": "title",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://www.w3.org/2019/wot/td#title"
+                  }
+                ]
+              },
+              "valueType": "xs:string",
+              "value": "IM-150E controller"
+            },
+            {
+              "modelType": "SubmodelElementCollection",
+              "idShort": "EndpointMetadata",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/EndpointMetadata"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "modelType": "Property",
+                  "idShort": "base",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#baseURI"
+                      }
+                    ]
+                  },
+                  "valueType": "xs:anyURI",
+                  "value": "opc.tcp://10.20.30.40:4840"
+                },
+                {
+                  "modelType": "Property",
+                  "idShort": "contentType",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+                      }
+                    ]
+                  },
+                  "valueType": "xs:string",
+                  "value": "application/json"
+                },
+                {
+                  "modelType": "SubmodelElementList",
+                  "idShort": "security",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+                      }
+                    ]
+                  },
+                  "typeValueListElement": "ReferenceElement",
+                  "orderRelevant": true,
+                  "semanticIdListElement": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "modelType": "SubmodelElementCollection",
+                  "idShort": "securityDefinitions",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#definesSecurityScheme"
+                      }
+                    ]
+                  },
+                  "value": [
+                    {
+                      "modelType": "SubmodelElementCollection",
+                      "idShort": "opcua_channel_sc",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "http://opcfoundation.org/UA/WoT-Binding/OPCUASecurityChannelScheme"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "modelType": "Property",
+                          "idShort": "uav_securityMode",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "http://opcfoundation.org/UA/WoT-Binding/securityMode"
+                              }
+                            ]
+                          },
+                          "valueType": "xs:string",
+                          "value": "SignAndEncrypt"
+                        },
+                        {
+                          "modelType": "Property",
+                          "idShort": "uav_securityPolicy",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "http://opcfoundation.org/UA/WoT-Binding/securityPolicy"
+                              }
+                            ]
+                          },
+                          "valueType": "xs:string",
+                          "value": "Basic256Sha256"
+                        }
+                      ]
+                    },
+                    {
+                      "modelType": "SubmodelElementCollection",
+                      "idShort": "opcua_authentication_sc",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "http://opcfoundation.org/UA/WoT-Binding/OPCUASecurityAuthenticationScheme"
+                          }
+                        ]
+                      },
+                      "value": [
+                        {
+                          "modelType": "Property",
+                          "idShort": "uav_userIdentityToken",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "http://opcfoundation.org/UA/WoT-Binding/userIdentityToken"
+                              }
+                            ]
+                          },
+                          "valueType": "xs:string",
+                          "value": "UserName"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "modelType": "SubmodelElementCollection",
+              "idShort": "InteractionMetadata",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/InteractionMetadata"
+                  }
+                ]
+              },
+              "supplementalSemanticIds": [
+                {
+                  "type": "ExternalReference",
+                  "keys": [
+                    {
+                      "type": "GlobalReference",
+                      "value": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+                    }
+                  ]
+                }
+              ],
+              "value": [
+                {
+                  "modelType": "SubmodelElementCollection",
+                  "idShort": "properties",
+                  "semanticId": {
+                    "type": "ExternalReference",
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+                      }
+                    ]
+                  },
+                  "value": [
+                    {
+                      "modelType": "SubmodelElementCollection",
+                      "idShort": "BarrelTemperatureZone1",
+                      "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                          {
+                            "type": "GlobalReference",
+                            "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/PropertyDefinition"
+                          }
+                        ]
+                      },
+                      "supplementalSemanticIds": [
+                        {
+                          "type": "ExternalReference",
+                          "keys": [
+                            {
+                              "type": "GlobalReference",
+                              "value": "https://www.w3.org/2019/wot/td#name"
+                            }
+                          ]
+                        }
+                      ],
+                      "value": [
+                        {
+                          "modelType": "Property",
+                          "idShort": "key",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/key"
+                              }
+                            ]
+                          },
+                          "supplementalSemanticIds": [
+                            {
+                              "type": "ExternalReference",
+                              "keys": [
+                                {
+                                  "type": "GlobalReference",
+                                  "value": "https://www.w3.org/2019/wot/td#name"
+                                }
+                              ]
+                            }
+                          ],
+                          "valueType": "xs:string",
+                          "value": "barrelTemperatureZone1"
+                        },
+                        {
+                          "modelType": "Property",
+                          "idShort": "type",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                              }
+                            ]
+                          },
+                          "valueType": "xs:string",
+                          "value": "number"
+                        },
+                        {
+                          "modelType": "Property",
+                          "idShort": "title",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#title"
+                              }
+                            ]
+                          },
+                          "valueType": "xs:string",
+                          "value": "Barrel temperature zone 1"
+                        },
+                        {
+                          "modelType": "Property",
+                          "idShort": "observable",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#isObservable"
+                              }
+                            ]
+                          },
+                          "valueType": "xs:boolean",
+                          "value": "true"
+                        },
+                        {
+                          "modelType": "Property",
+                          "idShort": "unit",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://schema.org/unitCode"
+                              }
+                            ]
+                          },
+                          "valueType": "xs:string",
+                          "value": "CEL"
+                        },
+                        {
+                          "modelType": "SubmodelElementCollection",
+                          "idShort": "forms",
+                          "semanticId": {
+                            "type": "ExternalReference",
+                            "keys": [
+                              {
+                                "type": "GlobalReference",
+                                "value": "https://www.w3.org/2019/wot/td#hasForm"
+                              }
+                            ]
+                          },
+                          "value": [
+                            {
+                              "modelType": "Property",
+                              "idShort": "href",
+                              "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#hasTarget"
+                                  }
+                                ]
+                              },
+                              "valueType": "xs:string",
+                              "value": "opc.tcp://10.20.30.40:4840"
+                            },
+                            {
+                              "modelType": "Property",
+                              "idShort": "contentType",
+                              "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "https://www.w3.org/2019/wot/hypermedia#forContentType"
+                                  }
+                                ]
+                              },
+                              "valueType": "xs:string",
+                              "value": "application/json"
+                            },
+                            {
+                              "modelType": "Property",
+                              "idShort": "uav_browsePath",
+                              "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                  {
+                                    "type": "GlobalReference",
+                                    "value": "http://opcfoundation.org/UA/WoT-Binding/browsePath"
+                                  }
+                                ]
+                              },
+                              "valueType": "xs:string",
+                              "value": "/Objects/2:IM150E/2:Barrel/2:Zone1/2:Temperature"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modelType": "Submodel",
+      "idShort": "OperationalData",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://bnb.co.kr/ids/cd/InjectionMoldingOperationalData/1/0"
+          }
+        ]
+      },
+      "id": "https://bnb.co.kr/ids/sm/imm-150e-002/operational",
+      "kind": "Instance",
+      "submodelElements": [
+        {
+          "modelType": "Property",
+          "idShort": "MachineState",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/MachineState/1/0"
+              }
+            ]
+          },
+          "valueType": "xs:string",
+          "value": "Producing"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "CycleTime",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/CycleTime/1/0"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "28.4"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ShotCount",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/ShotCount/1/0"
+              }
+            ]
+          },
+          "valueType": "xs:long",
+          "value": "1284771"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ClampForceActual",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/ClampForceActual/1/0"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "1465"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ScrewRotationSpeed",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/ScrewRotationSpeed/1/0"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "180"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "CushionValue",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/CushionValue/1/0"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "5.2"
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "BarrelTemperature",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/BarrelTemperature/1/0"
+              }
+            ]
+          },
+          "value": [
+            {
+              "modelType": "Property",
+              "idShort": "Zone1",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/BarrelTemperatureZone/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "235.4"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "Zone2",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/BarrelTemperatureZone/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "241.2"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "Zone3",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/BarrelTemperatureZone/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "248.0"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "Zone4",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/BarrelTemperatureZone/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "250.6"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "Zone5",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/BarrelTemperatureZone/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "246.1"
+            }
+          ]
+        },
+        {
+          "modelType": "Property",
+          "idShort": "Timestamp",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/SampleTimestamp/1/0"
+              }
+            ]
+          },
+          "valueType": "xs:dateTime",
+          "value": "2026-08-30T09:30:00+09:00"
+        }
+      ]
+    }
+  ]
+}

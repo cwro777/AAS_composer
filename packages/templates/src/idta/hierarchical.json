@@ -40,7 +40,8 @@
               "source": "IDTA 02011-1-1 Template JSON (SMT/Cardinality=ZeroToMany) — 재귀 구조의 한 단계. 더 깊은 계층은 사용자가 만든다",
               "required": false,
               "cardinality": "0..*",
-              "entityType": "CoManagedEntity"
+              "entityType": "CoManagedEntity",
+              "editableIdShort": true
             },
             {
               "t": "rel",
@@ -50,7 +51,8 @@
               "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
               "required": false,
               "cardinality": "0..*",
-              "autoInsert": false
+              "autoInsert": false,
+              "editableIdShort": true
             },
             {
               "t": "rel",
@@ -60,7 +62,8 @@
               "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
               "required": false,
               "cardinality": "0..*",
-              "autoInsert": false
+              "autoInsert": false,
+              "editableIdShort": true
             },
             {
               "t": "rel",
@@ -70,7 +73,8 @@
               "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
               "required": false,
               "cardinality": "0..*",
-              "autoInsert": false
+              "autoInsert": false,
+              "editableIdShort": true
             },
             {
               "t": "prop",
@@ -83,7 +87,8 @@
               "valueType": "xs:unsignedLong",
               "exampleValue": "4"
             }
-          ]
+          ],
+          "editableIdShort": true
         },
         {
           "t": "rel",
@@ -93,7 +98,8 @@
           "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
           "required": false,
           "cardinality": "0..*",
-          "autoInsert": false
+          "autoInsert": false,
+          "editableIdShort": true
         },
         {
           "t": "rel",
@@ -103,7 +109,8 @@
           "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
           "required": false,
           "cardinality": "0..*",
-          "autoInsert": false
+          "autoInsert": false,
+          "editableIdShort": true
         },
         {
           "t": "rel",
@@ -113,9 +120,11 @@
           "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
           "required": false,
           "cardinality": "0..*",
-          "autoInsert": false
+          "autoInsert": false,
+          "editableIdShort": true
         }
-      ]
+      ],
+      "editableIdShort": true
     },
     {
       "t": "prop",

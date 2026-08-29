@@ -120,8 +120,12 @@ harvest 결과를 사양서와 두 번 대조해 `verified`를 `spec`으로 올�
 Nameplate 2.0 → 3.0 마이그레이션 미리보기도 이 단계다.
 
 열려 있는 것:
-- **P0(설비 3대 실측)** — 완료하면 그 JSON을 `packages/kernel/test/fixtures/`에 넣으면
-  자동으로 왕복·검증 대상이 된다.
+- **P0 실측 — 사출성형기 1대 완료, 2대 남음.**
+  `packages/templates/test/build-imm.ts`가 템플릿만으로 설비 한 대를 조립하고,
+  결과를 `packages/kernel/test/fixtures/injection-molding-imm150.json`으로 남긴다
+  (갱신: `UPDATE_FIXTURE=1 pnpm test --filter @aas/templates`).
+  **실측에서 걸린 지점은 같은 테스트의 `friction` 골든에 있다** — P4·P5·P6의 근거다.
+  다음 설비는 같은 방식으로 build-*.ts를 하나 더 쓰면 된다.
 - **Package Explorer 샘플 AASX 3종** — 같은 폴더에 넣으면 손실 없이 열고 저장되는지 검사된다.
   현재는 15종 노드를 모두 쓰는 합성 픽스처(`test/coverage.test.ts`)로 대신하고 있다.
 - 미확인 semanticId 8건 — `unverifiedOf()`가 목록으로 내주고 골든 스냅샷에 고정돼 있다.
