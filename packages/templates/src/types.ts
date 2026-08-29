@@ -27,6 +27,16 @@ export interface ElementDef {
   required: boolean;
   /** '1' | '0..1' | '0..*' | '1..*' */
   cardinality: '1' | '0..1' | '0..*' | '1..*';
+  /**
+   * 삽입 시 자동으로 넣을지. 기본 true.
+   *
+   * false로 두는 경우는 하나뿐이다 — **요소가 인스턴스 데이터 없이는 규격을 만족할 수 없을 때.**
+   * RelationshipElement의 `first`/`second`가 그렇다(필수인데 대상이 정해져야 값이 생긴다).
+   * 정의는 남기므로 팔레트에 뜨고 T-001도 이 요소를 안다. 다만 가짜 참조를 심지 않는다.
+   */
+  autoInsert?: boolean;
+  /** Entity 전용. SelfManagedEntity는 globalAssetId나 specificAssetId가 필수다(AASd-014). */
+  entityType?: 'CoManagedEntity' | 'SelfManagedEntity';
   valueType?: string;
   exampleValue?: string;
   langs?: LangText[];

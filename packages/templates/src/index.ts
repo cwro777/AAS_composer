@@ -20,10 +20,19 @@ import handover from './idta/handover.json' with { type: 'json' };
 import timeseries from './idta/timeseries.json' with { type: 'json' };
 import carbon from './idta/carbon.json' with { type: 'json' };
 import operational from './idta/operational.json' with { type: 'json' };
+import hierarchical from './idta/hierarchical.json' with { type: 'json' };
 
 export type { ElementDef, TemplateDef, Verified } from './types.js';
 
-const DEFS = [nameplate, technical, handover, timeseries, carbon, operational] as unknown as TemplateDef[];
+const DEFS = [
+  nameplate,
+  technical,
+  handover,
+  timeseries,
+  carbon,
+  operational,
+  hierarchical,
+] as unknown as TemplateDef[];
 
 const BY_ID = new Map<string, TemplateDef>(DEFS.map((d) => [d.id, d]));
 
@@ -100,6 +109,8 @@ export function instantiate(def: TemplateDef, opts: InstantiateOptions): Cmd {
 
   const put = (e: ElementDef, parent: NodeId): void => {
     if (opts.requiredOnly && !e.required) return;
+    /* 인스턴스 데이터 없이는 규격을 만족할 수 없는 요소는 정의만 남기고 넣지 않는다. */
+    if (e.autoInsert === false) return;
     const id = opts.newId();
     cmds.push({
       t: 'insert',
@@ -115,6 +126,7 @@ export function instantiate(def: TemplateDef, opts: InstantiateOptions): Cmd {
         ...(e.min !== undefined ? { min: e.min } : {}),
         ...(e.max !== undefined ? { max: e.max } : {}),
         ...(e.contentType ? { contentType: e.contentType } : {}),
+        ...(e.entityType ? { entityType: e.entityType } : {}),
         ...(e.typeValueListElement ? { typeValueListElement: e.typeValueListElement } : {}),
         ...(e.semanticIdListElement ? { semanticIdListElement: e.semanticIdListElement } : {}),
         ...(e.valueTypeListElement ? { valueTypeListElement: e.valueTypeListElement } : {}),

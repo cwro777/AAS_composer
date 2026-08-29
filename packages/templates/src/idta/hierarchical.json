@@ -1,0 +1,132 @@
+{
+  "id": "idta-02011",
+  "idtaNumber": "02011-1-1",
+  "name": "Hierarchical Structures enabling BoM",
+  "version": "1.1",
+  "publishedAt": "2024-06",
+  "sourceUrl": "https://github.com/admin-shell-io/submodel-templates/tree/main/published/Hierarchical%20Structures%20enabling%20Bills%20of%20Material/1/1",
+  "submodel": {
+    "idShort": "HierarchicalStructures",
+    "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/1/1/Submodel",
+    "verified": "spec",
+    "idPattern": "{ns}/sm/{asset}/hierarchicalstructures"
+  },
+  "elements": [
+    {
+      "t": "entity",
+      "idShort": "EntryNode",
+      "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/EntryNode/1/0",
+      "verified": "spec",
+      "source": "IDTA 02011-1-1 Template JSON (SMT/Cardinality=One)",
+      "required": true,
+      "cardinality": "1",
+      "entityType": "CoManagedEntity",
+      "children": [
+        {
+          "t": "entity",
+          "idShort": "Node",
+          "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/Node/1/0",
+          "verified": "spec",
+          "source": "IDTA 02011-1-1 Template JSON (SMT/Cardinality=OneToMany)",
+          "required": true,
+          "cardinality": "1..*",
+          "entityType": "CoManagedEntity",
+          "children": [
+            {
+              "t": "entity",
+              "idShort": "Node",
+              "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/Node/1/0",
+              "verified": "spec",
+              "source": "IDTA 02011-1-1 Template JSON (SMT/Cardinality=ZeroToMany) — 재귀 구조의 한 단계. 더 깊은 계층은 사용자가 만든다",
+              "required": false,
+              "cardinality": "0..*",
+              "entityType": "CoManagedEntity"
+            },
+            {
+              "t": "rel",
+              "idShort": "SameAs",
+              "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/SameAs/1/0",
+              "verified": "spec",
+              "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
+              "required": false,
+              "cardinality": "0..*",
+              "autoInsert": false
+            },
+            {
+              "t": "rel",
+              "idShort": "IsPartOf",
+              "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/IsPartOf/1/0",
+              "verified": "spec",
+              "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
+              "required": false,
+              "cardinality": "0..*",
+              "autoInsert": false
+            },
+            {
+              "t": "rel",
+              "idShort": "HasPart",
+              "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/HasPart/1/0",
+              "verified": "spec",
+              "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
+              "required": false,
+              "cardinality": "0..*",
+              "autoInsert": false
+            },
+            {
+              "t": "prop",
+              "idShort": "BulkCount",
+              "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/BulkCount/1/0",
+              "verified": "spec",
+              "source": "IDTA 02011-1-1 Template JSON (SMT/Cardinality=ZeroToOne)",
+              "required": false,
+              "cardinality": "0..1",
+              "valueType": "xs:unsignedLong",
+              "exampleValue": "4"
+            }
+          ]
+        },
+        {
+          "t": "rel",
+          "idShort": "SameAs",
+          "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/SameAs/1/0",
+          "verified": "spec",
+          "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
+          "required": false,
+          "cardinality": "0..*",
+          "autoInsert": false
+        },
+        {
+          "t": "rel",
+          "idShort": "IsPartOf",
+          "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/IsPartOf/1/0",
+          "verified": "spec",
+          "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
+          "required": false,
+          "cardinality": "0..*",
+          "autoInsert": false
+        },
+        {
+          "t": "rel",
+          "idShort": "HasPart",
+          "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/HasPart/1/0",
+          "verified": "spec",
+          "source": "IDTA 02011-1-1 — first/second가 필수라 대상이 정해진 뒤에 만든다",
+          "required": false,
+          "cardinality": "0..*",
+          "autoInsert": false
+        }
+      ]
+    },
+    {
+      "t": "prop",
+      "idShort": "ArcheType",
+      "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/ArcheType/1/0",
+      "verified": "spec",
+      "source": "IDTA 02011-1-1 Template JSON (SMT/Cardinality=One, FormChoices=Full;OneDown;OneUp)",
+      "required": true,
+      "cardinality": "1",
+      "valueType": "xs:string",
+      "exampleValue": "Full"
+    }
+  ]
+}

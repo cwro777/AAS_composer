@@ -14,7 +14,7 @@
     "lint": "turbo run lint",
     "check:kernel": "node scripts/check-kernel-deps.mjs",
     "verify": "pnpm check:kernel && turbo run typecheck test lint",
-    "golden:update": "vitest run --update --dir packages/kernel",
+    "golden:update": "pnpm --filter @aas/kernel --filter @aas/templates exec vitest run --update",
     "e2e": "pnpm --filter @aas/e2e e2e",
     "format": "prettier --write ."
   },

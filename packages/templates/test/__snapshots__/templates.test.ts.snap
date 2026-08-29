@@ -1067,6 +1067,128 @@ exports[`IDTA 템플릿 > Handover Documentation (IDTA 02004-2-0 v2.0) > 출력 
 }
 `;
 
+exports[`IDTA 템플릿 > Hierarchical Structures enabling BoM (02011-1-1 v1.1) > 출력 JSON 골든 1`] = `
+{
+  "assetAdministrationShells": [
+    {
+      "assetInformation": {
+        "assetKind": "Instance",
+        "globalAssetId": "https://bnb.co.kr/ids/asset/mx200-line1-001",
+      },
+      "id": "https://bnb.co.kr/ids/aas/mx200-line1-001",
+      "idShort": "MX200_Line1_AAS",
+      "modelType": "AssetAdministrationShell",
+      "submodels": [
+        {
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/mx200-line1-001/hierarchicalstructures",
+            },
+          ],
+          "type": "ModelReference",
+        },
+      ],
+    },
+  ],
+  "submodels": [
+    {
+      "id": "https://bnb.co.kr/ids/sm/mx200-line1-001/hierarchicalstructures",
+      "idShort": "HierarchicalStructures",
+      "kind": "Instance",
+      "modelType": "Submodel",
+      "semanticId": {
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/HierarchicalStructures/1/1/Submodel",
+          },
+        ],
+        "type": "ExternalReference",
+      },
+      "submodelElements": [
+        {
+          "entityType": "CoManagedEntity",
+          "idShort": "EntryNode",
+          "modelType": "Entity",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/HierarchicalStructures/EntryNode/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "statements": [
+            {
+              "entityType": "CoManagedEntity",
+              "idShort": "Node",
+              "modelType": "Entity",
+              "semanticId": {
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://admin-shell.io/idta/HierarchicalStructures/Node/1/0",
+                  },
+                ],
+                "type": "ExternalReference",
+              },
+              "statements": [
+                {
+                  "entityType": "CoManagedEntity",
+                  "idShort": "Node",
+                  "modelType": "Entity",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/HierarchicalStructures/Node/1/0",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                },
+                {
+                  "idShort": "BulkCount",
+                  "modelType": "Property",
+                  "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/HierarchicalStructures/BulkCount/1/0",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "value": "4",
+                  "valueType": "xs:unsignedLong",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          "idShort": "ArcheType",
+          "modelType": "Property",
+          "semanticId": {
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/HierarchicalStructures/ArcheType/1/0",
+              },
+            ],
+            "type": "ExternalReference",
+          },
+          "value": "Full",
+          "valueType": "xs:string",
+        },
+      ],
+    },
+  ],
+}
+`;
+
 exports[`IDTA 템플릿 > Operational Data (사내 정의 v1.0) > 출력 JSON 골든 1`] = `
 {
   "assetAdministrationShells": [
@@ -1573,6 +1695,7 @@ exports[`IDTA 템플릿 > 미확인 semanticId가 목록으로 드러난다 1`] 
     "Nameplate/AddressInformation/NationalCode",
   ],
   "idta-02008": [],
+  "idta-02011": [],
   "idta-02023": [
     "CarbonFootprint/ProductCarbonFootprints/ProductCarbonFootprint/LifeCyclePhases",
     "CarbonFootprint/ProductCarbonFootprints/ProductCarbonFootprint/LifeCyclePhases/LifeCyclePhase",
