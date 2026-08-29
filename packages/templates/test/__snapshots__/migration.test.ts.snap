@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Nameplate 2.0 → 3.0 마이그레이션 > 미리보기가 무엇이 바뀌는지 전부 보여준다 1`] = `
+[
+  "submodel-semanticId Nameplate: https://admin-shell.io/zvei/nameplate/2/0/Nameplate → https://admin-shell.io/idta/nameplate/3/0/Nameplate",
+  "origin Nameplate: idta-02006@2.0 → idta-02006@3.0",
+  "semanticId Nameplate/ManufacturerName: 0173-1#02-AAO677#002 → 0112/2///61987#ABA565#009",
+  "supplemental Nameplate/ManufacturerName: (없음) → 0173-1#02-AAO677#004",
+  "semanticId Nameplate/SerialNumber: 0173-1#02-AAM556#002 → 0112/2///61987#ABA951#009",
+  "supplemental Nameplate/SerialNumber: (없음) → 0173-1#02-AAM556#004",
+  "semanticId Nameplate/YearOfConstruction: 0173-1#02-AAP906#001 → 0112/2///61987#ABP000#002",
+  "supplemental Nameplate/YearOfConstruction: (없음) → 0173-1#02-AAP906#003",
+  "supplemental Nameplate/CountryOfOrigin: (없음) → 0173-1#02-AAO259#007",
+]
+`;

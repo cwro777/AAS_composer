@@ -114,10 +114,14 @@ function serializeElement(doc: AasDoc, id: NodeId, parentIsList: boolean): Json 
       o['min'] = n.min;
       o['max'] = n.max;
       break;
-    case 'mlp':
-      o['value'] = n.value.filter((l) => l.text) as unknown as Json;
+    case 'mlp': {
+      /* 텍스트가 하나도 없으면 value를 내보내지 않는다 — 빈 배열은 규격 위반이다.
+         편집 중에는 늘 나오는 상태다(언어 칸만 만들고 아직 안 채운 경우). */
+      const langs = n.value.filter((l) => l.text);
+      if (langs.length) o['value'] = langs as unknown as Json;
       if (n.valueId) o['valueId'] = refToJson(n.valueId);
       break;
+    }
     case 'file':
       o['contentType'] = n.contentType;
       o['value'] = n.value;

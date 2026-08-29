@@ -1,0 +1,182 @@
+{
+  "id": "nameplate-2-0__3-0",
+  "templateId": "idta-02006",
+  "name": "Digital Nameplate 2.0 → 3.0",
+  "from": {
+    "idtaNumber": "02006-2-0",
+    "version": "2.0",
+    "submodelSemanticId": "https://admin-shell.io/zvei/nameplate/2/0/Nameplate"
+  },
+  "to": {
+    "idtaNumber": "02006-3-0",
+    "version": "3.0",
+    "submodelSemanticId": "https://admin-shell.io/idta/nameplate/3/0/Nameplate"
+  },
+  "sourceUrl": "https://github.com/admin-shell-io/submodel-templates/tree/main/deprecated/Digital%20nameplate/2/0 · https://github.com/admin-shell-io/submodel-templates/tree/main/published/Digital%20nameplate/3/0",
+  "note": "3.0은 주 식별자를 eCl@ss에서 IEC CDD로 바꾸고, 기존 eCl@ss 값을 supplementalSemanticIds로 내렸다. 두 공식 Template JSON을 기계로 대조해 만든 매핑이다.",
+  "elements": [
+    {
+      "idShort": "URIOfTheProduct",
+      "semanticId": { "from": "0173-1#02-AAY811#001", "to": "0112/2///61987#ABN590#002" },
+      "supplementalSemanticIds": ["0173-1#02-ABH173#003"]
+    },
+    {
+      "idShort": "ManufacturerName",
+      "semanticId": { "from": "0173-1#02-AAO677#002", "to": "0112/2///61987#ABA565#009" },
+      "supplementalSemanticIds": ["0173-1#02-AAO677#004"]
+    },
+    {
+      "idShort": "ManufacturerProductDesignation",
+      "semanticId": { "from": "0173-1#02-AAW338#001", "to": "0112/2///61987#ABA567#009" },
+      "supplementalSemanticIds": ["0173-1#02-AAW338#003"]
+    },
+    {
+      "idShort": "ManufacturerProductRoot",
+      "semanticId": { "from": "0173-1#02-AAU732#001", "to": "0112/2///61360_7#AAS011#001" },
+      "supplementalSemanticIds": ["0173-1#02-AAU732#003"]
+    },
+    {
+      "idShort": "ManufacturerProductFamily",
+      "semanticId": { "from": "0173-1#02-AAU731#001", "to": "0112/2///61987#ABP464#002" },
+      "supplementalSemanticIds": ["0173-1#02-AAU731#003"]
+    },
+    {
+      "idShort": "ManufacturerProductType",
+      "semanticId": { "from": "0173-1#02-AAO057#002", "to": "0112/2///61987#ABA300#008" },
+      "supplementalSemanticIds": ["0173-1#02-AAO057#004"]
+    },
+    {
+      "idShort": "OrderCodeOfManufacturer",
+      "semanticId": { "from": "0173-1#02-AAO227#002", "to": "0112/2///61987#ABA950#008" },
+      "supplementalSemanticIds": ["0173-1#02-AAO227#004"]
+    },
+    {
+      "idShort": "ProductArticleNumberOfManufacturer",
+      "semanticId": { "from": "0173-1#02-AAO676#003", "to": "0112/2///61987#ABA581#007" },
+      "supplementalSemanticIds": ["0173-1#02-AAO676#005"]
+    },
+    {
+      "idShort": "SerialNumber",
+      "semanticId": { "from": "0173-1#02-AAM556#002", "to": "0112/2///61987#ABA951#009" },
+      "supplementalSemanticIds": ["0173-1#02-AAM556#004"]
+    },
+    {
+      "idShort": "YearOfConstruction",
+      "semanticId": { "from": "0173-1#02-AAP906#001", "to": "0112/2///61987#ABP000#002" },
+      "supplementalSemanticIds": ["0173-1#02-AAP906#003"]
+    },
+    {
+      "idShort": "DateOfManufacture",
+      "semanticId": { "from": "0173-1#02-AAR972#002", "to": "0112/2///61987#ABB757#007" },
+      "supplementalSemanticIds": ["0173-1#02-AAR972#004"]
+    },
+    {
+      "idShort": "HardwareVersion",
+      "semanticId": { "from": "0173-1#02-AAN270#002", "to": "0112/2///61987#ABA926#008" },
+      "supplementalSemanticIds": ["0173-1#02-AAN270#004"]
+    },
+    {
+      "idShort": "FirmwareVersion",
+      "semanticId": { "from": "0173-1#02-AAM985#002", "to": "0112/2///61987#ABA302#006" },
+      "supplementalSemanticIds": ["0173-1#02-AAN270#004"]
+    },
+    {
+      "idShort": "SoftwareVersion",
+      "semanticId": { "from": "0173-1#02-AAM737#002", "to": "0112/2///61987#ABA601#008" },
+      "supplementalSemanticIds": ["0173-1#02-AAM737#004"]
+    },
+    {
+      "idShort": "CountryOfOrigin",
+      "semanticId": { "from": "0173-1#02-AAO259#004", "to": "0112/2///61987#ABP462#001" },
+      "supplementalSemanticIds": ["0173-1#02-AAO259#007"]
+    },
+    {
+      "idShort": "CompanyLogo",
+      "semanticId": {
+        "from": "https://admin-shell.io/zvei/nameplate/2/0/Nameplate/CompanyLogo",
+        "to": "0112/2///61987#ABP463#001"
+      },
+      "supplementalSemanticIds": ["0173-1#02-ABI776#002"]
+    },
+    {
+      "idShort": "Markings",
+      "semanticId": { "from": "0173-1#01-AGZ673#001", "to": "0112/2///61360_7#AAS006#001" },
+      "supplementalSemanticIds": ["0173-1#02-ABI563#003/0173-1#01-AHF849#003"]
+    },
+    {
+      "idShort": "MarkingName",
+      "semanticId": {
+        "from": "https://admin-shell.io/zvei/nameplate/2/0/Nameplate/Markings/Marking/MarkingName",
+        "to": "0112/2///61987#ABA231#009"
+      },
+      "supplementalSemanticIds": ["0173-1#02-ABI190#003"]
+    },
+    {
+      "idShort": "DesignationOfCertificateOrApproval",
+      "semanticId": { "from": "0112/2///61987#ABH783#001", "to": "0112/2///61987#ABH783#003" },
+      "supplementalSemanticIds": ["0173-1#02-ABI975#002"]
+    },
+    {
+      "idShort": "IssueDate",
+      "semanticId": {
+        "from": "https://admin-shell.io/zvei/nameplate/2/0/Nameplate/Markings/Marking/IssueDate",
+        "to": "0112/2///61987#ABO097#001"
+      },
+      "supplementalSemanticIds": ["0173-1#02-ABL774#001"]
+    },
+    {
+      "idShort": "ExpiryDate",
+      "semanticId": {
+        "from": "https://admin-shell.io/zvei/nameplate/2/0/Nameplate/Markings/Marking/ExpiryDate",
+        "to": "0112/2///61987#ABH830#002"
+      },
+      "supplementalSemanticIds": ["0173-1#02-ABL775#001"]
+    },
+    {
+      "idShort": "MarkingFile",
+      "semanticId": {
+        "from": "https://admin-shell.io/zvei/nameplate/2/0/Nameplate/Markings/Marking/MarkingFile",
+        "to": "0112/2///61987#ABO100#002"
+      },
+      "supplementalSemanticIds": ["0173-1#02-ABI191#003"]
+    },
+    {
+      "idShort": "MarkingAdditionalText",
+      "semanticId": {
+        "from": "https://admin-shell.io/zvei/nameplate/2/0/Nameplate/Markings/Marking/MarkingAdditionalText",
+        "to": "0112/2///61987#ABB146#007"
+      },
+      "supplementalSemanticIds": ["0173-1#02-ABI192#003"]
+    },
+    {
+      "idShort": "AssetSpecificProperties",
+      "semanticId": {
+        "from": "0173-1#01-AGZ672#001",
+        "to": "0173-1#02-ABI218#003/0173-1#01-AGZ672#004"
+      }
+    }
+  ],
+  "manual": [
+    {
+      "idShort": "ContactInformation",
+      "note": {
+        "ko": "3.0은 연락처를 직접 담지 않는다. AddressInformation이 빈 smt-dropin이 되고 내용은 IDTA 02002 Contact Information에서 온다. 하위 항목(Street·Zipcode·Phone·Email 등)을 어디에 둘지 사람이 정해야 한다.",
+        "en": "3.0 delegates contact data: AddressInformation is an empty smt-dropin filled from IDTA 02002 Contact Information. Decide where the sub-elements go."
+      }
+    },
+    {
+      "idShort": "ExplosionSafeties",
+      "note": {
+        "ko": "방폭 관련 하위 구조 전체가 3.0에서 빠졌다. 옮길 곳을 정하지 않고 마이그레이션하면 데이터가 사라진다.",
+        "en": "The whole ExplosionSafeties subtree is gone in 3.0. Migrating without a target loses this data."
+      }
+    },
+    {
+      "idShort": "Marking",
+      "note": {
+        "ko": "2.0의 Marking 컬렉션은 3.0에서 Markings 목록의 이름 없는 자식이 된다(AASd-120). 구조 변경이라 자동 변환하지 않는다.",
+        "en": "2.0's Marking collection becomes an unnamed child of the Markings list in 3.0 (AASd-120). Structural change, not automated."
+      }
+    }
+  ]
+}

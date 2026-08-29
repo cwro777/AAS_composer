@@ -50,6 +50,34 @@ export interface ElementDef {
   children?: ElementDef[];
 }
 
+/**
+ * 템플릿 개정 매핑.
+ *
+ * 사양서가 개정되면 서브모델 IRI와 요소 IRDI가 **동시에** 바뀐다. 그것을 코드가 아니라
+ * 데이터로 선언하고, 적용 전에 먼저 미리보기를 보여준다.
+ *
+ * 자동 변환하지 않는 것(`manual`)을 분명히 남기는 것이 이 파일의 핵심이다 —
+ * 구조가 바뀌는 항목을 조용히 옮기면 데이터가 사라진다.
+ */
+export interface MigrationDef {
+  id: string;
+  templateId: string;
+  name: string;
+  from: { idtaNumber: string; version: string; submodelSemanticId: string };
+  to: { idtaNumber: string; version: string; submodelSemanticId: string };
+  sourceUrl: string;
+  note?: string;
+  elements: Array<{
+    idShort: string;
+    /** 이 값일 때만 바꾼다. 다르면 건드리지 않고 보고한다. */
+    semanticId?: { from: string; to: string };
+    /** 개정판에서 새로 붙는 보조 식별자 */
+    supplementalSemanticIds?: string[];
+    rename?: string;
+  }>;
+  manual: Array<{ idShort: string; note: { ko: string; en: string } }>;
+}
+
 export interface TemplateDef {
   /** 'idta-02006' */
   id: string;

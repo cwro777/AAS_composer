@@ -37,6 +37,45 @@ function docWith(kind: 'smc' | 'sml'): ReturnType<typeof emptyDoc> {
   return doc;
 }
 
+describe('MultiLanguageProperty도 마찬가지다', () => {
+  /* 언어 칸만 만들고 아직 텍스트를 안 넣은 상태 — 편집 중에 늘 나온다 */
+  const docWithEmptyMlp = (): ReturnType<typeof emptyDoc> => {
+    let doc = emptyDoc();
+    doc = apply(doc, {
+      t: 'insert',
+      parent: null,
+      index: 0,
+      node: newNode('sm1', 'submodel', {
+        idShort: 'Holder',
+        identifier: 'https://bnb.co.kr/ids/sm/mlp/1',
+      }),
+    }).doc;
+    doc = apply(doc, {
+      t: 'insert',
+      parent: 'sm1',
+      index: 0,
+      node: newNode('m1', 'mlp', { idShort: 'ManufacturerName', langs: [{ language: 'ko', text: '' }] }),
+    }).doc;
+    return doc;
+  };
+
+  it('텍스트가 없으면 value 키가 없다', () => {
+    const env = serialize(docWithEmptyMlp()) as Record<string, unknown>;
+    const el = (
+      (env['submodels'] as Array<Record<string, unknown>>)[0]!['submodelElements'] as Array<
+        Record<string, unknown>
+      >
+    )[0]!;
+    expect(el).not.toHaveProperty('value');
+  });
+
+  it('aas-core3.0 위반 0건', () => {
+    const r = verifyEnvironment(serialize(docWithEmptyMlp()));
+    expect(r.deserializationError).toBeUndefined();
+    expect(r.issues.map((i) => i.message.en)).toEqual([]);
+  });
+});
+
 describe('빈 컬렉션은 value를 내보내지 않는다', () => {
   for (const kind of ['smc', 'sml'] as const) {
     it(`${kind}: 자식이 없으면 value 키 자체가 없다`, () => {

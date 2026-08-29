@@ -71,12 +71,15 @@
 
 ## 현재 상태
 
-**P1·P2 완료, P3 진행 중.** `pnpm verify` 통과 — 22/22 태스크, 91개 테스트
-(커널 30 · 템플릿 57 · 스텁 스모크 4).
+**P1·P2·P3 완료.** `pnpm verify` 통과 — 22/22 태스크, 101개 테스트
+(커널 32 · 템플릿 65 · 스텁 스모크 4).
 
 - `@aas/kernel` — 문서 모델·명령·직렬화·파싱·정규화·L1 위임·L2 정책. **노드 15종.**
-- `@aas/templates` — **템플릿 9종** + 적합성 검사(T-001·T-002·T-003) + `verified` 표기.
+- `@aas/templates` — **템플릿 9종** + 적합성 검사(T-001·T-002·T-003) + `verified` 표기
+  + **개정 마이그레이션**(`planMigration` — 미리보기와 적용을 분리한다).
   기존 6종 + Hierarchical Structures(02011-1-1) + AID MQTT·OPC UA(02017-1-1).
+  미확인 semanticId는 9건뿐이고 전부 이유가 분명하다 — 사내 정의 6건,
+  공식 템플릿에 없는 예시 속성 3건(eCl@ss 라이선스 없음).
 - 나머지 워크스페이스는 **스캐폴드**다 — `semantic`(P6) · `aasx`(P7) · `ui`(토큰만) ·
   `web`(P4) · `api`(P7) · `e2e`. 기능은 `throw new Error('P#에서 구현합니다.')` 스텁이고,
   스모크 테스트가 "스텁임"을 검사한다. **스텁을 구현으로 착각하지 말 것.**
@@ -88,7 +91,13 @@ P3에서 확정된 것:
   RelationshipElement의 first/second가 그렇다. 공식 템플릿은 "EMPTY" 자리표시자를 쓰지만
   우리는 가짜 참조를 심지 않는다. 정의는 남으므로 팔레트에 뜨고 T-001도 안다.
 - **빈 컬렉션은 value/submodelElements/최상위 배열을 내보내지 않는다.** 규격이
-  "설정하지 않거나 최소 1개"를 요구한다. `test/empty-collection.test.ts`가 지킨다.
+  "설정하지 않거나 최소 1개"를 요구한다. MultiLanguageProperty의 빈 value도 같다.
+  `test/empty-collection.test.ts`가 지킨다.
+- **골든 스냅샷 키는 템플릿 id로 고정한다.** name·idtaNumber·version을 키에 넣으면
+  메타데이터를 고치는 순간 골든이 고아가 되고 새 키로 조용히 다시 쓰인다 — 안전망이 사라진다.
+- **마이그레이션은 계획과 적용을 분리한다.** `planMigration()`은 문서를 바꾸지 않고
+  steps(미리보기)와 manual(사람이 판단할 것)을 돌려준다. 구조가 바뀌는 항목을
+  자동 변환하지 않는 것이 핵심이다 — 조용히 옮기면 데이터가 사라진다.
 
 확정된 것 — 다시 설계하지 않는다:
 - 자식 순서는 `AasDoc.order` 배열, 좌표와 List 자식의 표시 이름은 `Layout`.

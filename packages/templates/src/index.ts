@@ -12,7 +12,7 @@ import {
   parentOf,
 } from '@aas/kernel';
 
-import type { ElementDef, TemplateDef, Verified } from './types.js';
+import type { ElementDef, MigrationDef, TemplateDef, Verified } from './types.js';
 
 import nameplate from './idta/nameplate.json' with { type: 'json' };
 import technical from './idta/technical.json' with { type: 'json' };
@@ -23,8 +23,9 @@ import operational from './idta/operational.json' with { type: 'json' };
 import hierarchical from './idta/hierarchical.json' with { type: 'json' };
 import aidMqtt from './idta/aid-mqtt.json' with { type: 'json' };
 import aidOpcua from './idta/aid-opcua.json' with { type: 'json' };
+import nameplate20to30 from './migrations/nameplate-2-0__3-0.json' with { type: 'json' };
 
-export type { ElementDef, TemplateDef, Verified } from './types.js';
+export type { ElementDef, MigrationDef, TemplateDef, Verified } from './types.js';
 
 const DEFS = [
   nameplate,
@@ -215,6 +216,155 @@ export function checkConformance(doc: AasDoc, submodelId: NodeId): Conformance[]
   }
   walk(def.elements, submodelId, sm.idShort);
   return out;
+}
+
+/* ── 템플릿 개정 마이그레이션 ──────────────────────────────── */
+
+const MIGRATIONS = [nameplate20to30] as unknown as MigrationDef[];
+const MIG_BY_ID = new Map<string, MigrationDef>(MIGRATIONS.map((m) => [m.id, m]));
+
+export function listMigrations(): MigrationDef[] {
+  return [...MIGRATIONS];
+}
+
+export function getMigration(id: string): MigrationDef | undefined {
+  return MIG_BY_ID.get(id);
+}
+
+/** 이 서브모델에 적용할 수 있는 개정 매핑 (T-005의 근거) */
+export function migrationsFor(doc: AasDoc, submodelId: NodeId): MigrationDef[] {
+  const sm = doc.nodes[submodelId];
+  if (!sm || sm.t !== 'submodel') return [];
+  return MIGRATIONS.filter((m) => sm.semanticId === m.from.submodelSemanticId);
+}
+
+export interface MigrationStep {
+  kind: 'submodel-semanticId' | 'semanticId' | 'supplemental' | 'rename' | 'origin';
+  node: NodeId;
+  path: string;
+  before?: string;
+  after?: string;
+}
+
+export interface MigrationPlan {
+  migration: string;
+  applicable: boolean;
+  reason?: { ko: string; en: string };
+  /** 미리보기 — 무엇이 어떻게 바뀌는지 */
+  steps: MigrationStep[];
+  /** 사람이 판단해야 하는 항목. 문서에 실제로 있는 것만 담는다 */
+  manual: Array<{ node: NodeId; path: string; note: { ko: string; en: string } }>;
+  /** 적용할 때만 쓴다. apply(doc, plan.cmds) — 하나의 실행취소 단위다 */
+  cmds: Cmd;
+}
+
+/**
+ * 개정 매핑을 문서에 적용할 계획을 세운다. **문서를 바꾸지 않는다.**
+ *
+ * 먼저 보여주고 승인받는 것이 이 함수의 존재 이유다. 사양서 개정은 서브모델 IRI와
+ * 요소 IRDI를 동시에 바꾸므로, 무엇이 바뀌는지 보지 않고 적용하면 되돌리기 어렵다.
+ */
+export function planMigration(doc: AasDoc, submodelId: NodeId, def: MigrationDef): MigrationPlan {
+  const empty = (reason: { ko: string; en: string }): MigrationPlan => ({
+    migration: def.id,
+    applicable: false,
+    reason,
+    steps: [],
+    manual: [],
+    cmds: { t: 'batch', label: `migrate:${def.id}`, cmds: [] },
+  });
+
+  const sm = doc.nodes[submodelId];
+  if (!sm || sm.t !== 'submodel') {
+    return empty({ ko: '서브모델이 아닙니다.', en: 'Not a submodel.' });
+  }
+  if (sm.semanticId !== def.from.submodelSemanticId) {
+    return empty({
+      ko: `이 서브모델은 ${def.from.idtaNumber}이 아닙니다. semanticId가 ${sm.semanticId ?? '(없음)'}입니다.`,
+      en: `Submodel is not ${def.from.idtaNumber}; its semanticId is ${sm.semanticId ?? '(none)'}.`,
+    });
+  }
+
+  const steps: MigrationStep[] = [];
+  const manual: MigrationPlan['manual'] = [];
+  const cmds: Cmd[] = [];
+
+  steps.push({
+    kind: 'submodel-semanticId',
+    node: submodelId,
+    path: sm.idShort,
+    before: sm.semanticId,
+    after: def.to.submodelSemanticId,
+  });
+  cmds.push({ t: 'set', node: submodelId, path: 'semanticId', value: def.to.submodelSemanticId });
+
+  if (sm.origin) {
+    steps.push({
+      kind: 'origin',
+      node: submodelId,
+      path: sm.idShort,
+      before: `${sm.origin.templateId}@${sm.origin.version}`,
+      after: `${sm.origin.templateId}@${def.to.version}`,
+    });
+    cmds.push({
+      t: 'set',
+      node: submodelId,
+      path: 'origin',
+      value: { templateId: sm.origin.templateId, version: def.to.version },
+    });
+  }
+
+  const byShort = new Map(def.elements.map((e) => [e.idShort, e]));
+  const manualByShort = new Map(def.manual.map((m) => [m.idShort, m]));
+
+  const walk = (id: NodeId, prefix: string): void => {
+    for (const c of doc.order[id] ?? []) {
+      const n = doc.nodes[c];
+      if (!n) continue;
+      const path = `${prefix}/${n.idShort || '·'}`;
+
+      const man = manualByShort.get(n.idShort);
+      if (man) manual.push({ node: c, path, note: man.note });
+
+      const m = byShort.get(n.idShort);
+      if (m) {
+        /* from 값과 다르면 건드리지 않는다. 이미 옮겼거나 사내에서 바꾼 값일 수 있다. */
+        if (m.semanticId && n.semanticId === m.semanticId.from) {
+          steps.push({ kind: 'semanticId', node: c, path, before: n.semanticId, after: m.semanticId.to });
+          cmds.push({ t: 'set', node: c, path: 'semanticId', value: m.semanticId.to });
+        }
+        if (m.supplementalSemanticIds?.length) {
+          const cur = n.supplementalSemanticIds ?? [];
+          const add = m.supplementalSemanticIds.filter((s) => !cur.includes(s));
+          if (add.length) {
+            const after = [...cur, ...add];
+            steps.push({
+              kind: 'supplemental',
+              node: c,
+              path,
+              before: cur.join(' ') || '(없음)',
+              after: after.join(' '),
+            });
+            cmds.push({ t: 'set', node: c, path: 'supplementalSemanticIds', value: after });
+          }
+        }
+        if (m.rename && n.idShort !== m.rename) {
+          steps.push({ kind: 'rename', node: c, path, before: n.idShort, after: m.rename });
+          cmds.push({ t: 'set', node: c, path: 'idShort', value: m.rename });
+        }
+      }
+      walk(c, path);
+    }
+  };
+  walk(submodelId, sm.idShort);
+
+  return {
+    migration: def.id,
+    applicable: true,
+    steps,
+    manual,
+    cmds: { t: 'batch', label: `migrate:${def.id}`, cmds },
+  };
 }
 
 /** 문서 전체에서 템플릿 출처를 가진 서브모델을 찾아 검사한다. */
