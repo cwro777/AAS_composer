@@ -971,7 +971,7 @@ exports[`IDTA 템플릿 > Asset Interfaces Description (OPC UA) (02017-1-1 v1.1)
 }
 `;
 
-exports[`IDTA 템플릿 > Carbon Footprint (IDTA 02023 v1.0) > 출력 JSON 골든 1`] = `
+exports[`IDTA 템플릿 > Carbon Footprint (02023-1-0 v1.0) > 출력 JSON 골든 1`] = `
 {
   "assetAdministrationShells": [
     {
@@ -1048,9 +1048,19 @@ exports[`IDTA 템플릿 > Carbon Footprint (IDTA 02023 v1.0) > 출력 JSON 골�
               },
               "value": [
                 {
-                  "idShort": "PcfCalculationMethod",
-                  "modelType": "Property",
+                  "idShort": "PcfCalculationMethods",
+                  "modelType": "SubmodelElementList",
+                  "orderRelevant": true,
                   "semanticId": {
+                    "keys": [
+                      {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/CarbonFootprint/PcfCalculationMethods/1/0",
+                      },
+                    ],
+                    "type": "ExternalReference",
+                  },
+                  "semanticIdListElement": {
                     "keys": [
                       {
                         "type": "GlobalReference",
@@ -1059,8 +1069,15 @@ exports[`IDTA 템플릿 > Carbon Footprint (IDTA 02023 v1.0) > 출력 JSON 골�
                     ],
                     "type": "ExternalReference",
                   },
-                  "value": "ISO 14067",
-                  "valueType": "xs:string",
+                  "typeValueListElement": "Property",
+                  "value": [
+                    {
+                      "modelType": "Property",
+                      "value": "ISO 14067",
+                      "valueType": "xs:string",
+                    },
+                  ],
+                  "valueTypeListElement": "xs:string",
                 },
                 {
                   "idShort": "PcfCO2eq",
@@ -1075,7 +1092,7 @@ exports[`IDTA 템플릿 > Carbon Footprint (IDTA 02023 v1.0) > 출력 JSON 골�
                     "type": "ExternalReference",
                   },
                   "value": "1842.5",
-                  "valueType": "xs:double",
+                  "valueType": "xs:decimal",
                 },
                 {
                   "idShort": "ReferenceImpactUnitForCalculation",
@@ -2659,20 +2676,12 @@ exports[`IDTA 템플릿 > 미확인 semanticId가 목록으로 드러난다 1`] 
     "TechnicalData/TechnicalProperties/AmbientTemperature",
   ],
   "idta-02004": [],
-  "idta-02006": [
-    "Nameplate/AddressInformation/Street",
-    "Nameplate/AddressInformation/Zipcode",
-    "Nameplate/AddressInformation/CityTown",
-    "Nameplate/AddressInformation/NationalCode",
-  ],
+  "idta-02006": [],
   "idta-02008": [],
   "idta-02011": [],
   "idta-02017-mqtt": [],
   "idta-02017-opcua": [],
-  "idta-02023": [
-    "CarbonFootprint/ProductCarbonFootprints/ProductCarbonFootprint/LifeCyclePhases",
-    "CarbonFootprint/ProductCarbonFootprints/ProductCarbonFootprint/LifeCyclePhases/LifeCyclePhase",
-  ],
+  "idta-02023": [],
   "local-operational": [
     "OperationalData",
     "OperationalData/CurrentTemperature",

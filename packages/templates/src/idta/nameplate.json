@@ -72,11 +72,11 @@
         {
           "t": "mlp",
           "idShort": "Street",
-          "verified": "none",
-          "required": true,
-          "cardinality": "1",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
           "semanticId": "0173-1#02-AAO128#002",
-          "source": "Nameplate 2.0 값 — 3.0 사양서 재확인 필요",
+          "source": "IDTA 02002-1-0 Template JSON, ContactInformation (Multiplicity=ZeroToOne). Nameplate 3.0의 AddressInformation은 내용이 비어 있는 smt-dropin이라 주소 항목은 이 템플릿에서 온다",
           "langs": [
             {
               "language": "ko",
@@ -87,11 +87,11 @@
         {
           "t": "mlp",
           "idShort": "Zipcode",
-          "verified": "none",
-          "required": true,
-          "cardinality": "1",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
           "semanticId": "0173-1#02-AAO129#002",
-          "source": "Nameplate 2.0 값 — 3.0 사양서 재확인 필요",
+          "source": "IDTA 02002-1-0 Template JSON, ContactInformation (Multiplicity=ZeroToOne)",
           "langs": [
             {
               "language": "ko",
@@ -102,11 +102,11 @@
         {
           "t": "mlp",
           "idShort": "CityTown",
-          "verified": "none",
-          "required": true,
-          "cardinality": "1",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
           "semanticId": "0173-1#02-AAO132#002",
-          "source": "Nameplate 2.0 값 — 3.0 사양서 재확인 필요",
+          "source": "IDTA 02002-1-0 Template JSON, ContactInformation (Multiplicity=ZeroToOne)",
           "langs": [
             {
               "language": "ko",
@@ -117,11 +117,11 @@
         {
           "t": "mlp",
           "idShort": "NationalCode",
-          "verified": "none",
-          "required": true,
-          "cardinality": "1",
+          "verified": "spec",
+          "required": false,
+          "cardinality": "0..1",
           "semanticId": "0173-1#02-AAO134#002",
-          "source": "Nameplate 2.0 값 — 3.0 사양서 재확인 필요",
+          "source": "IDTA 02002-1-0 Template JSON, ContactInformation (Multiplicity=ZeroToOne)",
           "langs": [
             {
               "language": "en",
@@ -191,8 +191,8 @@
       "t": "prop",
       "idShort": "OrderCodeOfManufacturer",
       "verified": "spec",
-      "required": false,
-      "cardinality": "0..1",
+      "required": true,
+      "cardinality": "1",
       "valueType": "xs:string",
       "semanticId": "0112/2///61987#ABA950#008",
       "supplementalSemanticIds": [
@@ -233,8 +233,8 @@
       "t": "prop",
       "idShort": "YearOfConstruction",
       "verified": "spec",
-      "required": true,
-      "cardinality": "1",
+      "required": false,
+      "cardinality": "0..1",
       "valueType": "xs:string",
       "semanticId": "0112/2///61987#ABP000#002",
       "supplementalSemanticIds": [
