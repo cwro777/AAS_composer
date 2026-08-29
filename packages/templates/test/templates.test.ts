@@ -57,7 +57,11 @@ describe('IDTA 템플릿', () => {
   });
 
   for (const def of templates) {
-    describe(`${def.name} (${def.idtaNumber} v${def.version})`, () => {
+    /* 스냅샷 키는 템플릿 id로 고정한다.
+       name·idtaNumber·version을 키에 넣으면 메타데이터를 고치는 순간 골든이 고아가 되고
+       새 키로 조용히 다시 쓰인다 — Carbon의 idtaNumber를 정정할 때 실제로 그 일이 일어났다.
+       그 템플릿만 비교 대상 없이 통과하게 되므로 안전망이 사라진다. */
+    describe(def.id, () => {
       const { doc: base, shell } = docWithShell();
       const cmd: Cmd = instantiate(def, {
         newId: ids('t'),
