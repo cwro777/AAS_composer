@@ -93,5 +93,13 @@ const sms = (await (await fetch(`${BASYX}/submodels`)).json()) as { result: Arra
 line('BaSyx 셸', shells.result.map((s) => s.idShort).join(', ') || '(없음)');
 line('BaSyx 서브모델', `${sms.result.length}건 — ${sms.result.map((s) => s.idShort).join(', ')}`);
 
+/* 점검 스크립트가 매번 모델을 남기면 저장소가 점검용으로 뒤덮인다. 남기려면 KEEP=1 */
+if (process.env['KEEP'] === '1') {
+  line('남김', `${created.id} (KEEP=1)`);
+} else {
+  await app.request(`/models/${created.id}`, { method: 'DELETE' });
+  line('정리', '점검용 모델을 지웠습니다 (남기려면 KEEP=1). BaSyx에 올린 것은 그대로입니다.');
+}
+
 await sql.end();
 await sql2.end();

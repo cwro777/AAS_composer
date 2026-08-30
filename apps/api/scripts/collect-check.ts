@@ -112,4 +112,17 @@ line('수집 상태', `받은 값 ${status.jobs[0]?.received ?? 0}건 · 오류 
 
 await app.request(`/collect/${created.id}/stop`, { method: 'POST' });
 await collector.stopAll();
+
+/**
+ * 만든 것을 치운다.
+ *
+ * 점검 스크립트가 매번 모델을 남기면 저장소와 운전 화면이 금세 점검용으로 뒤덮인다.
+ * 남겨서 화면에서 보고 싶으면 `KEEP=1`.
+ */
+if (process.env['KEEP'] === '1') {
+  line('남김', `${created.id} (KEEP=1)`);
+} else {
+  await app.request(`/models/${created.id}`, { method: 'DELETE' });
+  line('정리', '점검용 모델과 시계열을 지웠습니다 (남기려면 KEEP=1)');
+}
 process.exit(0);

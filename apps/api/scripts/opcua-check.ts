@@ -163,4 +163,13 @@ await app.request(`/collect/${bad.id}/stop`, { method: 'POST' });
 
 await collector.stopAll();
 await server.shutdown();
+
+/* 점검 스크립트가 매번 모델을 남기면 저장소가 점검용으로 뒤덮인다. 남기려면 KEEP=1 */
+if (process.env['KEEP'] === '1') {
+  line('남김', `${created.id} · ${bad.id} (KEEP=1)`);
+} else {
+  await app.request(`/models/${created.id}`, { method: 'DELETE' });
+  await app.request(`/models/${bad.id}`, { method: 'DELETE' });
+  line('정리', '점검용 모델 2건과 시계열을 지웠습니다 (남기려면 KEEP=1)');
+}
 process.exit(0);

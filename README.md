@@ -100,6 +100,8 @@ Set-Content -Path apps\web\.next -Stream com.dropbox.ignored -Value 1
 ### 살아 있는 스택에 대고 확인 (`pnpm --filter @aas/api exec tsx …`)
 
 전부 실제 서버·브로커에 붙습니다. 흉내가 아닙니다.
+**만든 모델은 끝나면서 스스로 지웁니다** — 안 그러면 저장소와 운전 화면이 점검용으로
+뒤덮입니다. 화면에서 보려면 `KEEP=1`을 앞에 붙이십시오.
 
 | 스크립트 | 확인하는 것 |
 | --- | --- |
