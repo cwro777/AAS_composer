@@ -207,7 +207,9 @@ describe('버전 비교', () => {
     expect(body.changes).toHaveLength(2);
     expect(body.changes[0]!.text).toContain('Submodel Nameplate 추가');
     expect(body.changes[0]!.text).toContain('IMM_150E_AAS');
+    /* 이전 값은 역명령에서 온다 — "A → B"로 읽혀야 한다 */
     expect(body.changes[1]!.text).toContain('kind');
+    expect(body.changes[1]!.text).toContain('→');
     expect(body.changes[0]!.author).toBe('홍길동');
   });
 
@@ -243,10 +245,147 @@ describe('내보내기', () => {
   });
 });
 
+describe('BaSyx 게시', () => {
+  /** 실제 BaSyx 없이 응답을 흉내 낸다 */
+  const fakeBasyx = (statusFor: (url: string) => number) => {
+    const calls: Array<{ url: string; method: string }> = [];
+    const fetchLike = async (url: string, init?: { method?: string }) => {
+      calls.push({ url, method: init?.method ?? 'GET' });
+      const status = statusFor(url);
+      return { ok: status < 400, status, text: async () => (status < 400 ? '' : 'boom') };
+    };
+    return { calls, fetchLike };
+  };
+
+  const withStore = (fetchLike: ReturnType<typeof fakeBasyx>['fetchLike']): ReturnType<typeof createApp> =>
+    createApp(createMemoryStore({ newId: () => 'm1', now: () => '2026-08-30T00:00:00.000Z' }), {
+      fetchLike,
+    });
+
+  /** 서브모델 하나가 달린 셸 — 게시할 것이 있는 문서 */
+  async function seeded(app: ReturnType<typeof createApp>): Promise<string> {
+    const doc = apply(
+      apply(emptyDoc(), {
+        t: 'insert',
+        parent: null,
+        index: 0,
+        node: newNode('n1', 'shell', {
+          idShort: 'IMM_AAS',
+          identifier: 'https://bnb.co.kr/ids/aas/imm',
+          globalAssetId: 'https://bnb.co.kr/ids/asset/imm',
+        }),
+      }).doc,
+      {
+        t: 'insert',
+        parent: 'n1',
+        index: 0,
+        node: newNode('n2', 'submodel', {
+          idShort: 'Nameplate',
+          identifier: 'https://bnb.co.kr/ids/sm/imm/nameplate',
+          semanticId: 'https://admin-shell.io/idta/nameplate/3/0/Nameplate',
+        }),
+      },
+    ).doc;
+    const res = await app.request('/models', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'imm', doc }),
+    });
+    return ((await res.json()) as { id: string }).id;
+  }
+
+  it('서브모델을 먼저, 셸을 나중에 올린다 — 셸이 참조하기 때문이다', async () => {
+    const fake = fakeBasyx(() => 201);
+    const app = withStore(fake.fetchLike);
+    const id = await seeded(app);
+
+    const res = await app.request(`/publish/${id}`, { method: 'POST' });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { ok: number; failed: number; items: Array<{ kind: string }> };
+    expect(body.ok).toBe(2);
+    expect(body.failed).toBe(0);
+    expect(body.items.map((i) => i.kind)).toEqual(['submodel', 'shell']);
+    expect(fake.calls.map((c) => c.url.replace('http://localhost:8081', ''))).toEqual([
+      '/submodels',
+      '/shells',
+    ]);
+  });
+
+  it('이미 있으면 PUT으로 갱신한다 — 두 번 눌러도 409가 쌓이지 않는다', async () => {
+    const fake = fakeBasyx((url) => (url.includes('/submodels/') ? 204 : url.endsWith('/submodels') ? 409 : 201));
+    const app = withStore(fake.fetchLike);
+    const id = await seeded(app);
+
+    const res = await app.request(`/publish/${id}`, { method: 'POST' });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { items: Array<{ updated: boolean; ok: boolean }> };
+    expect(body.items[0]!.updated).toBe(true);
+    expect(body.items[0]!.ok).toBe(true);
+    /* Base64URL로 인코딩한 id로 PUT을 보냈는지 */
+    expect(fake.calls[1]!.method).toBe('PUT');
+    expect(fake.calls[1]!.url).toContain('/submodels/aHR0cHM6Ly9ibmIuY28ua3IvaWRzL3NtL2ltbS9uYW1lcGxhdGU');
+  });
+
+  it('일부만 실패하면 207과 항목별 결과를 준다 — 롤백하지 않는다', async () => {
+    const fake = fakeBasyx((url) => (url.endsWith('/shells') ? 500 : 201));
+    const app = withStore(fake.fetchLike);
+    const id = await seeded(app);
+
+    const res = await app.request(`/publish/${id}`, { method: 'POST' });
+    expect(res.status).toBe(207);
+    const body = (await res.json()) as { ok: number; failed: number; items: Array<{ error?: string }> };
+    expect(body.ok).toBe(1);
+    expect(body.failed).toBe(1);
+    expect(body.items[1]!.error).toContain('boom');
+  });
+
+  it('오류가 있는 모델은 막는다 — force로만 강행한다', async () => {
+    const fake = fakeBasyx(() => 201);
+    const app = withStore(fake.fetchLike);
+    /* idShort가 숫자로 시작 → POL-NAME 오류. 식별자는 있으므로 올릴 것은 있다 */
+    const doc = apply(emptyDoc(), {
+      t: 'insert',
+      parent: null,
+      index: 0,
+      node: newNode('n1', 'submodel', {
+        idShort: '1Bad',
+        identifier: 'https://bnb.co.kr/ids/sm/broken',
+      }),
+    }).doc;
+    const id = ((await (
+      await app.request('/models', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name: 'broken', doc }),
+      })
+    ).json()) as { id: string }).id;
+
+    const blocked = await app.request(`/publish/${id}`, { method: 'POST' });
+    expect(blocked.status).toBe(422);
+    expect(fake.calls).toHaveLength(0);
+
+    const forced = await app.request(`/publish/${id}?force=1`, { method: 'POST' });
+    expect(forced.status).toBe(200);
+    expect(fake.calls.length).toBeGreaterThan(0);
+  });
+
+  it('BaSyx가 죽어 있으면 502로 알린다', async () => {
+    const app = withStore(async () => {
+      throw new Error('ECONNREFUSED');
+    });
+    const id = await seeded(app);
+    const res = await app.request(`/publish/${id}`, { method: 'POST' });
+    expect(res.status).toBe(502);
+    const body = (await res.json()) as { error: string; target: string };
+    expect(body.error).toBe('UNREACHABLE');
+    expect(body.target).toContain('8081');
+  });
+});
+
 describe('아직 없는 것', () => {
-  it('사전·게시·일괄은 501과 함께 어느 단계인지 알려 준다', async () => {
+  it('사전·일괄은 501과 함께 어느 단계인지 알려 준다', async () => {
     const app = fresh();
-    for (const p of ['/dictionary/search', '/publish/x', '/batch']) {
+    for (const p of ['/dictionary/search', '/batch']) {
       const res = await app.request(p);
       expect(res.status).toBe(501);
       const body = (await res.json()) as { note: string };

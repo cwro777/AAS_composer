@@ -5,8 +5,9 @@ services:
       POSTGRES_USER: aas
       POSTGRES_PASSWORD: aas
       POSTGRES_DB: aas
+    # 이 PC의 5432는 다른 스택(TimescaleDB)이 이미 쓰고 있다. 비켜 쓴다.
     ports:
-      - '5432:5432'
+      - '5433:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -16,8 +17,9 @@ services:
       retries: 10
 
   # BaSyx V2 — AAS V3 API. 게시 대상은 이 버전으로 확정되어 있다.
+  # 태그를 고정한다. SNAPSHOT은 같은 이름으로 내용이 바뀌어 재현이 안 된다.
   basyx:
-    image: eclipsebasyx/aas-environment:2.0.0
+    image: eclipsebasyx/aas-environment:2.0.0-milestone-15
     ports:
       - '8081:8081'
     environment:

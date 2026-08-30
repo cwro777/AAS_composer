@@ -17,8 +17,14 @@ export interface DiffLine {
   text: string;
 }
 
+function short(v: unknown): string {
+  const s = typeof v === 'string' ? v : JSON.stringify(v);
+  if (s === undefined || s === 'null' || s === '""') return '(비어 있음)';
+  return s.length > 40 ? `${s.slice(0, 40)}…` : s;
+}
+
 /** 명령 하나를 문장으로. 이름은 그 시점의 문서에서 찾는다 */
-function describe(cmd: Cmd, doc: AasDoc): string {
+function describe(cmd: Cmd, doc: AasDoc, undo?: Cmd[]): string {
   switch (cmd.t) {
     case 'insert': {
       const kind = MODEL_TYPE[cmd.node.t];
@@ -40,9 +46,15 @@ function describe(cmd: Cmd, doc: AasDoc): string {
     }
     case 'set': {
       const n = doc.nodes[cmd.node];
-      const v = typeof cmd.value === 'string' ? cmd.value : JSON.stringify(cmd.value);
-      const shown = v.length > 40 ? `${v.slice(0, 40)}…` : v;
-      return `${n?.idShort ?? '노드'}의 ${cmd.path}을(를) ${shown || '(비움)'}(으)로`;
+      /* 이전 값은 역명령이 갖고 있다 — 저장해 둔 것을 쓰면 "A → B"로 읽힌다.
+         현재 문서만 보면 idShort를 바꾼 경우 "X의 idShort를 X로"가 되어 읽을 수 없다. */
+      const before = undo?.find((u) => u.t === 'set' && u.node === cmd.node && u.path === cmd.path);
+      const from = before && before.t === 'set' ? short(before.value) : null;
+      const to = short(cmd.value);
+      const who = n?.idShort ?? '노드';
+      return from === null
+        ? `${who}의 ${cmd.path}을(를) ${to}(으)로`
+        : `${who}의 ${cmd.path}: ${from} → ${to}`;
     }
     case 'batch':
       return cmd.label || `${cmd.cmds.length}개 변경`;
@@ -59,6 +71,6 @@ export function diffLines(commands: CommandRecord[], doc: AasDoc): DiffLine[] {
     version: c.version,
     at: c.at,
     author: c.author,
-    text: describe(c.cmd, doc),
+    text: describe(c.cmd, doc, c.undo),
   }));
 }

@@ -19,10 +19,12 @@ import { writeAasx } from '@aas/aasx';
 import { buildConceptDescriptions, attachConceptDescriptions, serialize } from '@aas/kernel';
 import { termsResolver } from '@aas/semantic';
 
+import { type FetchLike, publish } from './basyx.js';
 import { diffLines } from './diff.js';
 import type { ModelStore } from './store.js';
 
 const IRI_PREFIX = process.env['IRI_PREFIX'] ?? 'https://bnb.co.kr/ids';
+const BASYX_URL = process.env['BASYX_URL'] ?? 'http://localhost:8081';
 
 /* 문서 구조는 커널이 지킨다. 여기서는 형태만 본다 — 두 곳에서 규칙을 쓰지 않기 위해서다. */
 const docSchema = z.object({
@@ -64,8 +66,10 @@ function issuesOf(doc: AasDoc): ReturnType<typeof validate> {
   return [...policy, ...template];
 }
 
-export function createApp(store: ModelStore): Hono {
+/** 네트워크는 주입받는다 — 테스트가 실제 BaSyx 없이도 돌아야 한다 */
+export function createApp(store: ModelStore, opts?: { fetchLike?: FetchLike }): Hono {
   const app = new Hono();
+  const fetchImpl: FetchLike = opts?.fetchLike ?? ((url, init) => fetch(url, init as RequestInit));
 
   app.get('/health', (c) => c.json({ ok: true }));
 
@@ -230,11 +234,39 @@ export function createApp(store: ModelStore): Hono {
     return ok ? c.json({ ok: true }) : c.json({ error: 'NOT_FOUND' }, 404);
   });
 
+  /**
+   * BaSyx V2 게시.
+   *
+   * 부분 실패를 롤백하지 않는다 — 항목별 결과를 돌려주고 실패한 것만 다시 시도한다.
+   * conceptDescriptions는 올리지 않는다. BaSyx의 개념 저장소는 별도 서비스라
+   * 지금 여기서 다루면 절반만 맞는 구현이 된다.
+   */
+  app.post('/publish/:id', async (c) => {
+    const rec = await store.get(c.req.param('id'));
+    if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
+
+    const baseUrl = c.req.query('target') ?? BASYX_URL;
+    const errors = issuesOf(rec.doc).filter((i) => i.severity === 'error');
+    if (errors.length && c.req.query('force') !== '1') {
+      /* 깨진 모델을 저장소에 올리면 받는 쪽이 먼저 곤란해진다 */
+      return c.json(
+        { error: 'HAS_ERRORS', errors: errors.length, hint: '오류를 고치거나 force=1로 강행하십시오.' },
+        422,
+      );
+    }
+
+    try {
+      const result = await publish(serialize(rec.doc), { baseUrl, fetchLike: fetchImpl });
+      return c.json(result, result.failed ? 207 : 200);
+    } catch (e) {
+      return c.json({ error: 'UNREACHABLE', target: baseUrl, detail: (e as Error).message }, 502);
+    }
+  });
+
   /** 아직 만들지 않은 경로는 501과 함께 어느 단계의 일인지 알려 준다 */
   for (const [path, note] of [
     ['/dictionary/search', 'P7 — IEC CDD 프록시 캐시. 지금은 용어집이 브라우저 안에 있다'],
     ['/dictionary/:irdi', 'P7 — 단일 조회 + 버전 유효성'],
-    ['/publish/:id', 'P7 — BaSyx V2 등록'],
     ['/batch', 'P8 — CSV 고정 컬럼 일괄 생성'],
   ] as const) {
     app.all(path, (c) => c.json({ error: 'NOT_IMPLEMENTED', path, note }, 501));

@@ -96,10 +96,15 @@
 - `@aas/aasx` — **P7 완료.** OPC 패키지 쓰기·읽기. 관계 타입은 admin-shell.io가 정한 것을
   그대로 쓴다(이름을 지어내면 Package Explorer가 열지 못한다). `docs/sample-imm150.aasx`가
   실제 산출물이다.
-- `apps/api` — **P7 진행 중.** 모델 저장소·명령 로그·버전 비교·검증·AASX 내보내기.
-  **저장소는 아직 메모리다** — 서버를 껐다 켜면 사라진다. `ModelStore` 인터페이스 뒤에 있고
-  `src/db/schema.ts`에 PostgreSQL 스키마가 이미 있으니, Drizzle 구현을 끼우면 라우트는 그대로다.
-  사전 프록시·BaSyx 게시·일괄 생성은 501로 응답하며 어느 단계의 일인지 알려 준다.
+- `apps/api` — **P7 진행 중.** 모델 저장소·명령 로그·버전 비교·검증·AASX·BaSyx 게시.
+  저장소는 `DATABASE_URL`이 있으면 **PostgreSQL(Drizzle)**, 없으면 메모리다. 메모리일 때는
+  껐다 켜면 사라지고 시작 로그가 그렇게 말한다.
+  게시는 **부분 실패를 롤백하지 않는다** — 항목별 결과를 돌려주고 실패한 것만 다시 시도한다.
+  네트워크는 주입받으므로(`createApp(store, { fetchLike })`) 테스트는 실제 BaSyx 없이 돈다.
+  사전 프록시·일괄 생성만 501이다.
+- **이 PC의 5432는 다른 스택(TimescaleDB)이 쓰고 있다.** 우리 PostgreSQL은 **5433**이다.
+  Docker는 WSL 안에서 돈다 — `wsl -e bash -lc "cd /mnt/c/… && docker compose up -d"`.
+  살아 있는 스택 점검: `pnpm --filter @aas/api exec tsx scripts/live-check.ts`
 - 나머지 워크스페이스는 **스캐폴드**다 — `ui`(토큰만) · `e2e`.
 
 P3에서 확정된 것:
