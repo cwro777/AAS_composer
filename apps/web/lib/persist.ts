@@ -21,7 +21,9 @@ import {
   parse,
   serialize,
 } from '@aas/kernel';
+import type { Environment } from '@aas/kernel';
 import { termsResolver } from '@aas/semantic';
+import { writeAasx } from '@aas/aasx';
 
 const KEY = 'aas-composer/editor/v1';
 
@@ -92,6 +94,31 @@ export function suggestFilename(doc: AasDoc): string {
   const shell = doc.roots.map((r) => doc.nodes[r]).find((n) => n?.t === 'shell');
   const base = (shell?.idShort || 'aas-model').replace(/[^A-Za-z0-9_-]/g, '_');
   return `${base}.json`;
+}
+
+/**
+ * AASX로 내보낸다.
+ *
+ * File 요소가 가리키는 첨부는 아직 담지 못한다 — 에디터에 파일을 넣는 자리가 없기 때문이다.
+ * 조용히 빠뜨리지 않고 몇 건인지 돌려준다.
+ */
+export function buildAasx(doc: AasDoc): { bytes: Uint8Array; concepts: number; missingFiles: number } {
+  const { env, concepts } = buildExport(doc);
+  const missingFiles = Object.keys(doc.nodes).filter(
+    (id) => doc.nodes[id]!.t === 'file' && (doc.nodes[id] as { value?: string }).value,
+  ).length;
+  return { bytes: writeAasx({ environment: env as Environment }), concepts, missingFiles };
+}
+
+export function downloadBytes(filename: string, bytes: Uint8Array, mime: string): void {
+  const url = URL.createObjectURL(new Blob([bytes as unknown as BlobPart], { type: mime }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 export function downloadText(filename: string, text: string): void {

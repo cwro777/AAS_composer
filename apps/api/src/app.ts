@@ -1,0 +1,244 @@
+/**
+ * API — 모델 저장소 · 명령 로그 · 버전 비교 · 검증 · 내보내기.
+ *
+ * 원칙 (계획서 09장):
+ * - `@aas/kernel`을 그대로 import 한다. **검증 로직을 서버에서 다시 쓰지 않는다.**
+ *   에디터가 통과시킨 것이 서버에서 거절당하는 일은 같은 코드를 쓰면 생기지 않는다.
+ * - 응답 스키마는 Zod로 정의하고 그 타입을 web이 공유한다.
+ * - 저장은 스냅샷 + 명령 로그. 버전 비교와 감사 추적이 여기서 나온다.
+ *
+ * 단일 사용자이므로 병합 화면은 만들지 않는다. 충돌은 409 + 재적재 안내로 끝낸다.
+ */
+
+import { Hono } from 'hono';
+import { z } from 'zod';
+
+import { type AasDoc, type Cmd, apply, validate } from '@aas/kernel';
+import { checkAllConformance } from '@aas/templates';
+import { writeAasx } from '@aas/aasx';
+import { buildConceptDescriptions, attachConceptDescriptions, serialize } from '@aas/kernel';
+import { termsResolver } from '@aas/semantic';
+
+import { diffLines } from './diff.js';
+import type { ModelStore } from './store.js';
+
+const IRI_PREFIX = process.env['IRI_PREFIX'] ?? 'https://bnb.co.kr/ids';
+
+/* 문서 구조는 커널이 지킨다. 여기서는 형태만 본다 — 두 곳에서 규칙을 쓰지 않기 위해서다. */
+const docSchema = z.object({
+  schema: z.literal(1),
+  nodes: z.record(z.unknown()),
+  order: z.record(z.array(z.string())),
+  parent: z.record(z.string().nullable()),
+  roots: z.array(z.string()),
+});
+
+const createSchema = z.object({
+  name: z.string().min(1),
+  doc: docSchema,
+  layout: z.unknown().optional(),
+});
+
+const replaceSchema = z.object({
+  name: z.string().min(1).optional(),
+  doc: docSchema,
+  layout: z.unknown().optional(),
+});
+
+const commandsSchema = z.object({
+  commands: z.array(z.unknown()).min(1),
+  author: z.string().optional(),
+});
+
+/** 저장할 때마다 서버도 같은 커널로 검증한다 */
+function issuesOf(doc: AasDoc): ReturnType<typeof validate> {
+  const policy = validate(doc, { iriPrefix: IRI_PREFIX });
+  const template = checkAllConformance(doc).map((c) => ({
+    code: c.code,
+    layer: 'template' as const,
+    severity: (c.code === 'T-001' || c.code === 'T-002' ? 'error' : 'warn') as 'error' | 'warn',
+    node: c.node,
+    path: c.path,
+    message: c.message,
+  }));
+  return [...policy, ...template];
+}
+
+export function createApp(store: ModelStore): Hono {
+  const app = new Hono();
+
+  app.get('/health', (c) => c.json({ ok: true }));
+
+  app.get('/models', async (c) => c.json({ models: await store.list() }));
+
+  app.post('/models', async (c) => {
+    const body = createSchema.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json({ error: 'INVALID_BODY', detail: body.error.issues }, 400);
+    const doc = body.data.doc as unknown as AasDoc;
+    const rec = await store.create({
+      name: body.data.name,
+      doc,
+      layout: (body.data.layout ?? null) as never,
+      issues: issuesOf(doc),
+    });
+    c.header('ETag', String(rec.version));
+    return c.json(rec, 201);
+  });
+
+  app.get('/models/:id', async (c) => {
+    const rec = await store.get(c.req.param('id'));
+    if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
+    c.header('ETag', String(rec.version));
+    return c.json(rec);
+  });
+
+  /** 스냅샷 통째로 저장. If-Match가 없으면 덮어쓰지 않는다 */
+  app.put('/models/:id', async (c) => {
+    const id = c.req.param('id');
+    const cur = await store.get(id);
+    if (!cur) return c.json({ error: 'NOT_FOUND' }, 404);
+
+    const expected = Number(c.req.header('If-Match'));
+    if (!Number.isFinite(expected)) {
+      return c.json({ error: 'IF_MATCH_REQUIRED', version: cur.version }, 428);
+    }
+
+    const body = replaceSchema.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json({ error: 'INVALID_BODY', detail: body.error.issues }, 400);
+
+    const doc = body.data.doc as unknown as AasDoc;
+    const next = await store.replace(
+      id,
+      {
+        doc,
+        layout: (body.data.layout ?? null) as never,
+        issues: issuesOf(doc),
+        ...(body.data.name === undefined ? {} : { name: body.data.name }),
+      },
+      expected,
+    );
+    if (!next) {
+      /* 단일 사용자라 병합 화면을 만들지 않는다. 다시 불러오라고 알린다 */
+      return c.json(
+        {
+          error: 'VERSION_CONFLICT',
+          expected,
+          actual: cur.version,
+          hint: '다른 탭에서 먼저 저장했습니다. 다시 불러온 뒤 편집하십시오.',
+        },
+        409,
+      );
+    }
+    c.header('ETag', String(next.version));
+    return c.json(next);
+  });
+
+  /**
+   * 명령을 덧붙인다.
+   * 서버가 직접 `apply`를 돌린다 — 클라이언트가 보낸 문서를 믿지 않고,
+   * 같은 커널로 다시 계산해 결과가 갈라지지 않게 한다.
+   */
+  app.post('/models/:id/commands', async (c) => {
+    const id = c.req.param('id');
+    const cur = await store.get(id);
+    if (!cur) return c.json({ error: 'NOT_FOUND' }, 404);
+
+    const expected = Number(c.req.header('If-Match'));
+    if (!Number.isFinite(expected)) {
+      return c.json({ error: 'IF_MATCH_REQUIRED', version: cur.version }, 428);
+    }
+    if (expected !== cur.version) {
+      return c.json(
+        { error: 'VERSION_CONFLICT', expected, actual: cur.version, hint: '다시 불러온 뒤 편집하십시오.' },
+        409,
+      );
+    }
+
+    const body = commandsSchema.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json({ error: 'INVALID_BODY', detail: body.error.issues }, 400);
+
+    let doc = cur.doc;
+    const entries: Array<{ cmd: Cmd; undo: Cmd[]; author?: string | null }> = [];
+    for (const raw of body.data.commands) {
+      const cmd = raw as Cmd;
+      const r = apply(doc, cmd);
+      if (r.rejected) {
+        /* 전부 아니면 전무. 절반만 적용된 문서를 남기지 않는다 */
+        return c.json({ error: 'REJECTED', at: entries.length, rejected: r.rejected }, 422);
+      }
+      doc = r.doc;
+      entries.push({ cmd, undo: r.undo, author: body.data.author ?? null });
+    }
+
+    const next = await store.append(id, entries, doc, issuesOf(doc), expected);
+    if (!next) return c.json({ error: 'VERSION_CONFLICT', expected, actual: cur.version }, 409);
+    c.header('ETag', String(next.version));
+    return c.json({ version: next.version, issues: next.issues, doc: next.doc });
+  });
+
+  app.get('/models/:id/versions', async (c) => {
+    const id = c.req.param('id');
+    const rec = await store.get(id);
+    if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
+    const log = await store.commands(id);
+    return c.json({
+      current: rec.version,
+      versions: log.map((l) => ({ version: l.version, at: l.at, author: l.author })),
+    });
+  });
+
+  /** 무엇이 바뀌었는지 문장으로 */
+  app.get('/models/:id/diff', async (c) => {
+    const id = c.req.param('id');
+    const rec = await store.get(id);
+    if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
+    const from = c.req.query('from') ? Number(c.req.query('from')) : undefined;
+    const to = c.req.query('to') ? Number(c.req.query('to')) : undefined;
+    const log = await store.commands(id, from, to);
+    return c.json({ from: from ?? 1, to: to ?? rec.version, changes: diffLines(log, rec.doc) });
+  });
+
+  app.post('/models/:id/validate', async (c) => {
+    const rec = await store.get(c.req.param('id'));
+    if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
+    const issues = issuesOf(rec.doc);
+    return c.json({
+      version: rec.version,
+      errors: issues.filter((i) => i.severity === 'error').length,
+      warnings: issues.filter((i) => i.severity === 'warn').length,
+      issues,
+    });
+  });
+
+  /** AASX 내보내기. 첨부는 아직 담지 않는다 — 서버에 파일 저장소가 없다 */
+  app.get('/models/:id/aasx', async (c) => {
+    const rec = await store.get(c.req.param('id'));
+    if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
+    const cd = buildConceptDescriptions(rec.doc, termsResolver());
+    const env = attachConceptDescriptions(serialize(rec.doc), cd.conceptDescriptions);
+    const bytes = writeAasx({ environment: env });
+    const name = `${rec.name.replace(/[^A-Za-z0-9_-]/g, '_')}.aasx`;
+    c.header('Content-Type', 'application/asset-administration-shell-package');
+    c.header('Content-Disposition', `attachment; filename="${name}"`);
+    c.header('X-Concept-Descriptions', String(cd.conceptDescriptions.length));
+    c.header('X-Unresolved-Concepts', String(cd.unresolved.length));
+    return c.body(bytes as unknown as ArrayBuffer);
+  });
+
+  app.delete('/models/:id', async (c) => {
+    const ok = await store.remove(c.req.param('id'));
+    return ok ? c.json({ ok: true }) : c.json({ error: 'NOT_FOUND' }, 404);
+  });
+
+  /** 아직 만들지 않은 경로는 501과 함께 어느 단계의 일인지 알려 준다 */
+  for (const [path, note] of [
+    ['/dictionary/search', 'P7 — IEC CDD 프록시 캐시. 지금은 용어집이 브라우저 안에 있다'],
+    ['/dictionary/:irdi', 'P7 — 단일 조회 + 버전 유효성'],
+    ['/publish/:id', 'P7 — BaSyx V2 등록'],
+    ['/batch', 'P8 — CSV 고정 컬럼 일괄 생성'],
+  ] as const) {
+    app.all(path, (c) => c.json({ error: 'NOT_IMPLEMENTED', path, note }, 501));
+  }
+
+  return app;
+}

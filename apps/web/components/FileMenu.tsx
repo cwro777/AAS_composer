@@ -13,8 +13,10 @@ import { emptyDoc } from '@aas/kernel';
 
 import { treeLayout } from '../lib/layout';
 import {
+  buildAasx,
   buildExport,
   clearLocal,
+  downloadBytes,
   downloadText,
   environmentText,
   importEnvironment,
@@ -94,6 +96,24 @@ export function FileMenu(): React.JSX.Element {
         }}
       >
         내보내기
+      </button>
+
+      <button
+        type="button"
+        disabled={empty}
+        title="OPC 패키지. 첨부까지 한 묶음으로 주고받는 형식입니다."
+        onClick={() => {
+          const { bytes, concepts, missingFiles } = buildAasx(doc);
+          const name = suggestFilename(doc).replace(/\.json$/, '.aasx');
+          downloadBytes(name, bytes, 'application/asset-administration-shell-package');
+          notify(
+            missingFiles
+              ? `${name} — 개념 ${concepts}건 포함. File 요소 ${missingFiles}건의 첨부는 아직 담지 못합니다.`
+              : `${name} — 개념 ${concepts}건을 함께 담았습니다.`,
+          );
+        }}
+      >
+        AASX
       </button>
 
       <button
