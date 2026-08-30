@@ -50,8 +50,9 @@
   --n-ref: #814527;
   --n-entity: #2f6b8f;
   --n-rel: #7a5230;
-  --n-operation: #6b4a86;
-  --n-capability: #3f6d5a;
+  --n-annrel: #8a6a4a;
+  --n-op: #6b4a86;
+  --n-cap: #3f6d5a;
 
   --sans: 'IBM Plex Sans', 'IBM Plex Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
@@ -101,8 +102,9 @@
     --n-ref: #c68259;
     --n-entity: #6fa8cc;
     --n-rel: #c39a72;
-    --n-operation: #b096d4;
-    --n-capability: #74b39a;
+    --n-annrel: #c7a686;
+    --n-op: #b096d4;
+    --n-cap: #74b39a;
 
     --sh: 0 1px 2px rgba(0, 0, 0, 0.5), 0 6px 16px rgba(0, 0, 0, 0.4);
     --sh-hi: 0 2px 4px rgba(0, 0, 0, 0.6), 0 12px 28px rgba(0, 0, 0, 0.55);
@@ -148,8 +150,9 @@
   --n-ref: #c68259;
   --n-entity: #6fa8cc;
   --n-rel: #c39a72;
-  --n-operation: #b096d4;
-  --n-capability: #74b39a;
+  --n-annrel: #c7a686;
+  --n-op: #b096d4;
+  --n-cap: #74b39a;
 
   --sh: 0 1px 2px rgba(0, 0, 0, 0.5), 0 6px 16px rgba(0, 0, 0, 0.4);
   --sh-hi: 0 2px 4px rgba(0, 0, 0, 0.6), 0 12px 28px rgba(0, 0, 0, 0.55);
