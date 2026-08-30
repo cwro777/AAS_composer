@@ -11,7 +11,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { parse } from '@aas/kernel';
 import { getTemplate, instantiate } from '@aas/templates';
@@ -26,7 +26,7 @@ import {
   createMemorySampleStore,
 } from '../src/collect/collector.js';
 import { createMemoryStore } from '../src/store.js';
-import { readPayload, topicOf } from '../src/collect/mqtt.js';
+import { type MqttClientLike, createMqttAdapter, readPayload, topicOf } from '../src/collect/mqtt.js';
 import { isNodeId, rawOf, relativePathOf } from '../src/collect/opcua.js';
 import { planFor } from '../src/collect/plan.js';
 
@@ -98,6 +98,100 @@ describe('MQTT 페이로드 읽기', () => {
     /* 값이 없는 것과 0은 다르다 */
     expect(readPayload('', null)).toBe('');
     expect(readPayload('not json {', null)).toBe('not json {');
+  });
+});
+
+describe('MQTT 어댑터가 스스로 끊지 않는다', () => {
+  /** 이벤트를 손으로 밀어 넣을 수 있는 가짜 mqtt 클라이언트 */
+  function fakeClient(): { client: MqttClientLike; emit: (ev: string, ...a: unknown[]) => void; ended: () => number } {
+    const handlers = new Map<string, Array<(...a: never[]) => void>>();
+    let ends = 0;
+    const add = (ev: string, cb: (...a: never[]) => void): void => {
+      handlers.set(ev, [...(handlers.get(ev) ?? []), cb]);
+    };
+    return {
+      client: {
+        on: add,
+        once: add,
+        removeListener: (ev, cb) => handlers.set(ev, (handlers.get(ev) ?? []).filter((h) => h !== cb)),
+        subscribeAsync: async () => undefined,
+        end: () => {
+          ends += 1;
+        },
+        endAsync: async () => {
+          ends += 1;
+        },
+      },
+      emit: (ev, ...a) => [...(handlers.get(ev) ?? [])].forEach((h) => h(...(a as never[]))),
+      ended: () => ends,
+    };
+  }
+
+  const source = {
+    node: 'i1',
+    interfaceName: 'InterfaceMQTT',
+    protocol: 'mqtt' as const,
+    base: 'mqtt://localhost:1883',
+    contentType: null,
+    signals: [
+      {
+        node: 'n1',
+        name: 'BarrelTemperature',
+        key: null,
+        address: 'mqtt://localhost:1883/machine/imm150/t',
+        unit: 'CEL',
+        type: null,
+        semanticId: null,
+      },
+    ],
+  };
+
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('붙은 뒤 시간 초과 타이머가 살아 있는 연결을 끊지 않는다', async () => {
+    /* 이 버그로 값이 정확히 8초 만에, 오류 한 줄 없이 멎었다 */
+    const fake = fakeClient();
+    const adapter = createMqttAdapter({ connect: () => fake.client, connectTimeoutMs: 1000 });
+
+    const started = adapter.start(source, () => undefined);
+    fake.emit('connect');
+    await started;
+
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(fake.ended()).toBe(0);
+
+    const got: string[] = [];
+    const again = adapter.start(source, (s) => got.push(s.raw));
+    fake.emit('connect');
+    await again;
+    await vi.advanceTimersByTimeAsync(10_000);
+    fake.emit('message', 'machine/imm150/t', Buffer.from('235.4'));
+    expect(got).toEqual(['235.4']);
+  });
+
+  it('시간 안에 못 붙으면 끊고 던진다', async () => {
+    const fake = fakeClient();
+    const adapter = createMqttAdapter({ connect: () => fake.client, connectTimeoutMs: 1000 });
+    const started = adapter.start(source, () => undefined);
+    const assertion = expect(started).rejects.toThrow('연결 시간 초과');
+    await vi.advanceTimersByTimeAsync(1200);
+    await assertion;
+    expect(fake.ended()).toBe(1);
+  });
+
+  it('붙은 뒤의 브로커 오류는 문제로 남는다 — 프로세스를 죽이지 않는다', async () => {
+    const fake = fakeClient();
+    const adapter = createMqttAdapter({ connect: () => fake.client });
+    const problems: string[] = [];
+    const started = adapter.start(source, () => undefined, (p) => problems.push(p));
+    fake.emit('connect');
+    await started;
+
+    fake.emit('error', new Error('ECONNRESET'));
+    fake.emit('offline');
+    expect(problems[0]).toContain('ECONNRESET');
+    expect(problems[1]).toContain('연결이 끊겼습니다');
   });
 });
 

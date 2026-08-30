@@ -43,33 +43,80 @@ export function readPayload(payload: string, key: string | null): string {
   }
 }
 
-export function createMqttAdapter(opts?: { connectTimeoutMs?: number }): SourceAdapter {
+/** 테스트가 가짜 클라이언트를 끼울 수 있게 최소한만 요구한다 */
+export interface MqttClientLike {
+  on(event: string, cb: (...args: never[]) => void): unknown;
+  once(event: string, cb: (...args: never[]) => void): unknown;
+  removeListener(event: string, cb: (...args: never[]) => void): unknown;
+  subscribeAsync(topics: string[]): Promise<unknown>;
+  end(force?: boolean, cb?: () => void): unknown;
+  endAsync(force?: boolean): Promise<void>;
+}
+
+export interface MqttOptions {
+  connectTimeoutMs?: number;
+  /** 기본은 실제 mqtt.js. 테스트에서만 바꾼다 */
+  connect?: (url: string, options: { connectTimeout: number; reconnectPeriod: number }) => MqttClientLike;
+}
+
+export function createMqttAdapter(opts?: MqttOptions): SourceAdapter {
+  const timeoutMs = opts?.connectTimeoutMs ?? 8000;
+  const connect =
+    opts?.connect ?? ((url, options): MqttClientLike => mqtt.connect(url, options) as unknown as MqttClientLike);
+
   return {
     protocol: 'mqtt',
-    async start(source: SourcePlan, onSample: (s: IncomingSample) => void): Promise<StopFn> {
+    async start(
+      source: SourcePlan,
+      onSample: (s: IncomingSample) => void,
+      onProblem?: (reason: string) => void,
+    ): Promise<StopFn> {
       const topics = new Map<string, { signal: string; node: string; key: string | null }>();
       for (const s of source.signals) {
         topics.set(topicOf(s.address, source.base), { signal: s.name, node: s.node, key: s.key });
       }
 
-      const client = mqtt.connect(source.base, {
-        connectTimeout: opts?.connectTimeoutMs ?? 8000,
-        reconnectPeriod: 2000,
-      });
+      const client = connect(source.base, { connectTimeout: timeoutMs, reconnectPeriod: 2000 });
 
+      /**
+       * 붙을 때까지 기다린다.
+       *
+       * 시간 초과 타이머는 **반드시 지운다.** 지우지 않으면 붙은 지 timeoutMs 뒤에
+       * 그 타이머가 살아 있는 연결을 끊는다. 이미 resolve된 뒤라 reject는 무시되고,
+       * 오류도 남지 않아 값만 조용히 멎는다.
+       */
       await new Promise<void>((resolve, reject) => {
-        const fail = (e: Error): void => {
+        let settled = false;
+        let timer: NodeJS.Timeout;
+        const onConnect = (): void => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          client.removeListener('error', onError as never);
+          resolve();
+        };
+        const onError = (e: Error): void => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
           client.end(true, () => undefined);
           reject(e);
         };
-        client.once('connect', () => resolve());
-        client.once('error', fail);
-        setTimeout(() => fail(new Error('연결 시간 초과')), opts?.connectTimeoutMs ?? 8000);
+        timer = setTimeout(() => onError(new Error('연결 시간 초과')), timeoutMs);
+        client.once('connect', onConnect as never);
+        client.once('error', onError as never);
       });
+
+      /**
+       * 붙은 뒤의 오류에도 듣는 사람이 있어야 한다. mqtt.js는 EventEmitter라
+       * 'error'를 아무도 듣지 않으면 **던진다** — API 프로세스 전체가 죽는다.
+       */
+      client.on('error', ((e: Error) => onProblem?.(`브로커 오류: ${e.message}`)) as never);
+      client.on('offline', (() => onProblem?.('브로커 연결이 끊겼습니다. 다시 붙는 중입니다.')) as never);
 
       await client.subscribeAsync([...topics.keys()]);
 
-      client.on('message', (topic: string, payload: Buffer) => {
+      client.on('message', ((topic: string, payload: Buffer) => {
         const sig = topics.get(topic);
         if (!sig) return;
         onSample({
@@ -78,7 +125,7 @@ export function createMqttAdapter(opts?: { connectTimeoutMs?: number }): SourceA
           raw: readPayload(payload.toString('utf8'), sig.key),
           at: new Date(),
         });
-      });
+      }) as never);
 
       return async () => {
         await client.endAsync(true);
