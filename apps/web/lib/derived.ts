@@ -15,6 +15,7 @@ import {
   buildConceptDescriptions,
   identifierIsReferencedInRaw,
   nodeForPath,
+  parentOf,
   pathIndex,
   renameIdentifier,
   serialize,
@@ -23,7 +24,7 @@ import {
   verifyEnvironment,
 } from '@aas/kernel';
 import { checkAllConformance, conformanceFix } from '@aas/templates';
-import { termsResolver } from '@aas/semantic';
+import { selfIssuedIri, termByName, termsResolver } from '@aas/semantic';
 
 import { buildExport } from './persist';
 import { useSettings } from './settings';
@@ -131,6 +132,47 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
                     : `식별자를 ${target}(으)로 바꿨습니다.`,
                 );
               }
+            },
+          };
+        }
+      }
+
+      /**
+       * semanticId가 없다.
+       *
+       * **표준 IRDI를 지어내지 않는다.** 할 수 있는 것은 두 가지뿐이다 —
+       *  1. 사내 용어집에 같은 이름이 있으면 그 식별자를 쓴다 (근거가 있다)
+       *  2. 없으면 **우리 이름으로 발행한다**. 이것은 추측이 아니라 선언이다.
+       *
+       * 목록 직속 자식은 자기 semanticId가 아니라 부모의 semanticIdListElement로 덮는다.
+       */
+      if (i.code === 'POL-SEM-001' && i.node !== null && iriPrefix) {
+        const node = i.node;
+        const parent = parentOf(settled, node);
+        const listChild = parent !== null && settled.nodes[parent]?.t === 'sml';
+        const target = listChild ? parent : node;
+        const field = listChild ? 'semanticIdListElement' : 'semanticId';
+        const name = settled.nodes[target]!.idShort;
+
+        /* 목록 항목의 개념은 목록 자신의 개념과 다른 것이다 — 같은 IRI를 쓰면 안 된다 */
+        const term = termByName(listChild ? `${name}Element` : name) ?? (listChild ? undefined : termByName(name));
+        const minted = listChild
+          ? selfIssuedIri(iriPrefix, name, 'Element')
+          : selfIssuedIri(iriPrefix, name);
+        const value = term?.semanticId ?? minted;
+
+        if (value) {
+          issue.fix = {
+            label: term ? `용어집의 “${term.term}” 지정` : '사내 개념으로 발행',
+            run: () => {
+              const s = useEditor.getState();
+              const label = term ? `용어집에서 semanticId 지정` : '사내 개념 발행';
+              if (!s.run({ t: 'set', node: target, path: field, value }, label)) return;
+              s.notify(
+                term
+                  ? `${name}에 용어집의 “${term.term}”(${term.semanticId})을 지정했습니다.`
+                  : `${name}의 개념을 ${value}로 발행했습니다. 표준 사전에 해당 개념이 있으면 그쪽을 쓰는 편이 낫고, 이대로 가려면 용어집에 영문 이름과 정의를 등록해야 내보낼 때 함께 나갑니다.`,
+              );
             },
           };
         }

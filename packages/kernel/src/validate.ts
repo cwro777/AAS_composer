@@ -120,16 +120,33 @@ export function validate(doc: AasDoc, opts: PolicyOptions = {}): Issue[] {
     /* POL-SEM — 의미 식별자. List 직속 자식은 부모의 semanticIdListElement가 대신한다. */
     if (n.t !== 'shell' && !n.semanticId) {
       const p = parentOf(doc, id);
-      const coveredByList =
-        inList(doc, id) && !!p && !!(doc.nodes[p] as { semanticIdListElement?: string }).semanticIdListElement;
-      if (!coveredByList) {
-        push(
-          'POL-SEM-001',
-          'warn',
-          id,
-          `${where}에 semanticId가 없습니다. 의미론적 상호운용성이 보장되지 않습니다.`,
-          'No semanticId. Semantic interoperability is not guaranteed.',
-        );
+      const listChild = inList(doc, id) && !!p;
+      const covered =
+        listChild && !!(doc.nodes[p!] as { semanticIdListElement?: string }).semanticIdListElement;
+      if (!covered) {
+        /**
+         * 목록 직속 자식은 idShort가 비어 있는 것이 정상이다(AASd-120).
+         * “(이름 없음)에 semanticId가 없습니다”라고 하면 어디를 고쳐야 하는지 알 수 없다 —
+         * 고칠 자리는 자식이 아니라 **목록의 semanticIdListElement**다.
+         */
+        if (listChild) {
+          const list = doc.nodes[p!]!.idShort || '목록';
+          push(
+            'POL-SEM-001',
+            'warn',
+            id,
+            `${list}의 항목에 의미가 없습니다. 목록의 semanticIdListElement로 지정합니다.`,
+            `Items of ${list} carry no meaning. Set the list's semanticIdListElement.`,
+          );
+        } else {
+          push(
+            'POL-SEM-001',
+            'warn',
+            id,
+            `${where}에 semanticId가 없습니다. 의미론적 상호운용성이 보장되지 않습니다.`,
+            'No semanticId. Semantic interoperability is not guaranteed.',
+          );
+        }
       }
     }
     if (n.semanticId && n.supplementalSemanticIds?.includes(n.semanticId)) {

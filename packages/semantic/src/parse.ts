@@ -135,6 +135,23 @@ export function formatSemanticId(ref: SemanticRef): string {
 }
 
 /** 같은 개념인가 — 버전만 다른 경우를 가려낸다 */
+/**
+ * 자체 발행 개념 IRI.
+ *
+ * 표준 사전에 없는 개념을 만났을 때의 정답은 **IRDI를 지어내는 것이 아니라
+ * 우리 이름으로 발행하는 것**이다. 규격이 허용하는 길이고, 저장소가 이미 쓰는 꼴이
+ * `<접두어>/cd/<이름>/1/0`이다.
+ *
+ * 발행했다고 끝이 아니다. ConceptDescription에는 영문 표제어와 정의가 있어야 하므로
+ * (AASc-3a-002 · AASc-3a-008) 용어집에 등록하기 전까지는 사전 계층이 계속 지적한다.
+ * 그것이 옳다 — 이름만 있고 뜻이 없는 개념은 받는 쪽에서 쓸 수 없다.
+ */
+export function selfIssuedIri(prefix: string, ...segments: string[]): string {
+  const clean = segments.map((s) => s.replace(/[^A-Za-z0-9_-]/g, '')).filter(Boolean);
+  if (clean.length === 0) return '';
+  return `${prefix.replace(/\/+$/, '')}/cd/${clean.join('/')}/1/0`;
+}
+
 export function sameConcept(a: SemanticRef, b: SemanticRef): boolean {
   if (a.scheme !== b.scheme || a.scheme === 'unknown') return a.raw === b.raw;
   if (a.scheme === 'iri') return a.raw === b.raw;

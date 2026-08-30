@@ -70,9 +70,11 @@ pnpm --filter @aas/api exec tsx scripts/opcua-sim.ts
 
 ### Windows + Dropbox에서 dev 서버가 죽을 때
 
-`UNKNOWN: unknown error, open ... .next\server\vendor-chunks\...` 가 뜨면
-Dropbox가 `.next`를 동기화하며 파일을 잠근 것입니다. `pnpm build`가 `.next`를 새로
-만들면 제외 표시가 함께 사라지므로 다시 걸어야 합니다.
+`pnpm dev`와 `pnpm build`가 시작 전에 `.next`를 동기화 제외로 표시합니다
+(`apps/web/scripts/dropbox-ignore.mjs`). 보통은 신경 쓰지 않아도 됩니다.
+
+그래도 `UNKNOWN: unknown error, open ... .next\...` 가 뜨면 이미 잠긴 파일이 남은 것입니다.
+서버를 멈추고 아래를 실행한 뒤 다시 띄우십시오.
 
 ```powershell
 Remove-Item -Recurse -Force apps\web\.next

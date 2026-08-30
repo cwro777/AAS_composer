@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/dropbox-ignore.mjs",
     "dev": "next dev --port 3000",
+    "prebuild": "node scripts/dropbox-ignore.mjs",
     "build": "next build",
     "start": "next start --port 3000",
     "typecheck": "tsc -p tsconfig.json --noEmit",

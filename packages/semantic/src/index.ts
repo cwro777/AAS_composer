@@ -5,9 +5,9 @@
  * 사전 조회는 `@aas/semantic/dict`에 있다.
  */
 export type { SemanticRef, SemanticScheme, VerifiedBy } from './parse.js';
-export { formatSemanticId, parseSemanticId, sameConcept } from './parse.js';
+export { formatSemanticId, parseSemanticId, sameConcept, selfIssuedIri } from './parse.js';
 
 export type { TermBook, TermEntry } from './terms.js';
-export { SAMPLE_TERMS, mergeBooks, searchTerms, termFor } from './terms.js';
+export { SAMPLE_TERMS, mergeBooks, searchTerms, termByName, termFor } from './terms.js';
 
 export { conceptFromTerm, termsResolver } from './resolver.js';

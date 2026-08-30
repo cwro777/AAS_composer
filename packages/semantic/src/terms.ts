@@ -58,6 +58,33 @@ export function searchTerms(query: string, book: TermBook = SAMPLE_TERMS, limit 
  * `mergeBooks`와 같은 규칙이어야 한다. 회사 용어집을 샘플 뒤에 이어 붙이기만 해도
  * 덮어쓰기가 되도록 하려는 것이고, 두 경로가 다르면 어느 값이 나갈지 예측할 수 없다.
  */
+/** 대소문자·공백·밑줄·하이픈을 지운 비교 키 */
+function nameKey(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9가-힣]/g, '');
+}
+
+/**
+ * 이름이 **정확히** 같은 항목을 찾는다. 부분일치는 찾지 않는다.
+ *
+ * `searchTerms`는 사람이 고르라고 후보를 늘어놓는 것이고, 이 함수는 코드가 자동으로
+ * 붙이는 데 쓴다. semanticId는 비슷하면 안 되고 같아야 하므로 여기서는 넉넉하게 굴지 않는다.
+ */
+export function termByName(name: string, book: TermBook = SAMPLE_TERMS): TermEntry | undefined {
+  const key = nameKey(name);
+  if (!key) return undefined;
+  for (let i = book.terms.length - 1; i >= 0; i--) {
+    const t = book.terms[i]!;
+    if (
+      nameKey(t.term) === key ||
+      (t.nameEn && nameKey(t.nameEn) === key) ||
+      (t.aliases ?? []).some((a) => nameKey(a) === key)
+    ) {
+      return t;
+    }
+  }
+  return undefined;
+}
+
 export function termFor(semanticId: string, book: TermBook = SAMPLE_TERMS): TermEntry | undefined {
   for (let i = book.terms.length - 1; i >= 0; i--) {
     const t = book.terms[i]!;
