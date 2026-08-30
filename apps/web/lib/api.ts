@@ -60,6 +60,30 @@ export const listModels = (): Promise<{ models: ModelSummary[] }> => call('/mode
 export const createModel = (name: string, doc: unknown, layout?: unknown): Promise<{ id: string }> =>
   call('/models', { method: 'POST', body: JSON.stringify({ name, doc, layout }) });
 
+/* ── 사전 ───────────────────────────────────────── */
+
+export interface DictEntry {
+  irdi: string;
+  scheme: string;
+  source?: string | null;
+  nameEn?: string | null;
+  nameKo?: string | null;
+  definition?: string | null;
+  unit?: string | null;
+  dataType?: string | null;
+  status: string;
+  origin?: string | null;
+}
+
+/** 여러 개를 한 번에. 모르는 것은 `missing`으로 온다 — 조용히 빠지지 않는다 */
+export const lookupConcepts = (
+  ids: string[],
+): Promise<{ asked: number; entries: DictEntry[]; missing: string[] }> =>
+  call('/dictionary/lookup', { method: 'POST', body: JSON.stringify({ ids }) });
+
+export const dictionaryStatus = (): Promise<{ cached: number; upstream: string | null }> =>
+  call('/dictionary/status');
+
 /* ── 수집 ───────────────────────────────────────── */
 
 export type Protocol = 'mqtt' | 'opcua' | 'http' | 'modbus' | 'unknown';

@@ -13,6 +13,7 @@ import {
   type AasDoc,
   type NodeId,
   buildConceptDescriptions,
+  childrenOf,
   identifierIsReferencedInRaw,
   nodeForPath,
   parentOf,
@@ -359,14 +360,48 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
         });
       }
       for (const i of r.issues) {
-        out.push({
+        const node = nodeForPath(index, i.path);
+        const issue: UiIssue = {
           code: i.code,
           layer: 'core',
           severity: 'error',
-          node: nodeForPath(index, i.path),
+          node,
           path: i.path,
           text: i.message.ko,
-        });
+        };
+
+        /**
+         * AASd-109 — Property·Range 목록에는 valueTypeListElement가 있어야 한다.
+         *
+         * 답이 문서 안에 있다. 자식들이 이미 valueType을 갖고 있으므로 그것을 쓴다.
+         * 자식이 없거나 서로 다르면 규격 기본값인 xs:string으로 둔다 —
+         * 값이 들어오기 전에는 그 이상 알 수 없다.
+         */
+        if (i.code === 'AASd-109' && node && settled.nodes[node]?.t === 'sml') {
+          const kinds = new Set(
+            childrenOf(settled, node)
+              .map((c) => (settled.nodes[c] as { valueType?: string }).valueType)
+              .filter((v): v is string => !!v),
+          );
+          const value = kinds.size === 1 ? [...kinds][0]! : 'xs:string';
+          const target = node;
+          issue.fix = {
+            label: `valueTypeListElement를 ${value}로`,
+            run: () => {
+              const s = useEditor.getState();
+              const label = '목록의 valueTypeListElement 채우기';
+              if (s.run({ t: 'set', node: target, path: 'valueTypeListElement', value }, label)) {
+                s.notify(
+                  kinds.size === 1
+                    ? `자식들의 자료형(${value})을 목록에 지정했습니다.`
+                    : `자식의 자료형이 일정하지 않아 ${value}로 두었습니다. 실제 값에 맞게 고치십시오.`,
+                );
+              }
+            },
+          };
+        }
+
+        out.push(issue);
       }
     } catch (e) {
       out.push({

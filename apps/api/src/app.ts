@@ -340,6 +340,30 @@ export function createApp(
     return c.json(await dict.importEntries(entries, terms));
   });
 
+  /**
+   * 여러 개를 한 번에 조회한다.
+   *
+   * 문서 하나에 semanticId가 수십 개다. 하나씩 물으면 왕복이 그만큼 늘고, 에디터가
+   * 화면을 그리는 동안 기다리게 된다. **모르는 것은 조용히 빠진다** — 아는 것만 돌려주고
+   * `missing`으로 무엇을 못 찾았는지 함께 알린다.
+   */
+  app.post('/dictionary/lookup', async (c) => {
+    const body = await c.req.json().catch(() => null);
+    const ids = (body as { ids?: unknown } | null)?.ids;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return c.json({ error: 'IDS_REQUIRED', hint: '{ ids: string[] }가 필요합니다.' }, 400);
+    }
+    const wanted = [...new Set(ids.filter((x): x is string => typeof x === 'string'))].slice(0, 500);
+    const entries: DictEntry[] = [];
+    const missing: string[] = [];
+    for (const irdi of wanted) {
+      const r = await dict.lookup(irdi);
+      if (r.entry) entries.push(r.entry);
+      else missing.push(irdi);
+    }
+    return c.json({ asked: wanted.length, entries, missing });
+  });
+
   /** 단일 조회. /dictionary/search 뒤에 와야 한다 — 앞에 두면 search를 삼킨다 */
   app.get('/dictionary/:irdi{.+}', async (c) => {
     const irdi = decodeURIComponent(c.req.param('irdi'));

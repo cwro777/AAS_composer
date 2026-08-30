@@ -69,6 +69,35 @@ export function humanize(name: string): string {
   return spaced ? spaced[0]!.toUpperCase() + spaced.slice(1).toLowerCase() : '';
 }
 
+/**
+ * 서버 사전이 아는 것을 용어집 항목으로.
+ *
+ * **정의가 없으면 받지 않는다.** 규격이 영문 정의를 요구하므로(AASc-3a-008), 이름만
+ * 있는 항목을 넣어 봐야 ConceptDescription이 만들어지지 않고 경고만 모양을 바꾼다.
+ */
+export function entryFromDict(d: {
+  irdi: string;
+  nameEn?: string | null;
+  nameKo?: string | null;
+  definition?: string | null;
+  unit?: string | null;
+  dataType?: string | null;
+  origin?: string | null;
+}): TermEntry | null {
+  if (!d.nameEn?.trim() || !d.definition?.trim()) return null;
+  return {
+    term: d.nameKo?.trim() || d.nameEn.trim(),
+    nameEn: d.nameEn.trim(),
+    semanticId: d.irdi,
+    definition: d.definition.trim(),
+    ...(d.unit ? { unit: d.unit } : {}),
+    ...(d.dataType ? { dataType: d.dataType } : {}),
+    origin: 'idta',
+    verified: 'none',
+    provenance: `사전에서 받음${d.origin ? ` (${d.origin})` : ''}`,
+  };
+}
+
 interface TermsState {
   entries: TermEntry[];
   draft: ConceptDraft | null;
@@ -81,6 +110,8 @@ interface TermsState {
   /** 초안을 용어집에 넣는다. 규격이 요구하는 것이 비면 사유를 돌려준다. */
   commitDraft: () => { ok: true; entry: TermEntry } | { ok: false; reason: string };
   remove: (semanticId: string) => void;
+  /** 여러 항목을 한 번에. 이미 있는 것은 덮어쓰지 않는다 — 사람이 쓴 것이 이긴다 */
+  addMany: (list: TermEntry[]) => number;
   restore: () => void;
 }
 
@@ -131,6 +162,16 @@ export const useTerms = create<TermsState>()((set, get) => ({
     set({ entries, draft: null });
     persist(entries);
     return { ok: true as const, entry };
+  },
+
+  addMany: (list) => {
+    const have = new Set(get().entries.map((e) => e.semanticId));
+    const fresh = list.filter((e) => !have.has(e.semanticId));
+    if (fresh.length === 0) return 0;
+    const entries = [...get().entries, ...fresh];
+    set({ entries });
+    persist(entries);
+    return fresh.length;
   },
 
   remove: (semanticId) => {

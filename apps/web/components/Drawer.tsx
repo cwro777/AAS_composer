@@ -12,10 +12,11 @@
 
 import { useEffect, useState } from 'react';
 
+import { API_BASE, type ApiError, lookupConcepts } from '../lib/api';
 import { type UiIssue, useIssues, useJson } from '../lib/derived';
 import { DEFAULT_IRI_PREFIX, useSettings } from '../lib/settings';
 import { useEditor } from '../lib/store';
-import { useTerms } from '../lib/terms';
+import { entryFromDict, useTerms } from '../lib/terms';
 import { ConceptForm } from './ConceptForm';
 
 const LAYER_LABEL: Record<UiIssue['layer'], string> = {
@@ -67,8 +68,10 @@ export function Drawer(): React.JSX.Element {
   const restore = useSettings((s) => s.restore);
   const restoreTerms = useTerms((s) => s.restore);
   const [tab, setTab] = useState<'json' | 'issues'>('json');
+  const [busy, setBusy] = useState(false);
   const json = useJson(doc);
   const issues = useIssues(doc);
+  const fixable = issues.filter((i) => i.fix);
 
   /* 서버 렌더와 어긋나지 않게 마운트 뒤에 읽는다 */
   useEffect(() => {
@@ -83,6 +86,65 @@ export function Drawer(): React.JSX.Element {
     void copy(asText(i)).then((ok) =>
       notify(ok ? '이슈를 복사했습니다.' : '복사하지 못했습니다. 글자를 직접 선택하십시오.'),
     );
+  };
+
+  /**
+   * 눌러서 고칠 수 있는 것을 전부 적용한다.
+   *
+   * 한 번에 하나씩 적용하고 **매번 문서를 다시 읽는다.** 이슈 목록은 적용 전 문서에서
+   * 나온 것이라, 앞의 수정이 뒤의 대상을 없앴을 수 있다. 거부되면 그 하나만 건너뛴다.
+   *
+   * 사람에게 물어야 하는 것(사라지는 요소가 있는 합치기)은 그 자리에서 확인 창을 띄운다.
+   */
+  const fixAll = (): void => {
+    const targets = issues.filter((i) => i.fix);
+    let done = 0;
+    const before = useEditor.getState().past.length;
+    for (const i of targets) {
+      const at = useEditor.getState().past.length;
+      i.fix?.run();
+      if (useEditor.getState().past.length > at) done += 1;
+    }
+    const steps = useEditor.getState().past.length - before;
+    notify(
+      done === 0
+        ? '적용된 수정이 없습니다.'
+        : `${done}건을 고쳤습니다. 되돌리려면 Ctrl+Z를 ${steps}번 누르십시오.`,
+    );
+  };
+
+  /**
+   * 서버 사전이 아는 개념을 사내 용어집으로 가져온다.
+   *
+   * **지어내지 않는다.** 서버가 모르는 것은 그대로 남고, 정의가 없는 항목은 받지
+   * 않는다(규격이 영문 정의를 요구한다). 무엇을 못 채웠는지 건수로 말한다.
+   */
+  const fillFromDictionary = (): void => {
+    const ids = [...new Set(issues.filter((i) => i.code === 'CD-001').map((i) => i.path))];
+    if (ids.length === 0) {
+      notify('사전에서 채울 것이 없습니다.');
+      return;
+    }
+    setBusy(true);
+    lookupConcepts(ids)
+      .then((r) => {
+        const usable = r.entries.map(entryFromDict).filter((e): e is NonNullable<typeof e> => !!e);
+        const added = useTerms.getState().addMany(usable);
+        const noDefinition = r.entries.length - usable.length;
+        notify(
+          `${ids.length}건 중 ${added}건을 용어집에 넣었습니다.` +
+            (noDefinition ? ` 정의가 없어 못 쓴 것 ${noDefinition}건.` : '') +
+            (r.missing.length ? ` 사전이 모르는 것 ${r.missing.length}건.` : ''),
+        );
+      })
+      .catch((e: ApiError) =>
+        notify(
+          e.offline
+            ? `API 서버에 닿지 못했습니다 (${API_BASE}). 사전은 서버에 있습니다.`
+            : `사전 조회가 거절됐습니다: ${e.code}`,
+        ),
+      )
+      .finally(() => setBusy(false));
   };
 
   const copyAll = (): void => {
@@ -131,6 +193,24 @@ export function Drawer(): React.JSX.Element {
                 기본값
               </button>
             ) : null}
+            <button
+              type="button"
+              className="mini"
+              disabled={busy || issues.length === 0}
+              title="서버 사전이 아는 개념을 사내 용어집으로 가져옵니다. 모르는 것은 그대로 남습니다."
+              onClick={fillFromDictionary}
+            >
+              {busy ? '…' : '사전에서 채우기'}
+            </button>
+            <button
+              type="button"
+              className="mini"
+              disabled={fixable.length === 0}
+              title="눌러서 고칠 수 있는 이슈를 한 번에 적용합니다. 되돌리기는 한 번이면 됩니다."
+              onClick={fixAll}
+            >
+              모두 고치기 ({fixable.length})
+            </button>
             <button type="button" className="mini" disabled={issues.length === 0} onClick={copyAll}>
               전체 복사
             </button>
