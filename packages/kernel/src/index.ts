@@ -5,6 +5,7 @@ export * from './parse.js';
 export * from './canonicalize.js';
 export * from './locate.js';
 export * from './identifier.js';
+export * from './merge.js';
 export * from './concept.js';
 export * from './issue.js';
 export * from './validate.js';

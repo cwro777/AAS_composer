@@ -17,6 +17,7 @@ import {
   nodeForPath,
   parentOf,
   pathIndex,
+  planMerge,
   renameIdentifier,
   serialize,
   suggestIdentifier,
@@ -199,6 +200,59 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
                 term
                   ? `${name}에 용어집의 “${term.term}”(${term.semanticId})을 지정했습니다.`
                   : `${name}의 개념을 ${value}로 발행했습니다. 표준 사전에 해당 개념이 있으면 그쪽을 쓰는 편이 낫고, 이대로 가려면 용어집에 영문 이름과 정의를 등록해야 내보낼 때 함께 나갑니다.`,
+              );
+            },
+          };
+        }
+      }
+
+      /**
+       * 같은 뜻의 서브모델이 둘 — 하나로 합친다.
+       *
+       * 무엇을 잃는지 모르고 합치지 않는다. 내용이 같으면 그냥 지우고, 이름이 겹치지
+       * 않으면 옮겨 붙이고, 둘 다 아니면 **사라지는 요소 수를 라벨에 적어** 사람이
+       * 보고 누르게 한다. 되돌리기는 명령 하나로 된다.
+       */
+      if (i.code === 'POL-STRUCT-004' && i.node !== null) {
+        const dup = i.node;
+        const parent = parentOf(settled, dup);
+        const sem = settled.nodes[dup]!.semanticId;
+        const keep = Object.keys(settled.nodes).find(
+          (id) =>
+            id !== dup &&
+            settled.nodes[id]!.t === 'submodel' &&
+            settled.nodes[id]!.semanticId === sem &&
+            parentOf(settled, id) === parent,
+        );
+        const plan = keep ? planMerge(settled, keep, dup) : null;
+        if (plan) {
+          const label = plan.identical
+            ? '중복 삭제 (내용이 같습니다)'
+            : plan.conflicts.length === 0
+              ? `합치기 (요소 ${plan.movable.length}개 옮김)`
+              : `합치기 (요소 ${plan.lost - 1}개 사라짐)`;
+          issue.fix = {
+            label,
+            run: () => {
+              const s = useEditor.getState();
+              const fresh = keep ? planMerge(s.doc, keep, dup) : null;
+              if (!fresh) return;
+              if (
+                fresh.conflicts.length > 0 &&
+                !fresh.identical &&
+                !window.confirm(
+                  `같은 이름의 요소 ${fresh.conflicts.length}개(자손 포함 ${fresh.lost - 1}개)는 옮길 수 없어 사라집니다.\n` +
+                    `${fresh.conflicts.map((c) => c.idShort).join(', ')}\n\n계속할까요? (Ctrl+Z로 되돌릴 수 있습니다)`,
+                )
+              ) {
+                return;
+              }
+              const done = '서브모델 합치기';
+              if (!s.run({ t: 'batch', label: done, cmds: fresh.cmds }, done)) return;
+              s.notify(
+                fresh.identical
+                  ? '내용이 같은 중복 서브모델을 지웠습니다.'
+                  : `요소 ${fresh.movable.length}개를 옮기고 중복 서브모델을 지웠습니다.`,
               );
             },
           };

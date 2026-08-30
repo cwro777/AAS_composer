@@ -274,5 +274,36 @@ export function validate(doc: AasDoc, opts: PolicyOptions = {}): Issue[] {
     }
   }
 
+  /**
+   * POL-STRUCT-004 — 한 셸에 같은 뜻의 서브모델이 둘.
+   *
+   * 규격이 금지하지는 않는다. 그러나 IDTA 템플릿은 자산 하나에 한 벌을 전제하므로,
+   * Nameplate이나 TimeSeries가 두 개면 **받는 쪽은 어느 것이 참인지 알 수 없다.**
+   * 대개 같은 템플릿을 두 번 넣은 사고다.
+   *
+   * 첫 번째는 지적하지 않는다 — 남길 쪽이기 때문이다.
+   */
+  const bySemantic = new Map<string, NodeId[]>();
+  for (const id of Object.keys(doc.nodes)) {
+    const n = doc.nodes[id]!;
+    if (n.t !== 'submodel' || !n.semanticId) continue;
+    const key = `${parentOf(doc, id) ?? '(root)'} ${n.semanticId}`;
+    bySemantic.set(key, [...(bySemantic.get(key) ?? []), id]);
+  }
+  for (const ids of bySemantic.values()) {
+    if (ids.length < 2) continue;
+    const keep = doc.nodes[ids[0]!]!;
+    for (const dup of ids.slice(1)) {
+      const where = doc.nodes[dup]!.idShort || '(이름 없음)';
+      push(
+        'POL-STRUCT-004',
+        'warn',
+        dup,
+        `${where}은(는) ${keep.idShort || '앞의 서브모델'}과(와) 같은 semanticId입니다. 자산 하나에 같은 뜻의 서브모델이 둘이면 받는 쪽이 어느 것을 볼지 알 수 없습니다.`,
+        `${where} has the same semanticId as ${keep.idShort || 'the earlier submodel'}; with two submodels of the same meaning a receiver cannot tell which one to read.`,
+      );
+    }
+  }
+
   return sortIssues(out);
 }

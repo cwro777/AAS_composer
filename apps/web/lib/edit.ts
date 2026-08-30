@@ -128,6 +128,31 @@ export function setField(id: NodeId, path: string, value: unknown, label?: strin
 
 export function insertTemplate(def: TemplateDef, shell: NodeId | null): void {
   const s = useEditor.getState();
+
+  /**
+   * 같은 템플릿이 이미 붙어 있으면 묻는다.
+   *
+   * 규격이 막지는 않지만 IDTA 템플릿은 자산 하나에 한 벌을 전제한다. 두 번 넣는 것은
+   * 대개 사고이고, 넣고 나서 합치는 것보다 넣기 전에 멈추는 편이 싸다.
+   * 일부러 둘을 두려는 경우(설비마다 다른 접점 등)도 있으므로 막지는 않는다.
+   */
+  const already = Object.keys(s.doc.nodes).find(
+    (id) =>
+      s.doc.nodes[id]!.t === 'submodel' &&
+      s.doc.nodes[id]!.semanticId === def.submodel.semanticId &&
+      parentOf(s.doc, id) === shell,
+  );
+  if (
+    already &&
+    !window.confirm(
+      `${def.name}이(가) 이미 있습니다 (${s.doc.nodes[already]!.idShort}).\n` +
+        '같은 뜻의 서브모델이 둘이면 받는 쪽이 어느 것을 볼지 알 수 없습니다.\n\n그래도 하나 더 넣을까요?',
+    )
+  ) {
+    s.notify(`${def.name}은(는) 이미 있습니다.`);
+    return;
+  }
+
   const cmd: Cmd = instantiate(def, {
     newId: () => useEditor.getState().newId(),
     namespace: useSettings.getState().iriPrefix || DEFAULT_IRI_PREFIX,

@@ -260,12 +260,22 @@ export function apply(doc: AasDoc, cmd: Cmd): ApplyResult {
 
       /* List 안으로 옮기면서 idShort를 비웠다면, 되돌릴 때 이름도 복구해야 한다.
          이 한 줄이 없으면 apply → undo가 원문서로 돌아오지 않는다. */
-      const undo: Cmd[] = [{ t: 'move', node: cmd.node, parent: oldParent, index: oldIndex }];
-      if (normalized.idShort !== node.idShort) {
-        undo.push({ t: 'set', node: cmd.node, path: 'idShort', value: node.idShort });
-      }
+      const undo: Cmd[] = [];
+
+      /**
+       * **opSlot은 옮기기 전에 되돌린다.**
+       *
+       * Operation 밖으로 나가면 opSlot이 지워진다. 그 상태로 먼저 되돌려 넣으면
+       * `normalizeForParent`가 기본값 'in'을 채우고 `resortOpChildren`이 그 값으로
+       * 자리를 다시 매긴다 — 그 뒤에 슬롯을 고쳐도 그룹 안 상대 순서는 이미 어긋나 있다.
+       * 정렬은 안정적이므로 **슬롯이 먼저 맞아야** 자리가 맞는다.
+       */
       if (normalized.opSlot !== node.opSlot) {
         undo.push({ t: 'set', node: cmd.node, path: 'opSlot', value: node.opSlot ?? null });
+      }
+      undo.push({ t: 'move', node: cmd.node, parent: oldParent, index: oldIndex });
+      if (normalized.idShort !== node.idShort) {
+        undo.push({ t: 'set', node: cmd.node, path: 'idShort', value: node.idShort });
       }
       return { doc: d, undo };
     }
@@ -284,10 +294,21 @@ export function apply(doc: AasDoc, cmd: Cmd): ApplyResult {
         if (p !== null) d.order[p] = [...(d.order[p] ?? [])];
         resortOpChildren(d, p);
       }
-      return {
-        doc: d,
-        undo: [{ t: 'set', node: cmd.node, path: cmd.path, value: before ?? null }],
-      };
+      const undo: Cmd[] = [{ t: 'set', node: cmd.node, path: cmd.path, value: before ?? null }];
+
+      /**
+       * 슬롯을 바꾸면 형제 순서가 다시 매겨진다. 값을 되돌리는 것만으로는
+       * 자리가 돌아오지 않는다 — 정렬이 안정적이라 옮겨진 상대 순서가 그대로 남는다.
+       * 그래서 원래 자리로 한 번 더 옮긴다. 부모의 순서는 늘 정규화되어 있으므로
+       * (슬롯, 색인) 두 가지면 원래 순서가 복원된다.
+       */
+      if (cmd.path === 'opSlot') {
+        const p = parentOf(doc, cmd.node);
+        const at = p === null ? -1 : (doc.order[p] ?? []).indexOf(cmd.node);
+        if (p !== null && at >= 0) undo.push({ t: 'move', node: cmd.node, parent: p, index: at });
+      }
+
+      return { doc: d, undo };
     }
 
     case 'batch': {

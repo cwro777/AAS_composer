@@ -167,6 +167,15 @@ P3에서 확정된 것:
 - `typeValueListElement`가 Property·Range면 `valueTypeListElement`가 필수다(AASd-109).
 - **Operation의 자식 순서는 슬롯 그룹(in → out → inout)으로 정규화한다.** JSON이 세 배열로
   나눠 담으므로 슬롯이 뒤섞인 하나의 순서는 표현할 수 없다. `apply()`가 안정 정렬한다.
+  **역명령은 슬롯을 먼저 맞춘 뒤에 옮긴다.** 정렬이 안정적이라 자리는 (슬롯, 색인)으로
+  정해지는데, 순서를 뒤집으면 중간 상태의 기본 슬롯('in')으로 자리가 매겨지고 뒤늦게
+  슬롯을 고쳐도 그룹 안 상대 순서가 어긋난 채 남는다. `opSlot`을 바꾸는 `set`의 역명령도
+  값 복원 뒤에 원래 색인으로 한 번 더 옮긴다. `test/opslot.test.ts`가 지킨다.
+- **같은 셸에 같은 semanticId의 서브모델이 둘이면 POL-STRUCT-004다.** 규격이 금지하지는
+  않지만 IDTA 템플릿은 자산 하나에 한 벌을 전제한다. 합치기는 `planMerge()`가 계획만
+  만들고(문서를 바꾸지 않는다), 이름이 겹쳐 옮기지 못하는 자식은 **몇 개가 사라지는지
+  세어 사람에게 보인 뒤에** 지운다. 남기는 쪽의 필드는 건드리지 않는다 —
+  어느 쪽이 옳은지 우리가 모른다.
 - `opSlot`은 부모가 Operation일 때만 유효하다. 밖으로 옮기면 `apply()`가 지우고,
   되돌리면 역명령이 복구한다.
 - **qualifiers · extensions · administration · specificAssetIds · derivedFrom · assetType ·
