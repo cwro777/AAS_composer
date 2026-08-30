@@ -95,12 +95,21 @@ export function validate(doc: AasDoc, opts: PolicyOptions = {}): Issue[] {
       } else {
         const prev = seenIdentifier.get(identifier);
         if (prev) {
+          /**
+           * **누구와 겹치는지 말해야 한다.**
+           *
+           * idShort와 전역 식별자는 다른 것이고 유일성 범위도 다르다(형제 / 문서 전체).
+           * 그래서 화면에는 이름이 달라 보이는데 식별자만 같은 상황이 흔하다.
+           * 상대를 알려 주지 않으면 어디를 봐야 하는지 알 수 없다.
+           */
+          const other = doc.nodes[prev];
+          const otherName = other?.idShort || '(이름 없음)';
           push(
             'POL-ID-002',
             'error',
             id,
-            `전역 식별자가 중복됩니다: ${identifier}`,
-            `Duplicate global identifier: ${identifier}`,
+            `전역 식별자가 ${otherName}와(과) 같습니다: ${identifier} — idShort가 달라도 식별자는 모델 전체에서 유일해야 합니다.`,
+            `Global identifier collides with ${otherName}: ${identifier} — identifiers must be unique across the whole environment even when idShorts differ.`,
           );
         } else {
           seenIdentifier.set(identifier, id);

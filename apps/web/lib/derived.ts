@@ -137,6 +137,27 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
         }
       }
 
+      /** 식별자가 겹친다 — 유일한 값으로 바꾼다. 참조도 함께 따라간다 */
+      if (i.code === 'POL-ID-002' && i.node !== null && iriPrefix) {
+        const node = i.node;
+        const next = suggestIdentifier(settled, node, iriPrefix);
+        if (next) {
+          issue.fix = {
+            label: '유일한 식별자로 바꾸기',
+            run: () => {
+              const s = useEditor.getState();
+              const target = suggestIdentifier(s.doc, node, iriPrefix);
+              if (!target) return;
+              const cmds = renameIdentifier(s.doc, node, target);
+              if (cmds.length === 0) return;
+              const label = '식별자 중복 해소';
+              if (!s.run({ t: 'batch', label, cmds }, label)) return;
+              s.notify(`식별자를 ${target}(으)로 바꿨습니다.`);
+            },
+          };
+        }
+      }
+
       /**
        * semanticId가 없다.
        *

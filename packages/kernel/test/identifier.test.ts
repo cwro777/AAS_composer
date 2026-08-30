@@ -13,9 +13,11 @@ import { describe, expect, it } from 'vitest';
 import { apply, emptyDoc, newNode, undoAll } from '../src/index.js';
 import {
   identifierIsReferencedInRaw,
+  mintIdentifier,
   renameIdentifier,
   slugify,
   suggestIdentifier,
+  uniqueIdentifier,
 } from '../src/identifier.js';
 import type { AasDoc, Cmd } from '../src/index.js';
 
@@ -100,6 +102,64 @@ describe('식별자 제안', () => {
 
   it('Identifiable이 아니면 제안하지 않는다', () => {
     expect(suggestIdentifier(doc, 'r1', NS)).toBeNull();
+  });
+});
+
+describe('전역 유일성', () => {
+  const doc = build();
+
+  it('겹치지 않으면 그대로 둔다', () => {
+    expect(uniqueIdentifier(doc, `${NS}/sm/new-thing`)).toBe(`${NS}/sm/new-thing`);
+  });
+
+  it('겹치면 번호를 붙인다', () => {
+    expect(uniqueIdentifier(doc, OLD_SM)).toBe(`${OLD_SM}-2`);
+  });
+
+  it('자기 자신은 충돌로 세지 않는다', () => {
+    expect(uniqueIdentifier(doc, OLD_SM, 'm1')).toBe(OLD_SM);
+  });
+
+  it('발급은 종류에 맞는 마디를 쓰고 문서 전체에서 유일하다', () => {
+    expect(mintIdentifier(doc, 'submodel', 'MySubmodel', NS)).toBe(`${NS}/sm/my-submodel`);
+    const twice = apply(doc, {
+      t: 'set',
+      node: 'm1',
+      path: 'identifier',
+      value: `${NS}/sm/my-submodel`,
+    }).doc;
+    expect(mintIdentifier(twice, 'submodel', 'MySubmodel', NS)).toBe(`${NS}/sm/my-submodel-2`);
+  });
+
+  it('유일성 범위는 형제가 아니라 모델 전체다', () => {
+    /**
+     * 이것이 POL-ID-002의 원인이었다 — 이름을 형제 안에서만 겹치지 않게 하고
+     * 거기서 식별자를 파생시키면, 다른 셸 아래의 서브모델과 그대로 부딪힌다.
+     */
+    let d = apply(doc, {
+      t: 'insert',
+      parent: null,
+      index: 0,
+      node: newNode('s2', 'shell', { idShort: 'Other', identifier: `${NS}/aas/other` }),
+    }).doc;
+
+    const first = mintIdentifier(d, 'submodel', 'MySubmodel', NS)!;
+    expect(first).toBe(`${NS}/sm/my-submodel`);
+
+    /* 첫 번째를 다른 셸 아래에 넣는다 — 형제가 아니다 */
+    d = apply(d, {
+      t: 'insert',
+      parent: 's2',
+      index: 0,
+      node: newNode('m2', 'submodel', { idShort: 'MySubmodel', identifier: first }),
+    }).doc;
+
+    expect(mintIdentifier(d, 'submodel', 'MySubmodel', NS)).toBe(`${NS}/sm/my-submodel-2`);
+  });
+
+  it('이름이나 접두어가 없으면 발급하지 않는다', () => {
+    expect(mintIdentifier(doc, 'submodel', '', NS)).toBeNull();
+    expect(mintIdentifier(doc, 'submodel', 'X', '')).toBeNull();
   });
 });
 

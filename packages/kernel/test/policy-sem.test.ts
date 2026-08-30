@@ -42,6 +42,41 @@ function build(patch: Cmd[] = []): AasDoc {
 const semIssues = (doc: AasDoc): ReturnType<typeof validate> =>
   validate(doc).filter((i) => i.code === 'POL-SEM-001');
 
+describe('전역 식별자 중복 (POL-ID-002)', () => {
+  it('누구와 겹치는지 말한다 — 이름이 달라도 식별자는 같을 수 있다', () => {
+    let doc = build();
+    doc = apply(doc, {
+      t: 'insert',
+      parent: null,
+      index: 1,
+      node: newNode('m2', 'submodel', {
+        idShort: 'MySubmodel1',
+        identifier: 'https://bnb.co.kr/ids/sm/my-submodel',
+      }),
+    }).doc;
+
+    const dup = validate(doc).find((i) => i.code === 'POL-ID-002')!;
+    expect(dup.severity).toBe('error');
+    /* 상대를 알려 주지 않으면 어디를 봐야 하는지 알 수 없다 */
+    expect(dup.message.ko).toContain('MySubmodel');
+    expect(dup.message.ko).toContain('idShort가 달라도');
+  });
+
+  it('식별자가 다르면 이름이 같아도 지적하지 않는다', () => {
+    let doc = build();
+    doc = apply(doc, {
+      t: 'insert',
+      parent: null,
+      index: 1,
+      node: newNode('m2', 'submodel', {
+        idShort: 'MySubmodel',
+        identifier: 'https://bnb.co.kr/ids/sm/my-submodel-2',
+      }),
+    }).doc;
+    expect(validate(doc).some((i) => i.code === 'POL-ID-002')).toBe(false);
+  });
+});
+
 describe('목록 항목의 의미', () => {
   it('목록 자식의 경고는 목록 이름으로 말한다 — “(이름 없음)”이 아니다', () => {
     const doc = build();

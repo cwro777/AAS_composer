@@ -10,6 +10,7 @@ import {
   type NodeId,
   newNode,
   parentOf,
+  uniqueIdentifier,
 } from '@aas/kernel';
 
 import type { ElementDef, MigrationDef, TemplateDef, Verified } from './types.js';
@@ -74,6 +75,11 @@ export interface InstantiateOptions {
   assetSlug?: string;
   /** 붙일 Shell. 없으면 루트에 독립 서브모델로 놓는다. */
   shell?: NodeId | null;
+  /**
+   * 넣을 문서. 주면 서브모델의 전역 식별자를 **그 안에서 유일하게** 만든다.
+   * 같은 템플릿을 두 번 넣으면 idPattern이 같은 값을 두 번 내놓기 때문이다.
+   */
+  doc?: AasDoc;
   /** 필수 요소만 넣는다. 기본은 전부. */
   requiredOnly?: boolean;
   /** exampleValue를 값으로 채운다. 기본 true — 빈 모델보다 채워진 모델이 검토하기 쉽다. */
@@ -83,7 +89,9 @@ export interface InstantiateOptions {
 function identifierFor(def: TemplateDef, o: InstantiateOptions): string {
   const ns = o.namespace ?? 'https://example.com/ids';
   const asset = o.assetSlug ?? 'asset';
-  return def.submodel.idPattern.replace('{ns}', ns).replace('{asset}', asset);
+  const id = def.submodel.idPattern.replace('{ns}', ns).replace('{asset}', asset);
+  /* 문서를 알 때만 유일성을 보장할 수 있다. 모르면 패턴 그대로 — 조용히 바꾸지 않는다. */
+  return o.doc ? uniqueIdentifier(o.doc, id) : id;
 }
 
 /**

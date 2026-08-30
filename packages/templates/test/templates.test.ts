@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   type Cmd,
+  type NodeId,
   apply,
   canonicalize,
   emptyDoc,
@@ -80,6 +81,15 @@ describe('IDTA 템플릿', () => {
         const r = verifyEnvironment(env);
         expect(r.deserializationError).toBeUndefined();
         expect(r.issues.map((i) => `${i.code} ${i.path}: ${i.message.en}`)).toEqual([]);
+      });
+
+      it('같은 템플릿을 두 번 넣어도 식별자가 겹치지 않는다', () => {
+        /* idPattern은 같은 값을 두 번 내놓는다. 문서를 주면 유일하게 만들어야 한다. */
+        let i = 0;
+        const newId = (): NodeId => `d${++i}` as NodeId;
+        const once = apply(emptyDoc(), instantiate(def, { newId, shell: null })).doc;
+        const twice = apply(once, instantiate(def, { newId, shell: null, doc: once })).doc;
+        expect(validate(twice).filter((x) => x.code === 'POL-ID-002')).toEqual([]);
       });
 
       it('사내 정책(L2) 오류 0건', () => {

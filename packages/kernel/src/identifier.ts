@@ -34,6 +34,56 @@ function identifierOf(doc: AasDoc, id: NodeId): string {
   return n && isIdentifiable(n.t) ? ((n as { identifier?: string }).identifier ?? '') : '';
 }
 
+/** 문서가 이미 쓰고 있는 전역 식별자들 */
+export function takenIdentifiers(doc: AasDoc, except?: NodeId): Set<string> {
+  const out = new Set<string>();
+  for (const id of Object.keys(doc.nodes)) {
+    if (id === except) continue;
+    const v = identifierOf(doc, id);
+    if (v) out.add(v);
+  }
+  return out;
+}
+
+/**
+ * 후보를 문서 안에서 **유일하게** 만든다. 겹치지 않으면 그대로 돌려준다.
+ *
+ * 전역 식별자의 유일성 범위는 문서 전체다. 형제 안에서만 이름을 겹치지 않게 해서는
+ * 부족하다 — 다른 셸 아래의 서브모델과 얼마든지 부딪힌다.
+ */
+export function uniqueIdentifier(doc: AasDoc, candidate: string, except?: NodeId): string {
+  if (!candidate) return candidate;
+  const taken = takenIdentifiers(doc, except);
+  if (!taken.has(candidate)) return candidate;
+  for (let i = 2; i < 10_000; i += 1) {
+    const next = `${candidate}-${i}`;
+    if (!taken.has(next)) return next;
+  }
+  return candidate;
+}
+
+/**
+ * 종류와 이름으로 새 전역 식별자를 발급한다. 문서 안에서 유일하다.
+ *
+ * 새 노드를 만들 때도, 있는 노드를 고칠 때도 이 한 곳을 쓴다. 발급 규칙이 두 군데로
+ * 갈라지면 만든 것과 고친 것의 꼴이 달라진다.
+ */
+export function mintIdentifier(
+  doc: AasDoc,
+  t: AasNodeType,
+  name: string,
+  prefix: string,
+  except?: NodeId,
+): string | null {
+  const base = slugify(name);
+  if (!base || !prefix) return null;
+  return uniqueIdentifier(
+    doc,
+    `${prefix.replace(/\/+$/, '')}/${SEGMENT[t] ?? 'id'}/${base}`,
+    except,
+  );
+}
+
 /**
  * 네임스페이스 안쪽으로 옮긴 식별자를 제안한다.
  *
@@ -43,23 +93,8 @@ function identifierOf(doc: AasDoc, id: NodeId): string {
 export function suggestIdentifier(doc: AasDoc, node: NodeId, prefix: string): string | null {
   const n = doc.nodes[node];
   if (!n || !isIdentifiable(n.t)) return null;
-
-  const current = identifierOf(doc, node);
-  const tail = current.split(/[/#]/).filter(Boolean).pop() ?? '';
-  const base = slugify(n.idShort) || slugify(tail) || 'item';
-  const root = `${prefix.replace(/\/+$/, '')}/${SEGMENT[n.t] ?? 'id'}/${base}`;
-
-  const taken = new Set(
-    Object.keys(doc.nodes)
-      .filter((id) => id !== node)
-      .map((id) => identifierOf(doc, id))
-      .filter(Boolean),
-  );
-  if (!taken.has(root)) return root;
-  for (let i = 2; i < 1000; i += 1) {
-    if (!taken.has(`${root}-${i}`)) return `${root}-${i}`;
-  }
-  return null;
+  const tail = identifierOf(doc, node).split(/[/#]/).filter(Boolean).pop() ?? '';
+  return mintIdentifier(doc, n.t, n.idShort || tail || 'item', prefix, node);
 }
 
 /** `{ type, keys: [{ type, value }] }` 모양이면 그 keys 배열을 준다 */

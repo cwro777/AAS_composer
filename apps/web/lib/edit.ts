@@ -14,11 +14,15 @@ import {
   MODEL_TYPE,
   acceptsOf,
   childrenOf,
+  mintIdentifier,
   newNode,
   parentOf,
+  slugify,
+  uniqueIdentifier,
 } from '@aas/kernel';
 import { type TemplateDef, instantiate } from '@aas/templates';
 
+import { DEFAULT_IRI_PREFIX, useSettings } from './settings';
 import { useEditor } from './store';
 
 const SEED: Record<AasNodeType, string> = {
@@ -39,9 +43,14 @@ const SEED: Record<AasNodeType, string> = {
   cap: 'MyCapability',
 };
 
-const NS = 'https://bnb.co.kr/ids';
-
-/** 형제 안에서 겹치지 않는 idShort */
+/**
+ * idShort는 **형제 안에서** 겹치지 않으면 되고, 전역 식별자는 **문서 전체에서**
+ * 유일해야 한다. 범위가 다르다.
+ *
+ * 이 둘을 같은 계산으로 만들면 안 된다. idShort만 형제 기준으로 맞추고 식별자를
+ * 거기서 파생시키면, 다른 셸 아래의 서브모델과 식별자가 그대로 부딪힌다
+ * (POL-ID-002 — 화면에는 이름이 달라 보여서 원인을 찾기 어렵다).
+ */
 function uniqueShort(doc: AasDoc, parent: NodeId | null, base: string): string {
   const siblings = parent === null ? doc.roots : childrenOf(doc, parent);
   const taken = new Set(siblings.map((c) => doc.nodes[c]?.idShort));
@@ -66,9 +75,13 @@ export function addableUnder(doc: AasDoc, parent: NodeId | null): readonly AasNo
 
 export function addNode(t: AasNodeType, parent: NodeId | null): void {
   const s = useEditor.getState();
+  const ns = useSettings.getState().iriPrefix || DEFAULT_IRI_PREFIX;
   const id = s.newId();
   const idShort = uniqueShort(s.doc, parent, SEED[t]);
-  const slug = idShort.toLowerCase();
+  const identifier = mintIdentifier(s.doc, t, idShort, ns) ?? '';
+  /* 자산 식별자도 같은 규칙으로 — 셸마다 다른 물리 자산이다 */
+  const assetId = uniqueIdentifier(s.doc, `${ns.replace(/\/+$/, '')}/asset/${slugify(idShort)}`);
+
   const ok = s.run(
     {
       t: 'insert',
@@ -76,10 +89,8 @@ export function addNode(t: AasNodeType, parent: NodeId | null): void {
       index: Number.MAX_SAFE_INTEGER,
       node: newNode(id, t, {
         idShort,
-        ...(t === 'shell'
-          ? { identifier: `${NS}/aas/${slug}`, globalAssetId: `${NS}/asset/${slug}` }
-          : {}),
-        ...(t === 'submodel' ? { identifier: `${NS}/sm/${slug}` } : {}),
+        ...(t === 'shell' ? { identifier, globalAssetId: assetId } : {}),
+        ...(t === 'submodel' ? { identifier } : {}),
       }),
     },
     `${MODEL_TYPE[t]} 추가`,
@@ -119,9 +130,11 @@ export function insertTemplate(def: TemplateDef, shell: NodeId | null): void {
   const s = useEditor.getState();
   const cmd: Cmd = instantiate(def, {
     newId: () => useEditor.getState().newId(),
-    namespace: NS,
+    namespace: useSettings.getState().iriPrefix || DEFAULT_IRI_PREFIX,
     assetSlug: 'asset',
     shell,
+    /* 같은 템플릿을 두 번 넣어도 식별자가 겹치지 않게 한다 */
+    doc: s.doc,
   });
   s.run(cmd, `${def.name} 삽입`);
 }

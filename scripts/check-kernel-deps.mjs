@@ -64,9 +64,20 @@ const report = (file, msg) => {
 
 for (const file of walk(kernelSrc)) {
   const src = readFileSync(file, 'utf8');
+  /*
+   * 주석과 **따옴표 문자열**을 걷어내고 본다.
+   *
+   * 문자열을 남겨 두면 사람이 읽는 메시지에 'document' 같은 평범한 영어 단어가 들어간
+   * 것만으로 DOM 전역을 쓴 것처럼 잡힌다 — 실제로 한 번 그렇게 막혔다.
+   *
+   * 템플릿 리터럴은 일부러 그대로 둔다. 그 안의 `${…}`는 진짜 코드라서,
+   * 지워 버리면 `${document.title}` 같은 것을 놓친다. 통과시키는 것보다 낫다.
+   */
   const stripped = src
     .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1')
+    .replace(/'(?:[^'\\\n]|\\.)*'/g, "''")
+    .replace(/"(?:[^"\\\n]|\\.)*"/g, '""');
 
   for (const re of [IMPORT_RE, REQUIRE_RE, DYNAMIC_RE]) {
     re.lastIndex = 0;
