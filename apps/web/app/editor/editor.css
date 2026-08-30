@@ -378,6 +378,179 @@
   line-height: 1.6;
 }
 
+/* ── 표 편집 ─────────────────────────────────────────── */
+.tablewrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+}
+.tablebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.tablebar .where {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-right: auto;
+}
+.tablebar .where b {
+  font-size: 13px;
+}
+.tablebar .where i,
+.tablebar .where em {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-style: normal;
+  color: var(--ink-3);
+}
+.tablebar select {
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 12px;
+}
+.tablebar .mini {
+  width: auto;
+  height: 26px;
+}
+.hint.pad {
+  padding: 24px;
+  text-align: center;
+}
+
+.paste {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface-2);
+}
+.paste textarea {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.paste .row {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.paste .row .mini {
+  width: auto;
+}
+
+.tablescroll {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+table.grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+table.grid th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--panel, var(--surface-2));
+  border-bottom: 1px solid var(--line);
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+table.grid td {
+  border-bottom: 1px solid var(--line-soft);
+  padding: 2px 6px;
+  vertical-align: middle;
+}
+table.grid tr.sel td {
+  background: var(--accent-soft);
+}
+table.grid td.num,
+table.grid th.num {
+  width: 34px;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+table.grid td.kindcell {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+table.grid td .dim {
+  color: var(--ink-3);
+}
+table.grid input,
+table.grid select {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ink);
+  padding: 4px 5px;
+  font-size: 12px;
+}
+table.grid input.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+}
+table.grid input:hover:not(:disabled),
+table.grid select:hover {
+  border-color: var(--line);
+}
+table.grid input:focus,
+table.grid select:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+table.grid input:disabled {
+  color: var(--ink-3);
+}
+table.grid td.ops {
+  white-space: nowrap;
+  width: 76px;
+}
+table.grid td.ops button {
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink-3);
+  border-radius: 3px;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  margin-right: 2px;
+}
+table.grid td.ops button:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+table.grid td.ops button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 .drawer {
   flex: 0 0 auto;
   background: var(--surface);

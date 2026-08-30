@@ -16,6 +16,7 @@ import { Canvas } from '../../components/Canvas';
 import { Drawer } from '../../components/Drawer';
 import { Inspector } from '../../components/Inspector';
 import { Palette } from '../../components/Palette';
+import { Table } from '../../components/Table';
 import { Tree } from '../../components/Tree';
 import { treeLayout } from '../../lib/layout';
 import { useEditor } from '../../lib/store';
@@ -30,7 +31,7 @@ export default function EditorPage(): React.JSX.Element {
   const redo = useEditor((s) => s.redo);
   const notify = useEditor((s) => s.notify);
   const arrange = useEditor((s) => s.arrange);
-  const [view, setView] = useState<'tree' | 'canvas'>('tree');
+  const [view, setView] = useState<'tree' | 'canvas' | 'table'>('tree');
 
   /* Ctrl+Z / Ctrl+Shift+Z · Ctrl+Y — 입력 중에는 브라우저 기본 동작에 맡긴다 */
   useEffect(() => {
@@ -116,11 +117,22 @@ export default function EditorPage(): React.JSX.Element {
               >
                 캔버스
               </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={view === 'table'}
+                className={view === 'table' ? 'on' : ''}
+                onClick={() => setView('table')}
+              >
+                표
+              </button>
             </div>
             <span className="hint">
               {view === 'tree'
                 ? '↑↓ 이동 · ←→ 접기/펼치기 · Ctrl+↑↓ 순서 변경 · F2 이름 · Del 삭제'
-                : '드래그로 이동(실행취소 대상 아님) · 오른쪽 단자를 끌어 포함 관계를 만듭니다'}
+                : view === 'canvas'
+                  ? '드래그로 이동(실행취소 대상 아님) · 오른쪽 단자를 끌어 포함 관계를 만듭니다'
+                  : '선택한 컨테이너의 자식을 표로 고칩니다 · 엑셀에서 복사해 붙여넣을 수 있습니다'}
             </span>
             {view === 'canvas' ? (
               <button type="button" className="mini auto" onClick={() => arrange(treeLayout(doc))}>
@@ -130,6 +142,8 @@ export default function EditorPage(): React.JSX.Element {
           </div>
           {view === 'tree' ? (
             <Tree />
+          ) : view === 'table' ? (
+            <Table />
           ) : (
             <ReactFlowProvider>
               <Canvas />

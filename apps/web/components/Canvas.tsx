@@ -8,7 +8,7 @@
  * 실행취소 대상이 아니다.
  */
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import {
   Background,
@@ -94,7 +94,10 @@ export function Canvas(): React.JSX.Element {
   const select = useEditor((s) => s.select);
   const moveTo = useEditor((s) => s.moveTo);
   const run = useEditor((s) => s.run);
-  const { fitView } = useReactFlow();
+  const { fitView, getNode, getZoom, setCenter } = useReactFlow();
+  /* 캔버스에서 직접 고른 것인지 — 그러면 화면을 다시 움직이지 않는다 */
+  const clickedHere = useRef(false);
+  const lastCount = useRef(-1);
 
   /* 좌표가 없는 노드는 트리 배치로 채운다 — 새로 넣은 노드가 원점에 겹치지 않게 */
   const auto = useMemo(() => treeLayout(doc), [doc]);
@@ -119,11 +122,34 @@ export function Canvas(): React.JSX.Element {
     return out;
   }, [doc.order]);
 
-  /* 문서가 비었다가 채워지면 한 번 맞춰 준다 */
+  /**
+   * 작은 모델은 노드 수가 바뀔 때마다 전체가 보이게 맞춘다.
+   * "넣었는데 화면 밖에 있어 안 보인다"가 캔버스에서 가장 흔한 실패다.
+   * 큰 모델에서는 보던 자리가 튀는 편이 더 나쁘므로 건드리지 않는다.
+   */
+  const count = nodes.length;
   useEffect(() => {
-    if (nodes.length) void fitView({ duration: 200, padding: 0.2 });
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [nodes.length === 0]);
+    if (count === 0 || count === lastCount.current) return;
+    const first = lastCount.current === -1;
+    lastCount.current = count;
+    if (!first && count > 60) return;
+    const t = setTimeout(() => {
+      void fitView({ duration: first ? 0 : 200, padding: 0.18, maxZoom: 1 });
+    }, 0);
+    return () => clearTimeout(t);
+  }, [count, fitView]);
+
+  /* 트리나 검증 이슈에서 고른 노드는 화면 안으로 데려온다 */
+  useEffect(() => {
+    if (!selected) return;
+    if (clickedHere.current) {
+      clickedHere.current = false;
+      return;
+    }
+    const n = getNode(selected);
+    if (!n) return;
+    void setCenter(n.position.x + 100, n.position.y + 40, { zoom: getZoom(), duration: 200 });
+  }, [selected, getNode, getZoom, setCenter]);
 
   const onConnect = useCallback(
     ({ source, target }: { source: string | null; target: string | null }) => {
@@ -155,7 +181,10 @@ export function Canvas(): React.JSX.Element {
         minZoom={0.2}
         maxZoom={2.2}
         proOptions={{ hideAttribution: true }}
-        onNodeClick={(_, n) => select(n.id as NodeId)}
+        onNodeClick={(_, n) => {
+          clickedHere.current = true;
+          select(n.id as NodeId);
+        }}
         onPaneClick={() => select(null)}
         onNodeDragStop={(_, n) => moveTo(n.id as NodeId, n.position)}
         onConnect={onConnect}

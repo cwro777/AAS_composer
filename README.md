@@ -16,6 +16,20 @@ pnpm verify
 `docker compose up -d` 로 PostgreSQL 16과 BaSyx V2를 띄웁니다.
 BaSyx는 `http://localhost:8081/shells`, PostgreSQL은 `5432`입니다.
 
+### Windows + Dropbox에서 dev 서버가 죽을 때
+
+`UNKNOWN: unknown error, open ... .next\server\vendor-chunks\...` 가 뜨면
+Dropbox가 `.next`를 동기화하며 파일을 잠근 것입니다. `pnpm build`가 `.next`를 새로
+만들면 제외 표시가 함께 사라지므로 다시 걸어야 합니다.
+
+```powershell
+Remove-Item -Recurse -Force apps\web\.next
+New-Item -ItemType Directory -Force apps\web\.next
+Set-Content -Path apps\web\.next -Stream com.dropbox.ignored -Value 1
+```
+
+`node_modules`에도 같은 표시가 걸려 있습니다. 저장소를 Dropbox 밖으로 옮기면 이 문제는 사라집니다.
+
 ## 명령어
 
 | 명령 | 하는 일 |
@@ -36,7 +50,7 @@ BaSyx는 `http://localhost:8081/shells`, PostgreSQL은 `5432`입니다.
 | `packages/semantic` | 스텁 (P6) | IRDI/IRI 파서(순수) + 사전 어댑터(주입식) |
 | `packages/aasx` | 스텁 (P7) | OPC 패키징. 브라우저·서버 공용 |
 | `packages/ui` | 토큰만 | 디자인 토큰과 공용 컴포넌트 |
-| `apps/web` | 골격 (P4) | Next.js — 에디터 · 대시보드 2종 |
+| `apps/web` | **P4 완료 · P5 진행** | `/editor` — 트리 · 캔버스 · 표 3뷰, 실행취소, 검증 패널 |
 | `apps/api` | 골격 (P7) | Hono — 저장소 · 사전 프록시 · BaSyx 게이트웨이 |
 | `e2e` | 스모크 | Playwright |
 
