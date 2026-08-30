@@ -13,7 +13,7 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 
-import { type AasDoc, type Cmd, apply, validate } from '@aas/kernel';
+import { type AasDoc, type Cmd, type Environment, apply, validate } from '@aas/kernel';
 import { checkAllConformance } from '@aas/templates';
 import { writeAasx } from '@aas/aasx';
 import { buildConceptDescriptions, attachConceptDescriptions, serialize } from '@aas/kernel';
@@ -21,6 +21,9 @@ import { termsResolver } from '@aas/semantic';
 
 import { type FetchLike, publish } from './basyx.js';
 import { diffLines } from './diff.js';
+import { entriesFromEnvironment } from './dict/harvest.js';
+import { type Dictionary, createDictionary } from './dict/service.js';
+import { type DictEntry, createMemoryDictStore } from './dict/store.js';
 import type { ModelStore } from './store.js';
 
 const IRI_PREFIX = process.env['IRI_PREFIX'] ?? 'https://bnb.co.kr/ids';
@@ -66,10 +69,21 @@ function issuesOf(doc: AasDoc): ReturnType<typeof validate> {
   return [...policy, ...template];
 }
 
-/** 네트워크는 주입받는다 — 테스트가 실제 BaSyx 없이도 돌아야 한다 */
-export function createApp(store: ModelStore, opts?: { fetchLike?: FetchLike }): Hono {
+const importSchema = z.object({
+  environment: z.record(z.unknown()).optional(),
+  entries: z.array(z.record(z.unknown())).optional(),
+  terms: z.array(z.object({ term: z.string().min(1), irdi: z.string().min(1) })).optional(),
+  origin: z.string().optional(),
+});
+
+/** 네트워크와 사전은 주입받는다 — 테스트가 실제 BaSyx·사전 없이도 돌아야 한다 */
+export function createApp(
+  store: ModelStore,
+  opts?: { fetchLike?: FetchLike; dictionary?: Dictionary },
+): Hono {
   const app = new Hono();
   const fetchImpl: FetchLike = opts?.fetchLike ?? ((url, init) => fetch(url, init as RequestInit));
+  const dict = opts?.dictionary ?? createDictionary(createMemoryDictStore());
 
   app.get('/health', (c) => c.json({ ok: true }));
 
@@ -263,14 +277,56 @@ export function createApp(store: ModelStore, opts?: { fetchLike?: FetchLike }): 
     }
   });
 
+  /* ── 사전 프록시 ─────────────────────────────────────
+     상류(IEC CDD)는 아직 꽂혀 있지 않다. 지금 답하는 근거는 캐시이고,
+     캐시를 채우는 길은 import다. status가 그 사실을 감추지 않는다. */
+
+  app.get('/dictionary/status', async (c) => c.json(await dict.status()));
+
+  app.get('/dictionary/search', async (c) => {
+    const q = c.req.query('q') ?? '';
+    if (q.trim() === '') return c.json({ error: 'QUERY_REQUIRED' }, 400);
+    const limit = Math.min(Number(c.req.query('limit') ?? 20) || 20, 100);
+    const r = await dict.search(q, limit);
+    return c.json({ query: q, count: r.entries.length, upstream: r.upstream, results: r.entries });
+  });
+
+  /** 사전 내보내기 파일이나 IDTA 템플릿을 밀어 넣는다 */
+  app.post('/dictionary/import', async (c) => {
+    const body = importSchema.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json({ error: 'INVALID_BODY', detail: body.error.issues }, 400);
+
+    const entries: DictEntry[] = [];
+    const terms: Array<{ term: string; irdi: string }> = [];
+
+    if (body.data.environment) {
+      entries.push(
+        ...entriesFromEnvironment(
+          body.data.environment as unknown as Environment,
+          body.data.origin ?? 'import:environment',
+        ),
+      );
+    }
+    if (body.data.entries) entries.push(...(body.data.entries as unknown as DictEntry[]));
+    if (body.data.terms) terms.push(...body.data.terms);
+
+    if (entries.length === 0 && terms.length === 0) {
+      return c.json({ error: 'NOTHING_TO_IMPORT', hint: 'environment · entries · terms 중 하나가 필요합니다.' }, 400);
+    }
+    return c.json(await dict.importEntries(entries, terms));
+  });
+
+  /** 단일 조회. /dictionary/search 뒤에 와야 한다 — 앞에 두면 search를 삼킨다 */
+  app.get('/dictionary/:irdi{.+}', async (c) => {
+    const irdi = decodeURIComponent(c.req.param('irdi'));
+    const r = await dict.lookup(irdi);
+    return c.json({ irdi, ...r }, r.entry ? 200 : 404);
+  });
+
   /** 아직 만들지 않은 경로는 501과 함께 어느 단계의 일인지 알려 준다 */
-  for (const [path, note] of [
-    ['/dictionary/search', 'P7 — IEC CDD 프록시 캐시. 지금은 용어집이 브라우저 안에 있다'],
-    ['/dictionary/:irdi', 'P7 — 단일 조회 + 버전 유효성'],
-    ['/batch', 'P8 — CSV 고정 컬럼 일괄 생성'],
-  ] as const) {
-    app.all(path, (c) => c.json({ error: 'NOT_IMPLEMENTED', path, note }, 501));
-  }
+  app.all('/batch', (c) =>
+    c.json({ error: 'NOT_IMPLEMENTED', path: '/batch', note: 'P8 — CSV 고정 컬럼 일괄 생성' }, 501),
+  );
 
   return app;
 }

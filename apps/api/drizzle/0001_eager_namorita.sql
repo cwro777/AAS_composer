@@ -1,0 +1,1 @@
+ALTER TABLE "dict_concept" ADD COLUMN "origin" text;

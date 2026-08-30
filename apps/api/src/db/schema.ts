@@ -55,6 +55,9 @@ export const dictConcept = pgTable(
     dataType: text('data_type'),
     status: text('status').notNull().default('unknown'),
     successor: text('successor'),
+    /** 어디서 왔는가 — 'idta:02017-1-1' · 'terms:local' · 'upstream:cdd'.
+        섞이면 나중에 무엇을 다시 받아야 하는지 알 수 없다 */
+    origin: text('origin'),
     payload: jsonb('payload'),
     fetchedAt: timestamp('fetched_at', { withTimezone: true }),
   },

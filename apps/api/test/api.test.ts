@@ -383,13 +383,10 @@ describe('BaSyx 게시', () => {
 });
 
 describe('아직 없는 것', () => {
-  it('사전·일괄은 501과 함께 어느 단계인지 알려 준다', async () => {
-    const app = fresh();
-    for (const p of ['/dictionary/search', '/batch']) {
-      const res = await app.request(p);
-      expect(res.status).toBe(501);
-      const body = (await res.json()) as { note: string };
-      expect(body.note).toMatch(/P[78]/);
-    }
+  it('일괄 생성은 501과 함께 어느 단계인지 알려 준다', async () => {
+    const res = await fresh().request('/batch');
+    expect(res.status).toBe(501);
+    const body = (await res.json()) as { note: string };
+    expect(body.note).toMatch(/P8/);
   });
 });

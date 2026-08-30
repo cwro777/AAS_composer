@@ -101,7 +101,12 @@
   껐다 켜면 사라지고 시작 로그가 그렇게 말한다.
   게시는 **부분 실패를 롤백하지 않는다** — 항목별 결과를 돌려주고 실패한 것만 다시 시도한다.
   네트워크는 주입받으므로(`createApp(store, { fetchLike })`) 테스트는 실제 BaSyx 없이 돈다.
-  사전 프록시·일괄 생성만 501이다.
+  **사전 프록시는 캐시가 답한다.** 상류(IEC CDD)는 꽂혀 있지 않다 — cdd.iec.ch가 자동 접근을
+  403으로 막고 공개 REST 창구를 확인하지 못했다. **없는 API를 가정해 어댑터를 쓰지 말 것.**
+  캐시를 채우는 것은 `scripts/dict-seed.ts`이고 근거는 실재하는 자료뿐이다 —
+  사내 용어집과 IDTA Template JSON의 conceptDescriptions.
+  **IDTA CD에는 단위가 거의 없다**(223건 중 1건). 단위는 자체 개념이나 IEC CDD에서 온다.
+  일괄 생성만 501이다.
 - **이 PC의 5432는 다른 스택(TimescaleDB)이 쓰고 있다.** 우리 PostgreSQL은 **5433**이다.
   Docker는 WSL 안에서 돈다 — `wsl -e bash -lc "cd /mnt/c/… && docker compose up -d"`.
   살아 있는 스택 점검: `pnpm --filter @aas/api exec tsx scripts/live-check.ts`
