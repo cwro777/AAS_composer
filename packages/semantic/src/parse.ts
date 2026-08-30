@@ -119,8 +119,14 @@ export function formatSemanticId(ref: SemanticRef): string {
     case 'iec-cdd':
       return `IEC CDD ${ref.source}/${ref.code}#${ref.version}`;
     case 'iri': {
-      const tail = ref.raw.replace(/^https?:\/\//, '').split('/');
-      const last = tail[tail.length - 1] || tail[tail.length - 2] || ref.raw;
+      /* 버전이 경로 끝에 있으면(.../BarrelTemperature/1/0) 그것을 떼고 이름을 집는다.
+         떼지 않으면 마지막 조각이 버전 숫자라 "0 (1/0)"으로 보인다. */
+      let path = ref.raw.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+      if (ref.iriVersion && path.endsWith(`/${ref.iriVersion}`)) {
+        path = path.slice(0, -(ref.iriVersion.length + 1));
+      }
+      const segs = path.split('/').filter(Boolean);
+      const last = segs[segs.length - 1] ?? ref.raw;
       return ref.iriVersion ? `${last} (${ref.iriVersion})` : last;
     }
     default:

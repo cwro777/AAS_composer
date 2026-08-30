@@ -16,6 +16,7 @@ const LAYER_LABEL: Record<UiIssue['layer'], string> = {
   core: '규격',
   policy: '정책',
   template: '템플릿',
+  dictionary: '사전',
 };
 
 export function Drawer(): React.JSX.Element {

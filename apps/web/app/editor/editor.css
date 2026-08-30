@@ -793,6 +793,125 @@ table.grid td.ops button:disabled {
   margin-top: 3px;
   line-height: 1.45;
 }
+/* ── semanticId 필드 ─────────────────────────────────── */
+.semf .sembadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.sembadge {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--surface-3);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.sembadge.s-iec-cdd {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.sembadge.s-eclass {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.sembadge.v-spec {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.sembadge.v-none {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.sembadge.unknown {
+  background: var(--err-bg);
+  color: var(--err);
+  display: inline-block;
+  margin-top: 4px;
+}
+.semf .mini {
+  margin-top: 6px;
+}
+.termbox {
+  margin-top: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  padding: 8px;
+}
+.termbox input {
+  width: 100%;
+  margin-bottom: 6px;
+}
+.termbox ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 190px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.termbox li button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 6px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 5px 6px;
+  cursor: pointer;
+}
+.termbox li button:hover {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+.termbox li b {
+  font-size: 12.5px;
+}
+.termbox li i {
+  grid-column: 1;
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.termbox li .sem {
+  grid-column: 1;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-3);
+}
+.termbox li .unit {
+  grid-row: 1;
+  grid-column: 2;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+}
+.termbox li .org {
+  grid-row: 2;
+  grid-column: 2;
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--surface-3);
+  color: var(--ink-3);
+  align-self: start;
+}
+.termbox li .org.idta {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
 .lang {
   display: grid;
   grid-template-columns: 64px 1fr auto;

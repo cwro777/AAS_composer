@@ -13,6 +13,7 @@ import { emptyDoc } from '@aas/kernel';
 
 import { treeLayout } from '../lib/layout';
 import {
+  buildExport,
   clearLocal,
   downloadText,
   environmentText,
@@ -83,8 +84,13 @@ export function FileMenu(): React.JSX.Element {
         type="button"
         disabled={empty}
         onClick={() => {
+          const { concepts, unresolved } = buildExport(doc);
           downloadText(suggestFilename(doc), environmentText(doc));
-          notify(`${suggestFilename(doc)} 로 내보냈습니다.`);
+          notify(
+            unresolved
+              ? `${suggestFilename(doc)} — 개념 ${concepts}건 포함, ${unresolved}건은 단위·정의를 몰라 빠졌습니다.`
+              : `${suggestFilename(doc)} — 개념 ${concepts}건을 함께 담았습니다.`,
+          );
         }}
       >
         내보내기

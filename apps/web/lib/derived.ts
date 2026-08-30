@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import {
   type AasDoc,
   type NodeId,
+  buildConceptDescriptions,
   nodeForPath,
   pathIndex,
   serialize,
@@ -19,10 +20,12 @@ import {
   verifyEnvironment,
 } from '@aas/kernel';
 import { checkAllConformance, conformanceFix } from '@aas/templates';
+import { termsResolver } from '@aas/semantic';
 
+import { buildExport } from './persist';
 import { useEditor } from './store';
 
-export type IssueLayer = 'core' | 'policy' | 'template';
+export type IssueLayer = 'core' | 'policy' | 'template' | 'dictionary';
 
 export interface UiIssue {
   code: string;
@@ -50,7 +53,8 @@ export function useJson(doc: AasDoc, ms = 100): string {
   const [text, setText] = useState('{}');
   useEffect(() => {
     try {
-      setText(JSON.stringify(serialize(settled), null, 2));
+      /* 내보내기와 같은 것을 보여준다 — conceptDescriptions까지 포함 */
+      setText(JSON.stringify(buildExport(settled).env, null, 2));
     } catch (e) {
       setText(`// 직렬화 실패: ${(e as Error).message}`);
     }
@@ -121,6 +125,18 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
         };
       }
       out.push(issue);
+    }
+
+    /* L4 — 사전. 단위·자료형을 모르는 개념은 내보내도 수신 측이 해석하지 못한다 */
+    for (const i of buildConceptDescriptions(settled, termsResolver()).unresolved) {
+      out.push({
+        code: i.code,
+        layer: 'dictionary',
+        severity: i.severity,
+        node: i.node,
+        path: i.path,
+        text: i.message.ko,
+      });
     }
 
     /* L1 — 규격. aas-core3.0의 경로를 색인으로 우리 노드에 잇는다 */

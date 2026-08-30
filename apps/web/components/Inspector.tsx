@@ -13,6 +13,7 @@ import { type AasNode, type NodeId, MODEL_TYPE, childrenOf, parentOf, pathOf } f
 
 import { setField } from '../lib/edit';
 import { useEditor } from '../lib/store';
+import { SemanticField } from './SemanticField';
 
 const VALUE_TYPES = [
   'xs:string',
@@ -244,11 +245,8 @@ export function Inspector(): React.JSX.Element {
       {n.t !== 'shell' ? (
         <div className="sec">
           <p className="eyebrow">시맨틱</p>
-          <Field
-            label="semanticId"
+          <SemanticField
             value={(n as { semanticId?: string }).semanticId ?? ''}
-            placeholder="0112/2///61987#ABA565#009"
-            note="IEC CDD IRDI · eCl@ss IRDI · IDTA IRI. 추측해서 쓰지 마십시오."
             onCommit={(v) => setField(id, 'semanticId', v, 'semanticId 편집')}
           />
           <Field

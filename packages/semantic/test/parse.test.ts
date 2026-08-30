@@ -83,6 +83,16 @@ describe('표시와 비교', () => {
     );
   });
 
+  it('버전이 경로 끝에 있어도 이름을 집는다', () => {
+    /* 자체 IRI 규약이 이 모양이다. 버전을 떼지 않으면 "0 (1/0)"으로 보인다 */
+    expect(formatSemanticId(parseSemanticId('https://bnb.co.kr/ids/cd/BarrelTemperature/1/0'))).toBe(
+      'BarrelTemperature (1/0)',
+    );
+    expect(formatSemanticId(parseSemanticId('https://bnb.co.kr/ids/cd/ClampingForce/1/0/'))).toBe(
+      'ClampingForce (1/0)',
+    );
+  });
+
   it('버전만 다른 것은 같은 개념이다', () => {
     const a = parseSemanticId('0173-1#02-AAO677#002');
     const b = parseSemanticId('0173-1#02-AAO677#004');

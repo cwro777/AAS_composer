@@ -12,7 +12,16 @@
  * 그 기록이 필요해지는 시점은 서버에 명령 로그를 남기는 P7이다.
  */
 
-import { type AasDoc, type Layout, emptyLayout, parse, serialize } from '@aas/kernel';
+import {
+  type AasDoc,
+  type Layout,
+  attachConceptDescriptions,
+  buildConceptDescriptions,
+  emptyLayout,
+  parse,
+  serialize,
+} from '@aas/kernel';
+import { termsResolver } from '@aas/semantic';
 
 const KEY = 'aas-composer/editor/v1';
 
@@ -57,8 +66,25 @@ export function clearLocal(): void {
   }
 }
 
+/**
+ * 내보낼 Environment.
+ *
+ * `conceptDescriptions`를 함께 싣는다. semanticId는 가리키기만 하므로, 단위와 자료형이
+ * 문서에 없으면 수신 측이 `45.2`가 무엇인지 알 수 없다.
+ *
+ * 해석하지 못한 개념은 조용히 빠지지 않고 건수로 돌려준다 — 사용자가 알아야 한다.
+ */
+export function buildExport(doc: AasDoc): { env: unknown; concepts: number; unresolved: number } {
+  const cd = buildConceptDescriptions(doc, termsResolver());
+  return {
+    env: attachConceptDescriptions(serialize(doc), cd.conceptDescriptions),
+    concepts: cd.conceptDescriptions.length,
+    unresolved: cd.unresolved.length,
+  };
+}
+
 export function environmentText(doc: AasDoc): string {
-  return `${JSON.stringify(serialize(doc), null, 2)}\n`;
+  return `${JSON.stringify(buildExport(doc).env, null, 2)}\n`;
 }
 
 /** 첫 셸의 이름을 파일명으로 쓴다 — 내려받은 파일이 무엇인지 알아볼 수 있게 */
