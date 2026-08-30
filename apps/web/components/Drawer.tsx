@@ -72,6 +72,18 @@ export function Drawer(): React.JSX.Element {
                   <span className="msg">{i.text}</span>
                   <span className="loc">{i.path}</span>
                 </button>
+                {i.fix ? (
+                  <button
+                    type="button"
+                    className="fix"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      i.fix?.run();
+                    }}
+                  >
+                    {i.fix.label}
+                  </button>
+                ) : null}
               </li>
             ))}
           </ul>

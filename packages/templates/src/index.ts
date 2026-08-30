@@ -116,33 +116,61 @@ export function instantiate(def: TemplateDef, opts: InstantiateOptions): Cmd {
     if (opts.requiredOnly && !e.required) return;
     /* 인스턴스 데이터 없이는 규격을 만족할 수 없는 요소는 정의만 남기고 넣지 않는다. */
     if (e.autoInsert === false) return;
-    const id = opts.newId();
-    cmds.push({
-      t: 'insert',
-      parent,
-      index: Number.MAX_SAFE_INTEGER,
-      node: newNode(id, e.t, {
-        idShort: e.idShort,
-        ...(e.semanticId ? { semanticId: e.semanticId } : {}),
-        ...(e.supplementalSemanticIds ? { supplementalSemanticIds: e.supplementalSemanticIds } : {}),
-        ...(e.valueType ? { valueType: e.valueType } : {}),
-        ...(withExamples && e.exampleValue !== undefined ? { value: e.exampleValue } : {}),
-        ...(withExamples && e.langs ? { langs: e.langs } : {}),
-        ...(e.min !== undefined ? { min: e.min } : {}),
-        ...(e.max !== undefined ? { max: e.max } : {}),
-        ...(e.contentType ? { contentType: e.contentType } : {}),
-        ...(e.entityType ? { entityType: e.entityType } : {}),
-        ...(e.typeValueListElement ? { typeValueListElement: e.typeValueListElement } : {}),
-        ...(e.semanticIdListElement ? { semanticIdListElement: e.semanticIdListElement } : {}),
-        ...(e.valueTypeListElement ? { valueTypeListElement: e.valueTypeListElement } : {}),
-        origin,
-      }),
-    });
-    for (const c of e.children ?? []) put(c, id);
+    cmds.push(...elementCmds(e, parent, opts.newId, origin, withExamples, Number.MAX_SAFE_INTEGER));
   };
 
   for (const e of def.elements) put(e, smId);
   return { t: 'batch', label: `template:${def.id}@${def.version}`, cmds };
+}
+
+/**
+ * 템플릿 요소 하나(와 그 자손)를 넣는 명령.
+ *
+ * `instantiate`와 퀵픽스가 같은 코드를 쓴다 — 갈라지면 "삽입된 것"과
+ * "빠졌다고 지적받아 채운 것"이 서로 달라진다.
+ */
+export function elementCmds(
+  e: ElementDef,
+  parent: NodeId,
+  newId: () => NodeId,
+  origin: { templateId: string; version: string },
+  withExamples: boolean,
+  index: number,
+): Cmd[] {
+  const cmds: Cmd[] = [];
+  const put = (d: ElementDef, at: NodeId, idx: number): void => {
+    const id = newId();
+    cmds.push({
+      t: 'insert',
+      parent: at,
+      index: idx,
+      node: newNode(id, d.t, {
+        idShort: d.idShort,
+        ...(d.semanticId ? { semanticId: d.semanticId } : {}),
+        ...(d.supplementalSemanticIds ? { supplementalSemanticIds: d.supplementalSemanticIds } : {}),
+        ...(d.valueType ? { valueType: d.valueType } : {}),
+        ...(withExamples && d.exampleValue !== undefined ? { value: d.exampleValue } : {}),
+        ...(withExamples && d.langs ? { langs: d.langs } : {}),
+        ...(d.min !== undefined ? { min: d.min } : {}),
+        ...(d.max !== undefined ? { max: d.max } : {}),
+        ...(d.contentType ? { contentType: d.contentType } : {}),
+        ...(d.entityType ? { entityType: d.entityType } : {}),
+        ...(d.typeValueListElement ? { typeValueListElement: d.typeValueListElement } : {}),
+        ...(d.semanticIdListElement ? { semanticIdListElement: d.semanticIdListElement } : {}),
+        ...(d.valueTypeListElement ? { valueTypeListElement: d.valueTypeListElement } : {}),
+        origin,
+      }),
+    });
+    /* 자손은 정의 순서대로. autoInsert:false인 것은 여기서도 넣지 않는다 */
+    let k = 0;
+    for (const c of d.children ?? []) {
+      if (c.autoInsert === false) continue;
+      put(c, id, k++);
+    }
+  };
+
+  put(e, parent, index);
+  return cmds;
 }
 
 /* ── L3 적합성 — 삽입 후에도 템플릿이 계약으로 남는다 ─────────── */
@@ -372,6 +400,62 @@ export function planMigration(doc: AasDoc, submodelId: NodeId, def: MigrationDef
     steps,
     manual,
     cmds: { t: 'batch', label: `migrate:${def.id}`, cmds },
+  };
+}
+
+/**
+ * T-001(필수 요소 누락)을 고치는 명령.
+ *
+ * 계획서 04장 — **지적만 하는 검증은 결국 무시된다.** 빠진 요소가 무엇인지 아는 것은
+ * 템플릿이므로, 그것을 눌러서 채울 수 있어야 한다.
+ *
+ * 넣는 자리는 템플릿의 형제 순서를 따른다. 이미 있는 형제를 세어 그 뒤에 놓으므로
+ * 채워 넣은 요소가 목록 끝에 몰리지 않는다.
+ */
+export function conformanceFix(
+  doc: AasDoc,
+  issue: Conformance,
+  newId: () => NodeId,
+): { label: { ko: string; en: string }; cmds: Cmd[] } | null {
+  if (issue.code !== 'T-001' || issue.node === null) return null;
+  const parent = issue.node;
+  if (!doc.nodes[parent]) return null;
+
+  /* 이 노드를 품은, 템플릿에서 나온 서브모델을 찾는다 */
+  let smId: NodeId | null = parent;
+  while (smId !== null && doc.nodes[smId]?.t !== 'submodel') smId = parentOf(doc, smId);
+  const sm = smId === null ? undefined : doc.nodes[smId];
+  if (!sm?.origin) return null;
+  const def = BY_ID.get(sm.origin.templateId);
+  if (!def) return null;
+
+  /* 경로에서 서브모델 이름을 뺀 나머지를 정의에서 따라 내려간다 */
+  const segs = issue.path.split('/').slice(1);
+  let siblings: ElementDef[] = def.elements;
+  let target: ElementDef | undefined;
+  for (const seg of segs) {
+    target = siblings.find((e) => e.idShort === seg);
+    if (!target) return null;
+    siblings = target.children ?? [];
+  }
+  if (!target) return null;
+
+  /* target이 속한 형제 목록에서, 앞쪽 형제 중 이미 있는 것의 수가 삽입 위치다 */
+  let family: ElementDef[] = def.elements;
+  for (const seg of segs.slice(0, -1)) {
+    family = family.find((e) => e.idShort === seg)?.children ?? [];
+  }
+  const present = new Set((doc.order[parent] ?? []).map((c) => doc.nodes[c]?.idShort));
+  const at = family
+    .slice(0, Math.max(0, family.indexOf(target)))
+    .filter((e) => present.has(e.idShort)).length;
+
+  return {
+    label: {
+      ko: `템플릿에서 ${target.idShort} 생성`,
+      en: `Create ${target.idShort} from the template`,
+    },
+    cmds: elementCmds(target, parent, newId, sm.origin, true, at),
   };
 }
 

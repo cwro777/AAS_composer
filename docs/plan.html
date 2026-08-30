@@ -290,7 +290,7 @@ footer{grid-column:1/-1;border-top:1px solid var(--line);padding-top:20px;margin
     <div class="card">
       <p class="role">01 · 커널</p>
       <h4>명령으로 편집한다</h4>
-      <p>모든 변경이 <code>Cmd</code> 하나로 표현되고 역명령을 돌려줍니다. 에디터의 Ctrl+Z, 서버의 버전 로그, CSV 일괄 생성, n8n 노드가 전부 같은 명령을 씁니다.</p>
+      <p>모든 변경이 <code>Cmd</code> 하나로 표현되고 역명령을 돌려줍니다. 에디터의 Ctrl+Z, 서버의 버전 로그, CSV 일괄 생성, 값 수집기가 전부 같은 명령을 씁니다.</p>
     </div>
     <div class="card">
       <p class="role">02 · 편집</p>
@@ -365,7 +365,7 @@ footer{grid-column:1/-1;border-top:1px solid var(--line);padding-top:20px;margin
 
   <div class="call">
     <span class="lab">CI로 강제할 경계</span>
-    <p><code>@aas/kernel</code>의 import 그래프에 <code>react</code> · <code>next</code> · <code>hono</code> · <code>fflate</code> · <code>fetch</code>가 나타나면 빌드를 실패시킵니다. 이 검사 하나가 이후 모든 재사용(CLI, 일괄 생성 워커, n8n 노드, Orange 애드온의 JSON 검증)을 지켜 줍니다.</p>
+    <p><code>@aas/kernel</code>의 import 그래프에 <code>react</code> · <code>next</code> · <code>hono</code> · <code>fflate</code> · <code>fetch</code>가 나타나면 빌드를 실패시킵니다. 이 검사 하나가 이후 모든 재사용(CLI, 일괄 생성 워커, 값 수집기, Orange 애드온의 JSON 검증)을 지켜 줍니다.</p>
   </div>
 </section>
 
@@ -489,7 +489,7 @@ canonicalize(env)       → Environment   <span class="d">키 정렬 · 빈 배�
       <tr><td class="k">Operation</td><td class="m">Operation</td><td>원격 호출. input/output/inoutput 변수를 자식으로</td><td class="m">P2</td></tr>
       <tr><td class="k">Blob</td><td class="m">Blob</td><td>내장 바이너리 (File은 참조, Blob은 포함)</td><td class="m">P2</td></tr>
       <tr><td class="k">Capability</td><td class="m">Capability</td><td>자산이 제공하는 능력 선언</td><td class="m">P2</td></tr>
-      <tr><td class="k">BasicEvent</td><td class="m">BasicEventElement</td><td>값 변경 이벤트 — n8n Watch 노드의 근거</td><td class="m">P8</td></tr>
+      <tr><td class="k">BasicEvent</td><td class="m">BasicEventElement</td><td>값 변경 이벤트 — 값 수집기가 무엇을 지켜볼지의 근거</td><td class="m">P8</td></tr>
     </tbody>
   </table>
   </div>
@@ -648,7 +648,7 @@ canonicalize(env)       → Environment   <span class="d">키 정렬 · 빈 배�
   </div>
 
   <h3>템플릿 확보 순서</h3>
-  <p>현행 6종을 위 스키마로 옮기고, 플레이북의 <code>template-harvester</code> 서브에이전트로 2종을 추가합니다 — <b>Hierarchical Structures(02011-1-1)</b>와 <b>Asset Interfaces Description(02017-1-1)</b>. 후자는 OPC UA·MQTT 접점을 기술하므로 P8의 n8n 연동과 P9 대시보드의 데이터 경로 근거가 됩니다. 사양서에서 직접 확인하지 못한 semanticId는 <code>"verified":"none"</code>으로 남기고 UI에 <span class="pill w">미확인</span> 배지를 띄웁니다. <b>추측한 값을 조용히 넣지 않는 것이 규칙입니다.</b> eCl@ss 조회가 불가능해진 만큼, 템플릿 harvest 시 <b>사양서 페이지 번호까지 함께 기록</b>해 두면 나중에 재대조가 쉬워집니다.</p>
+  <p>현행 6종을 위 스키마로 옮기고, 플레이북의 <code>template-harvester</code> 서브에이전트로 2종을 추가합니다 — <b>Hierarchical Structures(02011-1-1)</b>와 <b>Asset Interfaces Description(02017-1-1)</b>. 후자는 OPC UA·MQTT 접점을 기술하므로 P8의 값 수집과 P9 대시보드의 데이터 경로 근거가 됩니다. 사양서에서 직접 확인하지 못한 semanticId는 <code>"verified":"none"</code>으로 남기고 UI에 <span class="pill w">미확인</span> 배지를 띄웁니다. <b>추측한 값을 조용히 넣지 않는 것이 규칙입니다.</b> eCl@ss 조회가 불가능해진 만큼, 템플릿 harvest 시 <b>사양서 페이지 번호까지 함께 기록</b>해 두면 나중에 재대조가 쉬워집니다.</p>
 </section>
 
 <section id="s8">
@@ -733,10 +733,10 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   <p>완료 기준은 <b>AASX Package Explorer로 열린다</b>이고, 이를 CI에서 확인할 수 없으므로 <b>구조 검사 테스트 + 사람이 한 번 여는 수동 확인</b>을 병행합니다. 자동화 가능한 대체 검사는 basyx-python-sdk의 AASX reader로 읽어 의미 동등을 확인하는 것입니다.</p>
 
   <h3>BaSyx 게시</h3>
-  <p><code>{smId}</code>는 전역 id의 Base64URL 인코딩입니다. 값 갱신 경로 <code>PATCH /submodels/{smId}/submodel-elements/{path}/$value</code>가 n8n 연동의 접점이 됩니다. 게시는 셸·서브모델 단위로 부분 성공을 허용하고, 실패 항목만 재시도할 수 있어야 합니다.</p>
+  <p><code>{smId}</code>는 전역 id의 Base64URL 인코딩입니다. 값 갱신 경로 <code>PATCH /submodels/{smId}/submodel-elements/{path}/$value</code>가 값 수집 경로의 접점이 됩니다. 게시는 셸·서브모델 단위로 부분 성공을 허용하고, 실패 항목만 재시도할 수 있어야 합니다.</p>
 
   <h3>운전 데이터는 AAS에 담지 않는다</h3>
-  <p>플레이북의 판단을 그대로 따릅니다. n8n이 설비에서 읽어 <b>시계열 저장소(TimescaleDB)에 적재</b>하고 대시보드는 그것을 읽습니다. AAS는 구조와 의미의 원본이지 시계열 데이터베이스가 아닙니다. Time Series Data 서브모델에는 <b>구간 메타데이터와 저장소 참조</b>만 둡니다.</p>
+  <p>플레이북의 판단을 그대로 따릅니다. 설비에서 읽은 값을 <b>시계열 저장소(TimescaleDB)에 적재</b>하고 대시보드는 그것을 읽습니다. <b>누가 읽어 오는지는 P8에서 정합니다</b> — n8n을 쓰지 않기로 했기 때문입니다. AAS는 구조와 의미의 원본이지 시계열 데이터베이스가 아닙니다. Time Series Data 서브모델에는 <b>구간 메타데이터와 저장소 참조</b>만 둡니다.</p>
 </section>
 
 <section id="s10">
@@ -776,7 +776,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
       <tr><td class="k">P3 템플릿</td><td class="n">2주</td><td class="n">2.5주</td><td>설비 수십 대 규모에서는 템플릿 품질이 자동화보다 가치가 큼</td></tr>
       <tr><td class="k">P6 시맨틱</td><td class="n">2주</td><td class="n">1.5주</td><td>사전 어댑터가 IEC CDD 하나. 인터넷 접근 가능해 오프라인 시드 불필요</td></tr>
       <tr><td class="k">P7 서버</td><td class="n">3주</td><td class="n">2주</td><td>단일 사용자 — 병합 화면·CRDT 준비 제외</td></tr>
-      <tr><td class="k">P8 일괄·n8n</td><td class="n">2주</td><td class="n">1주</td><td>수십 대 규모 — CSV는 고정 컬럼 최소 구현, n8n 노드 팩에 집중</td></tr>
+      <tr><td class="k">P8 일괄 생성</td><td class="n">2주</td><td class="n">1주 + α</td><td>수십 대 규모 — CSV는 고정 컬럼 최소 구현. n8n 제외로 값 수집 경로를 따로 정해야 함</td></tr>
       <tr><td class="k">P10 마무리</td><td class="n">2주</td><td class="n">1.5주</td><td>폐쇄망 오프라인 설치 이미지 제외</td></tr>
     </tbody>
   </table>
@@ -880,12 +880,16 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P8</span><b>n8n 노드 팩 · 최소 일괄 생성</b><span class="wk">1주</span></div>
+    <div class="phhead"><span class="phid">P8</span><b>최소 일괄 생성 · 값 수집 경로</b><span class="wk">1주 + α</span></div>
     <div class="phbody">
-      <p>대상이 수십 대이므로 <b>매핑 UI를 만들지 않습니다.</b> 템플릿별 고정 컬럼 CSV만 받고, 실패 행은 건너뛰어 리포트에 남깁니다. 무게중심은 n8n 노드 팩 — AAS Read Submodel / Write SubmodelElement / Watch Model 세 개이고, 이것이 P9 대시보드의 데이터 경로가 됩니다.</p>
+      <p>대상이 수십 대이므로 <b>매핑 UI를 만들지 않습니다.</b> 템플릿별 고정 컬럼 CSV만 받고, 실패 행은 건너뛰어 리포트에 남깁니다.</p>
+      <div class="call w">
+        <span class="lab">결정 필요 · n8n 제외</span>
+        <p><b>n8n을 쓰지 않기로 했습니다.</b> 그러면 P9 대시보드가 읽을 시계열을 누가 채우는지가 빕니다. 두 갈래입니다 — <b>①</b> <code>apps/api</code>가 AID 서브모델이 기술한 접점(OPC UA·MQTT)에서 직접 읽어 적재(프로토콜 클라이언트가 들어와 <b>+2주</b>), <b>②</b> 기존 MES·SCADA가 <code>POST /ingest</code>로 밀어 넣고 우리는 받기만 함(<b>+0.5주</b>). 설비 10~50대에 기존 시스템이 있다면 ②가 현실적입니다. <b>P8 착수 시점에 정합니다.</b></p>
+      </div>
       <ul class="dod">
         <li><label><input type="checkbox"><span>설비 50대 Nameplate를 CSV 한 장으로 생성, 실패 행 리포트 확인</span></label></li>
-        <li><label><input type="checkbox"><span>n8n에서 값 갱신이 BaSyx V2에 반영된다</span></label></li>
+        <li><label><input type="checkbox"><span>값 수집 경로를 ①·② 중에서 확정하고, 한 설비의 값이 시계열 저장소에 들어간다</span></label></li>
       </ul>
     </div>
   </div>

@@ -18,7 +18,9 @@ import {
   validate,
   verifyEnvironment,
 } from '@aas/kernel';
-import { checkAllConformance } from '@aas/templates';
+import { checkAllConformance, conformanceFix } from '@aas/templates';
+
+import { useEditor } from './store';
 
 export type IssueLayer = 'core' | 'policy' | 'template';
 
@@ -30,6 +32,8 @@ export interface UiIssue {
   node: NodeId | null;
   path: string;
   text: string;
+  /** 눌러서 고칠 수 있는 이슈만 채워진다. 지적만 하는 검증은 결국 무시된다. */
+  fix?: { label: string; run: () => void };
 }
 
 function useDebounced<T>(value: T, ms: number): T {
@@ -61,28 +65,62 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
   useEffect(() => {
     const out: UiIssue[] = [];
 
+    /* 셸이 하나뿐이면 "어느 셸에 붙일지"가 자명하다 */
+    const shells = settled.roots.filter((r) => settled.nodes[r]?.t === 'shell');
+
     /* L2 — 사내 정책. 노드를 알고 있으므로 클릭해서 이동할 수 있다 */
     for (const i of validate(settled, { iriPrefix: 'https://bnb.co.kr/ids' })) {
-      out.push({
+      const issue: UiIssue = {
         code: i.code,
         layer: 'policy',
         severity: i.severity,
         node: i.node,
         path: i.path,
         text: i.message.ko,
-      });
+      };
+      /* 독립 서브모델을 유일한 셸에 붙인다 */
+      if (i.code === 'POL-STRUCT-003' && i.node !== null && shells.length === 1) {
+        const node = i.node;
+        const shell = shells[0]!;
+        issue.fix = {
+          label: `${settled.nodes[shell]!.idShort || '셸'}에 연결`,
+          run: () =>
+            useEditor
+              .getState()
+              .run({ t: 'move', node, parent: shell, index: Number.MAX_SAFE_INTEGER }, '셸에 연결'),
+        };
+      }
+      out.push(issue);
     }
 
     /* L3 — 템플릿 적합성 */
     for (const c of checkAllConformance(settled)) {
-      out.push({
+      const issue: UiIssue = {
         code: c.code,
         layer: 'template',
         severity: c.code === 'T-001' || c.code === 'T-002' ? 'error' : 'warn',
         node: c.node,
         path: c.path,
         text: c.message.ko,
-      });
+      };
+      /* 빠진 필수 요소는 템플릿이 답을 안다 — 눌러서 채운다.
+         명령은 누르는 시점에 만든다. 여기서 만들면 검증할 때마다 노드 id가 소모된다. */
+      if (c.code === 'T-001' && c.node !== null) {
+        const missing = c.path.split('/').pop() ?? '요소';
+        issue.fix = {
+          label: `템플릿에서 ${missing} 생성`,
+          run: () => {
+            const s = useEditor.getState();
+            const built = conformanceFix(s.doc, c, s.newId);
+            if (!built) {
+              s.notify('이 이슈는 자동으로 고칠 수 없습니다. 템플릿 출처를 확인하십시오.');
+              return;
+            }
+            s.run({ t: 'batch', label: built.label.ko, cmds: built.cmds }, built.label.ko);
+          },
+        };
+      }
+      out.push(issue);
     }
 
     /* L1 — 규격. aas-core3.0의 경로를 색인으로 우리 노드에 잇는다 */
