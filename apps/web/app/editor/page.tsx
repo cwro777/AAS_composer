@@ -8,12 +8,16 @@
  * 같은 `AasDoc`과 `Cmd`만 쓰게 하는 것이 이 구조의 목적이다.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
+import { ReactFlowProvider } from '@xyflow/react';
+
+import { Canvas } from '../../components/Canvas';
 import { Drawer } from '../../components/Drawer';
 import { Inspector } from '../../components/Inspector';
 import { Palette } from '../../components/Palette';
 import { Tree } from '../../components/Tree';
+import { treeLayout } from '../../lib/layout';
 import { useEditor } from '../../lib/store';
 import './editor.css';
 
@@ -25,6 +29,8 @@ export default function EditorPage(): React.JSX.Element {
   const undo = useEditor((s) => s.undo);
   const redo = useEditor((s) => s.redo);
   const notify = useEditor((s) => s.notify);
+  const arrange = useEditor((s) => s.arrange);
+  const [view, setView] = useState<'tree' | 'canvas'>('tree');
 
   /* Ctrl+Z / Ctrl+Shift+Z · Ctrl+Y — 입력 중에는 브라우저 기본 동작에 맡긴다 */
   useEffect(() => {
@@ -91,12 +97,44 @@ export default function EditorPage(): React.JSX.Element {
         <Palette />
         <main className="stage">
           <div className="viewhead">
-            <span className="eyebrow">트리</span>
+            <div className="viewtabs" role="tablist" aria-label="보기">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={view === 'tree'}
+                className={view === 'tree' ? 'on' : ''}
+                onClick={() => setView('tree')}
+              >
+                트리
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={view === 'canvas'}
+                className={view === 'canvas' ? 'on' : ''}
+                onClick={() => setView('canvas')}
+              >
+                캔버스
+              </button>
+            </div>
             <span className="hint">
-              ↑↓ 이동 · ←→ 접기/펼치기 · Ctrl+↑↓ 순서 변경 · F2 이름 · Del 삭제
+              {view === 'tree'
+                ? '↑↓ 이동 · ←→ 접기/펼치기 · Ctrl+↑↓ 순서 변경 · F2 이름 · Del 삭제'
+                : '드래그로 이동(실행취소 대상 아님) · 오른쪽 단자를 끌어 포함 관계를 만듭니다'}
             </span>
+            {view === 'canvas' ? (
+              <button type="button" className="mini auto" onClick={() => arrange(treeLayout(doc))}>
+                자동 정렬
+              </button>
+            ) : null}
           </div>
-          <Tree />
+          {view === 'tree' ? (
+            <Tree />
+          ) : (
+            <ReactFlowProvider>
+              <Canvas />
+            </ReactFlowProvider>
+          )}
           <Drawer />
         </main>
         <aside className="side">

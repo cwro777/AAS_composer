@@ -70,6 +70,8 @@ interface EditorState {
   select: (id: NodeId | null) => void;
   /** 화면 정보 — 실행취소 대상이 아니다 */
   moveTo: (id: NodeId, pos: { x: number; y: number }) => void;
+  /** 자동 정렬 — 좌표를 한 번에 바꾼다 */
+  arrange: (pos: Record<NodeId, { x: number; y: number }>) => void;
   toggleCollapse: (id: NodeId) => void;
   load: (doc: AasDoc, layout?: Layout) => void;
   notify: (msg: string | null) => void;
@@ -152,6 +154,8 @@ export const useEditor = create<EditorState>()((set, get) => ({
 
   moveTo: (id, pos) =>
     set((s) => ({ layout: { ...s.layout, pos: { ...s.layout.pos, [id]: pos } } })),
+
+  arrange: (pos) => set((s) => ({ layout: { ...s.layout, pos } })),
 
   toggleCollapse: (id) =>
     set((s) => ({

@@ -131,6 +131,8 @@ export function Tree(): React.JSX.Element {
       role="tree"
       aria-label="모델 트리"
       tabIndex={0}
+      /* 탭 정지점은 트리 하나. 현재 항목은 activedescendant로 알린다 */
+      aria-activedescendant={selected ?? undefined}
       onKeyDown={onKeyDown}
     >
       {rows.map((r) => {
@@ -139,6 +141,7 @@ export function Tree(): React.JSX.Element {
         return (
           <div
             key={r.id}
+            id={r.id}
             data-id={r.id}
             role="treeitem"
             aria-selected={isSel}

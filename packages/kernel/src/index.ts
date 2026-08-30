@@ -3,6 +3,7 @@ export * from './command.js';
 export * from './serialize.js';
 export * from './parse.js';
 export * from './canonicalize.js';
+export * from './locate.js';
 export * from './issue.js';
 export * from './validate.js';
 export * from './verify.js';

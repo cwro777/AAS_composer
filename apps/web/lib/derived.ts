@@ -12,6 +12,8 @@ import { useEffect, useState } from 'react';
 import {
   type AasDoc,
   type NodeId,
+  nodeForPath,
+  pathIndex,
   serialize,
   validate,
   verifyEnvironment,
@@ -24,7 +26,7 @@ export interface UiIssue {
   code: string;
   layer: IssueLayer;
   severity: 'error' | 'warn' | 'info';
-  /** 노드로 이동할 수 있는 이슈만 채워진다. 규격(core) 이슈는 경로만 있다. */
+  /** 이슈를 눌렀을 때 갈 노드. 규격 이슈는 경로 색인으로 잇는다. */
   node: NodeId | null;
   path: string;
   text: string;
@@ -83,8 +85,9 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
       });
     }
 
-    /* L1 — 규격. aas-core3.0의 경로는 우리 NodeId를 모른다 */
+    /* L1 — 규격. aas-core3.0의 경로를 색인으로 우리 노드에 잇는다 */
     try {
+      const index = pathIndex(settled);
       const r = verifyEnvironment(serialize(settled));
       if (r.deserializationError) {
         out.push({
@@ -101,7 +104,7 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
           code: i.code,
           layer: 'core',
           severity: 'error',
-          node: null,
+          node: nodeForPath(index, i.path),
           path: i.path,
           text: i.message.ko,
         });
