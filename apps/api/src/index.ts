@@ -1,4 +1,5 @@
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
 import { serve } from '@hono/node-server';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -14,6 +15,19 @@ import { createPgDictStore } from './dict/pg.js';
 import { type Dictionary, createDictionary } from './dict/service.js';
 import { createMemoryDictStore } from './dict/store.js';
 import { type ModelStore, createMemoryStore } from './store.js';
+
+/**
+ * 저장소 주소는 저장소 밖(.env)에 둔다.
+ *
+ * 이걸 읽지 않으면 `pnpm dev`가 메모리로 뜨고, 수집기도 켜지지 않는다 —
+ * 대시보드에서 "수집기가 없습니다"만 보게 된다. 이미 있는 이름은 덮지 않으므로
+ * 셸에서 준 값이 항상 이긴다. 파일이 없으면 그냥 넘어간다(.env는 커밋하지 않는다).
+ */
+try {
+  process.loadEnvFile(fileURLToPath(new URL('../../../.env', import.meta.url)));
+} catch {
+  /* .env가 없으면 셸 환경변수만 쓴다 */
+}
 
 /**
  * 저장소는 DATABASE_URL이 있으면 PostgreSQL, 없으면 메모리다.
