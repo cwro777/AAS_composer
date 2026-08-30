@@ -53,11 +53,20 @@ pnpm dev
 에디터는 브라우저 안에만 저장합니다. 운전 화면에 뜨게 하려면 파일 메뉴의
 **서버에 보내기**를 눌러야 합니다.
 
-설비가 없는 자리에서 화면을 움직여 보려면:
+설비가 없는 자리에서 화면을 움직여 보려면 — MQTT는 값 발생기, OPC UA는 시뮬레이터입니다.
+둘 다 켠 다음 화면에서 **수집 시작**을 누릅니다.
 
 ```bash
 pnpm --filter @aas/api exec tsx scripts/feed-demo.ts --period 900
 ```
+
+```bash
+pnpm --filter @aas/api exec tsx scripts/opcua-sim.ts
+```
+
+`opcua-sim`은 실측 픽스처의 AID가 적어 둔 browsePath 그대로 주소공간을 만들어
+`opc.tcp://<호스트>:4841`에 띄웁니다. **Ctrl+C로 내리면 운전 화면에 "붙지 못했습니다"가
+뜹니다** — 그것이 정상 동작입니다.
 
 ### Windows + Dropbox에서 dev 서버가 죽을 때
 
@@ -95,7 +104,8 @@ Set-Content -Path apps\web\.next -Stream com.dropbox.ignored -Value 1
 | `scripts/live-check.ts` | PostgreSQL 저장·재적재 · BaSyx 등록 |
 | `scripts/collect-check.ts` | MQTT 발행 → 시계열 → AAS 마지막 값 |
 | `scripts/opcua-check.ts` | 실측 픽스처의 browsePath로 OPC UA 구독 (틀린 주소까지) |
-| `scripts/feed-demo.ts` | 화면을 움직일 값을 계속 발행 (Ctrl+C로 멈춤) |
+| `scripts/feed-demo.ts` | 화면을 움직일 MQTT 값을 계속 발행 (Ctrl+C로 멈춤) |
+| `scripts/opcua-sim.ts` | 픽스처의 browsePath 그대로인 OPC UA 서버를 계속 띄움 |
 | `scripts/dict-seed.ts` | 사전 캐시 채우기 — IDTA 템플릿과 사내 용어집에서만 |
 | `pnpm --filter @aas/api db:generate` / `db:migrate` | 스키마 마이그레이션 |
 
