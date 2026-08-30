@@ -24,6 +24,7 @@ import {
   createMemorySampleStore,
 } from '../src/collect/collector.js';
 import { readPayload, topicOf } from '../src/collect/mqtt.js';
+import { isNodeId, rawOf, relativePathOf } from '../src/collect/opcua.js';
 import { planFor } from '../src/collect/plan.js';
 
 const FIXTURE = fileURLToPath(
@@ -97,6 +98,46 @@ describe('MQTT 페이로드 읽기', () => {
   });
 });
 
+describe('OPC UA 주소 읽기', () => {
+  it('NodeId 표기를 알아본다 — browsePath로 착각하지 않는다', () => {
+    expect(isNodeId('ns=2;i=1234')).toBe(true);
+    expect(isNodeId('ns=2;s=Barrel.Zone1')).toBe(true);
+    expect(isNodeId('i=2258')).toBe(true);
+    expect(isNodeId('/Objects/2:IM150E/2:Barrel')).toBe(false);
+  });
+
+  it('browsePath는 앞 슬래시만 맞추고 마디 이름은 건드리지 않는다', () => {
+    /* 2: 를 우리가 바꾸면 다른 네임스페이스의 노드를 가리키게 된다 */
+    expect(relativePathOf('Objects/2:IM150E/2:Barrel')).toBe('/Objects/2:IM150E/2:Barrel');
+    expect(relativePathOf(' /Objects//2:IM150E ')).toBe('/Objects/2:IM150E');
+  });
+
+  const dv = (
+    value: unknown,
+    status = 0,
+  ): Parameters<typeof rawOf>[0] =>
+    ({ statusCode: { value: status, name: 'BadNodeIdUnknown' }, value: { value } }) as never;
+
+  it('Good이면 값을 문자열로 준다', () => {
+    expect(rawOf(dv(235.4))).toEqual({ raw: '235.4' });
+    expect(rawOf(dv(false))).toEqual({ raw: 'false' });
+  });
+
+  it('Bad 상태는 값이 아니다 — 0으로도 빈 문자열로도 만들지 않는다', () => {
+    const r = rawOf(dv(0, 0x80340000));
+    expect(r).toHaveProperty('problem');
+    expect((r as { problem: string }).problem).toContain('BadNodeIdUnknown');
+  });
+
+  it('값이 비어 있으면 문제로 남긴다', () => {
+    expect(rawOf(dv(null))).toHaveProperty('problem');
+  });
+
+  it('배열 값은 첫 원소만 취하지 않고 통째로 보존한다', () => {
+    expect(rawOf(dv([1, 2, 3]))).toEqual({ raw: '[1,2,3]' });
+  });
+});
+
 describe('수집기', () => {
   const doc = parse(JSON.parse(readFileSync(FIXTURE, 'utf8'))).doc;
   const plan = planFor(doc);
@@ -105,16 +146,19 @@ describe('수집기', () => {
   function fakeAdapter(protocol: 'opcua' | 'mqtt'): {
     adapter: SourceAdapter;
     push: (signal: string, raw: string) => void;
+    trouble: (reason: string) => void;
     stopped: () => number;
   } {
     let emit: ((s: { signal: string; node: string; raw: string; at: Date }) => void) | null = null;
+    let complain: ((reason: string) => void) | undefined;
     let nodeOf = new Map<string, string>();
     let stops = 0;
     return {
       adapter: {
         protocol,
-        async start(source, onSample) {
+        async start(source, onSample, onProblem) {
           emit = onSample;
+          complain = onProblem;
           nodeOf = new Map(source.signals.map((s) => [s.name, s.node]));
           return async () => {
             stops += 1;
@@ -123,6 +167,7 @@ describe('수집기', () => {
       },
       push: (signal, raw) =>
         emit?.({ signal, node: nodeOf.get(signal) ?? '', raw, at: new Date('2026-08-30T09:00:00Z') }),
+      trouble: (reason) => complain?.(reason),
       stopped: () => stops,
     };
   }
@@ -181,6 +226,23 @@ describe('수집기', () => {
     const collector = createCollector({ adapters: [dying], store: createMemorySampleStore() });
     const status = await collector.start('model-4', plan);
     expect(status.skipped[0]!.reason).toContain('ECONNREFUSED');
+  });
+
+  it('값이 되지 못한 것은 시계열이 아니라 problems로 간다', async () => {
+    const fake = fakeAdapter('opcua');
+    const store = createMemorySampleStore();
+    const collector = createCollector({ adapters: [fake.adapter], store });
+    await collector.start('model-6', plan);
+
+    fake.trouble('BarrelTemperatureZone1: 상태 코드 BadNodeIdUnknown');
+    fake.trouble('BarrelTemperatureZone1: 상태 코드 BadNodeIdUnknown'); // 같은 사유는 쌓지 않는다
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(await store.count('model-6')).toBe(0);
+    const [status] = collector.status('model-6');
+    expect(status!.problems).toHaveLength(1);
+    expect(status!.problems[0]).toContain('BadNodeIdUnknown');
+    expect(status!.problems[0]).toContain(plan.sources[0]!.interfaceName);
   });
 
   it('멈추면 어댑터도 끊는다', async () => {

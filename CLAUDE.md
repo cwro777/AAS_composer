@@ -107,12 +107,17 @@
   사내 용어집과 IDTA Template JSON의 conceptDescriptions.
   **IDTA CD에는 단위가 거의 없다**(223건 중 1건). 단위는 자체 개념이나 IEC CDD에서 온다.
   일괄 생성만 501이다.
-- **값 수집 — MQTT 경로 완료, OPC UA 어댑터 없음.** `planFor(doc)`가 AID 서브모델에서
+- **값 수집 — MQTT·OPC UA 완료.** `planFor(doc)`가 AID 서브모델에서
   프로토콜·주소·신호를 읽고, 읽지 못한 것은 `problems`에 남긴다(조용히 넘기지 않는다).
   **어댑터가 없는 프로토콜은 없다고 말한다** — `/collect/:id/start`가 207과 함께
   건너뛴 접점과 이유를 돌려준다. 있는 척하지 않는 것이 규칙이다.
   숫자로 읽히지 않는 페이로드는 `textValue`로 담는다 — **0으로 바꾸지 않는다.**
-  실브로커 점검: `pnpm --filter @aas/api exec tsx scripts/collect-check.ts`
+  OPC UA는 폴링이 아니라 **구독**이고, AID의 browsePath를
+  TranslateBrowsePathsToNodeIds로 한 번 옮긴 뒤 감시한다. 상태 코드가 Bad면 값이 아니라
+  `problems`로 간다. 보안은 None/익명뿐 — 인증이 필요한 엔드포인트는 연결에서 거절되고
+  그 사유가 `skipped`에 남는다.
+  실브로커·실서버 점검: `scripts/collect-check.ts`(MQTT) · `scripts/opcua-check.ts`(OPC UA —
+  실측 픽스처의 browsePath와 같은 주소공간을 띄워 붙는다. 틀린 주소일 때까지 함께 본다)
 - **이 PC의 5432는 다른 스택(TimescaleDB)이 쓰고 있다.** 우리 PostgreSQL은 **5433**이다.
   Docker는 WSL 안에서 돈다 — `wsl -e bash -lc "cd /mnt/c/… && docker compose up -d"`.
   살아 있는 스택 점검: `pnpm --filter @aas/api exec tsx scripts/live-check.ts`

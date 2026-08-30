@@ -7,6 +7,7 @@ import postgres from 'postgres';
 import { createApp } from './app.js';
 import { type Collector, type SampleStore, createCollector } from './collect/collector.js';
 import { createMqttAdapter } from './collect/mqtt.js';
+import { createOpcuaAdapter } from './collect/opcua.js';
 import { createPgSampleStore } from './collect/pg.js';
 import { createPgStore } from './db/store.js';
 import { createPgDictStore } from './dict/pg.js';
@@ -56,7 +57,10 @@ function wire(): Wiring {
      * AID는 접점만 기술하고 대상 요소를 가리키지 않는다. 그 연결은 별도 규격
      * (IDTA 02027 Asset Interfaces Mapping Configuration)의 몫이다. 짐작으로 잇지 않는다.
      */
-    collector: createCollector({ adapters: [createMqttAdapter()], store: samples }),
+    collector: createCollector({
+      adapters: [createMqttAdapter(), createOpcuaAdapter()],
+      store: samples,
+    }),
     kind: `PostgreSQL (${url.replace(/:[^:@]*@/, ':***@')})`,
   };
 }

@@ -7,8 +7,8 @@
  *
  * AAS는 구조와 의미의 원본이지 시계열 데이터베이스가 아니다(P0 실측).
  *
- * 프로토콜은 어댑터 뒤에 둔다. 테스트는 가짜 어댑터로 돌고, 실제 MQTT는 같은 인터페이스다.
- * OPC UA는 아직 없다 — 어댑터가 없으면 그렇게 말한다. 있는 척하지 않는다.
+ * 프로토콜은 어댑터 뒤에 둔다. 테스트는 가짜 어댑터로 돌고, 실제 MQTT·OPC UA는 같은
+ * 인터페이스다. **어댑터가 없는 프로토콜은 없다고 말한다** — 있는 척하지 않는다.
  */
 
 import type { Protocol, SignalPlan, SourcePlan } from './plan.js';
@@ -42,8 +42,17 @@ export type StopFn = () => Promise<void>;
 
 export interface SourceAdapter {
   protocol: Protocol;
-  /** 붙어서 값이 올 때마다 onSample을 부른다. 되돌려주는 함수로 끊는다 */
-  start(source: SourcePlan, onSample: (s: IncomingSample) => void): Promise<StopFn>;
+  /**
+   * 붙어서 값이 올 때마다 onSample을 부른다. 되돌려주는 함수로 끊는다.
+   *
+   * 값으로 삼을 수 없는 것(주소를 못 찾음, 상태 코드 Bad)은 onSample이 아니라
+   * onProblem으로 보낸다 — 시계열에 가짜 값이 섞이지 않게, 그러나 조용하지도 않게.
+   */
+  start(
+    source: SourcePlan,
+    onSample: (s: IncomingSample) => void,
+    onProblem?: (reason: string) => void,
+  ): Promise<StopFn>;
 }
 
 export interface JobStatus {
@@ -55,6 +64,8 @@ export interface JobStatus {
   lastError: string | null;
   /** 어댑터가 없어 붙지 못한 인터페이스 */
   skipped: Array<{ interfaceName: string; protocol: Protocol; reason: string }>;
+  /** 붙은 뒤에 생긴 읽기 문제. 최근 것부터 최대 20건 */
+  problems: string[];
 }
 
 export interface Collector {
@@ -113,6 +124,7 @@ export function createCollector(opts: CollectorOptions): Collector {
           lastAt: null,
           lastError: null,
           skipped: [],
+          problems: [],
         },
         stops: [],
       };
@@ -138,17 +150,24 @@ export function createCollector(opts: CollectorOptions): Collector {
 
         const byName = new Map(source.signals.map((s) => [s.name, s]));
         try {
-          const stop = await adapter.start(source, (incoming) => {
-            const sig = byName.get(incoming.signal);
-            if (!sig) return;
-            const stored = toStored(modelId, sig, incoming);
-            job.status.received += 1;
-            job.status.lastAt = stored.at.toISOString();
-            void opts.store.insert([stored]).catch((e: unknown) => {
-              job.status.lastError = `저장 실패: ${(e as Error).message}`;
-            });
-            opts.onLatest?.(modelId, stored);
-          });
+          const stop = await adapter.start(
+            source,
+            (incoming) => {
+              const sig = byName.get(incoming.signal);
+              if (!sig) return;
+              const stored = toStored(modelId, sig, incoming);
+              job.status.received += 1;
+              job.status.lastAt = stored.at.toISOString();
+              void opts.store.insert([stored]).catch((e: unknown) => {
+                job.status.lastError = `저장 실패: ${(e as Error).message}`;
+              });
+              opts.onLatest?.(modelId, stored);
+            },
+            (reason) => {
+              const line = `${source.interfaceName}: ${reason}`;
+              job.status.problems = [line, ...job.status.problems.filter((p) => p !== line)].slice(0, 20);
+            },
+          );
           job.stops.push(stop);
           job.status.sources.push({
             interfaceName: source.interfaceName,
