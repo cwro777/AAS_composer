@@ -1,0 +1,612 @@
+/*
+ * 대시보드 — 계기판.
+ *
+ * 색은 토큰만 쓴다(#hex 금지). 의미색(ok/warn/err)은 지연 등급에만 쓰고,
+ * 액센트는 선택 표시에만 쓴다. 둘을 섞으면 "고른 것"과 "위험한 것"이 구분되지 않는다.
+ */
+
+.dash {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.dhead {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.dhead b {
+  font-size: 0.95rem;
+}
+.dhead .back,
+.dhead .link {
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 0.15rem 0.5rem;
+}
+.dhead .link {
+  margin-left: auto;
+}
+.dhead .back:hover,
+.dhead .link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dim {
+  color: var(--ink-3);
+}
+
+/* ── 상태 화면 (빈 · 로딩 · 오류) ───────────────── */
+
+.state {
+  margin: auto;
+  max-width: 34rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+.state h2 {
+  color: var(--ink);
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+}
+.state.err h2 {
+  color: var(--err);
+}
+.state pre {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 0.7rem 0.9rem;
+  margin: 0.9rem 0;
+  overflow-x: auto;
+}
+.state button,
+.state a {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+.state.inline {
+  margin: 0 0 1rem;
+  max-width: none;
+  text-align: left;
+  padding: 0.9rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+}
+.state.inline h3 {
+  margin: 0 0 0.3rem;
+  font-size: 0.86rem;
+  color: var(--ink);
+}
+.state.inline p {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+/* ── 본문 ───────────────────────────────────────── */
+
+.ops {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 15rem 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: start;
+  min-height: 0;
+}
+@media (max-width: 60rem) {
+  .ops {
+    grid-template-columns: 1fr;
+  }
+}
+
+.models {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 0.7rem;
+}
+.models h2 {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 0.5rem;
+}
+.models ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.models button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.1rem 0.4rem;
+  text-align: left;
+  font: inherit;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  padding: 0.4rem 0.5rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+.models button:hover {
+  background: var(--surface-2);
+}
+.models button.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.models .nm {
+  font-size: 0.84rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.models .sub {
+  grid-column: 1 / -1;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink-3);
+}
+.models .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  align-self: center;
+}
+.models .dot.run {
+  background: var(--ok);
+}
+.models .dot.fail {
+  background: var(--err);
+}
+.models .dot.idle {
+  background: var(--ink-3);
+  opacity: 0.5;
+}
+.warnbox {
+  margin: 0.7rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.6;
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-radius: var(--r);
+  padding: 0.5rem 0.6rem;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 0.9rem 1rem 1.1rem;
+  min-width: 0;
+}
+.phead {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.8rem;
+}
+.phead h2 {
+  font-size: 1rem;
+  margin: 0;
+  margin-right: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.thr {
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.thr select {
+  font: inherit;
+  font-size: 0.75rem;
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 0.15rem 0.3rem;
+}
+.phead button {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+  cursor: pointer;
+}
+.phead button.start {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.phead button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── KPI ────────────────────────────────────────── */
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.kpi {
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  padding: 0.5rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.klab {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.kval {
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+/* 한글은 모노 글꼴에서 글자마다 폭이 벌어져 읽기 나빠진다 — 수치에만 모노를 쓴다 */
+.kval.text {
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+.khint {
+  font-size: 0.7rem;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.kpi.fresh {
+  border-left-color: var(--ok);
+}
+.kpi.fresh .kval {
+  color: var(--ok);
+}
+.kpi.late {
+  border-left-color: var(--warn);
+}
+.kpi.late .kval {
+  color: var(--warn);
+}
+.kpi.stale,
+.kpi.never {
+  border-left-color: var(--err);
+}
+.kpi.stale .kval,
+.kpi.never .kval {
+  color: var(--err);
+}
+
+/* ── 신호 표 ─────────────────────────────────────── */
+
+.sig {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.sig th {
+  text-align: left;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.sig td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: baseline;
+}
+.sig .r {
+  text-align: right;
+}
+.sig .center {
+  text-align: center;
+  padding: 1.2rem;
+}
+.sig tbody tr {
+  cursor: pointer;
+}
+.sig tbody tr:hover {
+  background: var(--surface-2);
+}
+.sig tbody tr.on {
+  background: var(--accent-soft);
+}
+.sig tbody tr.retired {
+  opacity: 0.65;
+}
+.sig .val {
+  font-family: var(--mono);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.sig .unit {
+  font-weight: 400;
+  color: var(--ink-3);
+  margin-left: 0.25rem;
+}
+.sig .addr {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  max-width: 18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.proto {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  background: var(--surface-3);
+  color: var(--ink-2);
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+  margin-left: 0.35rem;
+}
+.tag {
+  font-size: 0.62rem;
+  color: var(--err);
+  background: var(--err-bg);
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+  margin-left: 0.35rem;
+}
+.lag {
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+.lag.fresh {
+  color: var(--ok);
+}
+.lag.late {
+  color: var(--warn);
+}
+.lag.stale,
+.lag.never {
+  color: var(--err);
+}
+.lag.never {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+}
+.failed {
+  color: var(--err);
+}
+
+/* ── 시계열 ─────────────────────────────────────── */
+
+.series {
+  margin-top: 1.1rem;
+}
+.series h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  margin: 0 0 0.4rem;
+}
+.series h3 .dim {
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+.chart {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  padding: 0.5rem 0.6rem;
+}
+.chart svg {
+  width: 100%;
+  height: 150px;
+  display: block;
+  overflow: visible;
+}
+.chart .line {
+  fill: none;
+  stroke: var(--wire);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.chart .gap {
+  stroke: var(--ink-3);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+.chart .axis {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.chart .dot {
+  fill: var(--wire-hi);
+}
+.chart .ylab {
+  font-family: var(--mono);
+  font-size: 10px;
+  fill: var(--ink-3);
+}
+.chartfoot {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink-3);
+  padding-top: 0.3rem;
+}
+.chartfoot .mid {
+  color: var(--ink-3);
+}
+.chart.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 6rem;
+  color: var(--ink-3);
+  font-size: 0.8rem;
+}
+.textvals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+.textvals li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  padding: 0.3rem 0.5rem;
+}
+.textvals code {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+.textvals span {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  color: var(--ink-3);
+}
+
+/* ── 걸린 것 ─────────────────────────────────────── */
+
+.problems {
+  margin-top: 1.1rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.7rem;
+}
+.problems h3 {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 0.4rem;
+}
+.problems .count {
+  font-family: var(--mono);
+  background: var(--err-bg);
+  color: var(--err);
+  border-radius: 3px;
+  padding: 0.05rem 0.35rem;
+  margin-left: 0.3rem;
+}
+.problems ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.problems li {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  border-left: 3px solid var(--line);
+  padding: 0.3rem 0.6rem;
+  border-radius: 0 var(--r) var(--r) 0;
+}
+.problems li.err {
+  border-left-color: var(--err);
+  background: var(--err-bg);
+  color: var(--err);
+}
+.problems li.warn {
+  border-left-color: var(--warn);
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.problems li b {
+  margin-right: 0.35rem;
+}
+
+.note {
+  font-size: 0.78rem;
+  border-radius: var(--r);
+  padding: 0.5rem 0.7rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.note.err {
+  background: var(--err-bg);
+  color: var(--err);
+}
+
+/* ── 하단 ────────────────────────────────────────── */
+
+.ticker {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.4rem 1rem;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink-3);
+}
+.ticker .on {
+  color: var(--ok);
+}
+.ticker .dim {
+  margin-left: auto;
+}

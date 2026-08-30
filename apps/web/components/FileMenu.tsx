@@ -4,13 +4,16 @@
  * 파일 — 새로 만들기 · 가져오기 · 내보내기 · 복사.
  *
  * 자동 저장은 브라우저 안에만 남는다. 남과 주고받는 것은 Environment JSON 파일이다.
- * 서버 저장소와 버전은 P7이다.
+ *
+ * **서버에 보내기**는 다르다 — 수집과 시계열은 서버에만 있으므로, 설비를 붙이려면
+ * 모델이 서버에 있어야 한다. 지금은 새 모델로 만들기만 한다(덮어쓰기·버전 잠금은 미구현).
  */
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { emptyDoc } from '@aas/kernel';
 
+import { API_BASE, type ApiError, createModel } from '../lib/api';
 import { treeLayout } from '../lib/layout';
 import {
   buildAasx,
@@ -26,9 +29,11 @@ import { useEditor } from '../lib/store';
 
 export function FileMenu(): React.JSX.Element {
   const doc = useEditor((s) => s.doc);
+  const layout = useEditor((s) => s.layout);
   const load = useEditor((s) => s.load);
   const notify = useEditor((s) => s.notify);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [sending, setSending] = useState(false);
   const empty = Object.keys(doc.nodes).length === 0;
 
   const onPick = async (file: File): Promise<void> => {
@@ -114,6 +119,28 @@ export function FileMenu(): React.JSX.Element {
         }}
       >
         AASX
+      </button>
+
+      <button
+        type="button"
+        disabled={empty || sending}
+        title="수집·시계열은 서버에만 있습니다. 운전 모니터링을 붙이려면 여기서 보냅니다."
+        onClick={() => {
+          setSending(true);
+          const shell = doc.roots.map((r) => doc.nodes[r]).find((n) => n?.t === 'shell');
+          createModel(shell?.idShort || 'AAS 모델', doc, layout)
+            .then((r) => notify(`서버에 보냈습니다 — ${r.id.slice(0, 8)}. 운전 모니터링에서 보입니다.`))
+            .catch((e: ApiError) =>
+              notify(
+                e.offline
+                  ? `API 서버에 닿지 못했습니다 (${API_BASE}). pnpm dev로 함께 띄우십시오.`
+                  : `서버가 거절했습니다: ${e.code}`,
+              ),
+            )
+            .finally(() => setSending(false));
+        }}
+      >
+        {sending ? '보내는 중…' : '서버에 보내기'}
       </button>
 
       <button

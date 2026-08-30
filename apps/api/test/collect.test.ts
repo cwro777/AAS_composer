@@ -17,12 +17,15 @@ import { parse } from '@aas/kernel';
 import { getTemplate, instantiate } from '@aas/templates';
 import { apply, emptyDoc, newNode } from '@aas/kernel';
 
+import { createApp } from '../src/app.js';
 import {
+  type SampleStore,
   type SourceAdapter,
   type StoredSample,
   createCollector,
   createMemorySampleStore,
 } from '../src/collect/collector.js';
+import { createMemoryStore } from '../src/store.js';
 import { readPayload, topicOf } from '../src/collect/mqtt.js';
 import { isNodeId, rawOf, relativePathOf } from '../src/collect/opcua.js';
 import { planFor } from '../src/collect/plan.js';
@@ -95,6 +98,96 @@ describe('MQTT 페이로드 읽기', () => {
     /* 값이 없는 것과 0은 다르다 */
     expect(readPayload('', null)).toBe('');
     expect(readPayload('not json {', null)).toBe('not json {');
+  });
+});
+
+describe('신호별 현재 상태 (/models/:id/signals)', () => {
+  const doc = parse(JSON.parse(readFileSync(FIXTURE, 'utf8'))).doc;
+
+  async function withModel(): Promise<{ app: ReturnType<typeof createApp>; id: string; store: SampleStore }> {
+    const store = createMemorySampleStore();
+    const app = createApp(createMemoryStore(), { samples: store });
+    const res = await app.request('/models', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'IM-150E', doc }),
+    });
+    const { id } = (await res.json()) as { id: string };
+    return { app, id, store };
+  }
+
+  it('값이 한 번도 오지 않은 신호도 목록에 있다 — 죽은 신호가 사라지면 안 된다', async () => {
+    const { app, id } = await withModel();
+    const body = (await (await app.request(`/models/${id}/signals`)).json()) as {
+      signals: Array<{ signal: string; count: number; lastAt: string | null; address: string }>;
+    };
+    expect(body.signals).toHaveLength(1);
+    expect(body.signals[0]!.signal).toBe('BarrelTemperatureZone1');
+    expect(body.signals[0]!.count).toBe(0);
+    expect(body.signals[0]!.lastAt).toBeNull();
+    /* 어디를 보고 있는지도 함께 — 안 오는 이유를 찾을 자리다 */
+    expect(body.signals[0]!.address).toContain('/Objects/2:IM150E');
+  });
+
+  it('마지막 값과 건수를 준다. 지연은 서버 now로 재게 한다', async () => {
+    const { app, id, store } = await withModel();
+    await store.insert([
+      {
+        modelId: id,
+        node: 'n1',
+        signal: 'BarrelTemperatureZone1',
+        semanticId: null,
+        unit: 'CEL',
+        at: new Date('2026-08-30T09:00:00Z'),
+        numValue: 235.4,
+        textValue: null,
+      },
+      {
+        modelId: id,
+        node: 'n1',
+        signal: 'BarrelTemperatureZone1',
+        semanticId: null,
+        unit: 'CEL',
+        at: new Date('2026-08-30T09:00:10Z'),
+        numValue: 241.2,
+        textValue: null,
+      },
+    ]);
+
+    const body = (await (await app.request(`/models/${id}/signals`)).json()) as {
+      now: string;
+      signals: Array<{ numValue: number; count: number; lastAt: string; unit: string }>;
+    };
+    expect(body.signals[0]!.numValue).toBe(241.2);
+    expect(body.signals[0]!.count).toBe(2);
+    expect(body.signals[0]!.lastAt).toBe('2026-08-30T09:00:10.000Z');
+    expect(body.signals[0]!.unit).toBe('CEL');
+    expect(Date.parse(body.now)).toBeGreaterThan(0);
+  });
+
+  it('AID에서 빠졌지만 값이 남은 신호는 retired로 남는다 — 조용히 지우지 않는다', async () => {
+    const { app, id, store } = await withModel();
+    await store.insert([
+      {
+        modelId: id,
+        node: 'n9',
+        signal: 'OldSignal',
+        semanticId: null,
+        unit: null,
+        at: new Date('2026-08-30T08:00:00Z'),
+        numValue: 1,
+        textValue: null,
+      },
+    ]);
+    const body = (await (await app.request(`/models/${id}/signals`)).json()) as {
+      signals: Array<{ signal: string; retired?: boolean }>;
+    };
+    expect(body.signals.find((s) => s.signal === 'OldSignal')?.retired).toBe(true);
+  });
+
+  it('시계열 저장소가 없으면 501 — 있는 척하지 않는다', async () => {
+    const app = createApp(createMemoryStore());
+    expect((await app.request('/models/x/signals')).status).toBe(501);
   });
 });
 

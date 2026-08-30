@@ -84,6 +84,14 @@
   기존 6종 + Hierarchical Structures(02011-1-1) + AID MQTT·OPC UA(02017-1-1).
   미확인 semanticId는 9건뿐이고 전부 이유가 분명하다 — 사내 정의 6건,
   공식 템플릿에 없는 예시 속성 3건(eCl@ss 라이선스 없음).
+- `apps/web` — **P9 운전 모니터링 진행 중.** `/dashboard/operations`가 서버를 본다 —
+  수집 상태·신호별 지연·시계열. **지연은 서버가 준 `now`로 잰다**(브라우저 시계는 어긋난다).
+  값이 온 적 없는 신호도 목록에 남고, 조회 실패를 "신호 없음"으로 보이지 않는다.
+  서버 없음·모델 없음·수집 꺼짐을 각각 다른 화면으로 안내한다 — 사용자가 할 일이 다르다.
+  차트는 라이브러리 없이 SVG다. 축약은 구간 min·max를 남긴다(균등하게 솎으면 스파이크가 사라진다).
+  **팬·줌은 아직 없다** — 계획서의 10만 점 목표는 남아 있다.
+  모델 자산 관리(`/dashboard/models`)는 아직 없다.
+  대시보드만 TanStack Query를 쓰고 에디터(Zustand)와 섞지 않는다.
 - `apps/web` — **P4 완료, P5 진행 중.** `/editor`에 트리·캔버스·표 3뷰가 있고
   셋이 같은 스토어(문서·선택)를 본다. 실행취소는 커널의 역명령으로 만든다(zundo 없음).
   좌표는 Layout이라 실행취소 대상이 아니다. 표 편집의 붙여넣기는 batch 한 개다.
@@ -118,6 +126,14 @@
   그 사유가 `skipped`에 남는다.
   실브로커·실서버 점검: `scripts/collect-check.ts`(MQTT) · `scripts/opcua-check.ts`(OPC UA —
   실측 픽스처의 browsePath와 같은 주소공간을 띄워 붙는다. 틀린 주소일 때까지 함께 본다)
+  화면을 움직이는 값이 필요하면 `scripts/feed-demo.ts`.
+  **`GET /models/:id/signals`가 운전 화면의 근거다.** 신호별 마지막 한 건을 SQL
+  `DISTINCT ON`으로 뽑는다 — 최근 N건을 받아 화면에서 묶으면 수다스러운 신호가 창을 채워
+  조용한 신호가 목록에서 사라진다. 원시 SQL은 drizzle의 타입 변환을 거치지 않으므로
+  타임스탬프·수치를 손으로 변환한다(그래서 한 번 500이 났다).
+- **웹(3000)이 API(8787)를 직접 부른다.** CORS는 localhost로 좁혀 두었다(`WEB_ORIGIN`).
+  에디터는 여전히 브라우저 안에만 저장하고, **서버로 보내는 것은 명시적인 동작**이다
+  (파일 메뉴의 '서버에 보내기'). 지금은 새 모델로 만들기만 한다 — 덮어쓰기·버전 잠금은 미구현.
 - **이 PC의 5432는 다른 스택(TimescaleDB)이 쓰고 있다.** 우리 PostgreSQL은 **5433**이다.
   Docker는 WSL 안에서 돈다 — `wsl -e bash -lc "cd /mnt/c/… && docker compose up -d"`.
   살아 있는 스택 점검: `pnpm --filter @aas/api exec tsx scripts/live-check.ts`

@@ -11,6 +11,7 @@
  */
 
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { z } from 'zod';
 
 import { type AasDoc, type Cmd, type Environment, apply, validate } from '@aas/kernel';
@@ -93,6 +94,20 @@ export function createApp(
   const dict = opts?.dictionary ?? createDictionary(createMemoryDictStore());
   const collector = opts?.collector;
   const samples = opts?.samples;
+
+  /**
+   * 웹(3000)이 API(8787)를 직접 부른다. 단일 사용자·로컬 도구이므로 기원은
+   * localhost로 좁혀 둔다 — 열어 둘 이유가 없다. 배포처가 생기면 WEB_ORIGIN으로 준다.
+   */
+  app.use(
+    '*',
+    cors({
+      origin: (process.env['WEB_ORIGIN'] ?? 'http://localhost:3000,http://127.0.0.1:3000').split(','),
+      allowHeaders: ['content-type', 'if-match'],
+      allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      exposeHeaders: ['ETag'],
+    }),
+  );
 
   app.get('/health', (c) => c.json({ ok: true }));
 
@@ -372,6 +387,58 @@ export function createApp(
     const limit = Math.min(Number(c.req.query('limit') ?? 200) || 200, 5000);
     const rows = await samples.recent(id, signal, limit);
     return c.json({ count: rows.length, total: await samples.count(id), samples: rows });
+  });
+
+  /**
+   * 신호별 현재 상태 — 운영 화면의 근거.
+   *
+   * **계획에는 있는데 값이 한 번도 오지 않은 신호도 함께 낸다.** 받은 것만 보여주면
+   * 죽은 신호가 화면에서 사라진다 — 그것이 가장 감추면 안 되는 상태다.
+   *
+   * 지연은 서버가 계산하지 않고 `now`를 함께 보내 화면이 재게 한다.
+   * 브라우저 시계가 서버와 몇 분씩 어긋나는 일은 흔하다.
+   */
+  app.get('/models/:id/signals', async (c) => {
+    if (!samples) return c.json({ error: 'NO_SAMPLE_STORE' }, 501);
+    const rec = await store.get(c.req.param('id'));
+    if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
+
+    const seen = new Map((await samples.summary(rec.id)).map((s) => [s.signal, s]));
+    const plan = planFor(rec.doc);
+    const signals = [];
+
+    for (const source of plan.sources) {
+      for (const sig of source.signals) {
+        const got = seen.get(sig.name);
+        seen.delete(sig.name);
+        signals.push({
+          signal: sig.name,
+          node: sig.node,
+          interfaceName: source.interfaceName,
+          protocol: source.protocol,
+          address: sig.address,
+          unit: got?.unit ?? sig.unit,
+          semanticId: got?.semanticId ?? sig.semanticId,
+          lastAt: got?.lastAt ?? null,
+          numValue: got?.numValue ?? null,
+          textValue: got?.textValue ?? null,
+          count: got?.count ?? 0,
+        });
+      }
+    }
+
+    /* 계획에서 사라졌지만 값이 남아 있는 신호 — AID를 고친 뒤에 생긴다 */
+    for (const orphan of seen.values()) {
+      signals.push({
+        ...orphan,
+        interfaceName: null,
+        protocol: null,
+        address: null,
+        retired: true,
+      });
+    }
+
+    return c.json({ now: new Date().toISOString(), signals, problems: plan.problems });
   });
 
   /** 아직 만들지 않은 경로는 501과 함께 어느 단계의 일인지 알려 준다 */

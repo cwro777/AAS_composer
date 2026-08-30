@@ -32,10 +32,29 @@ export interface StoredSample {
   textValue: string | null;
 }
 
+/** 신호 하나의 현재 상태 — 마지막 값과 그것이 들어온 시각 */
+export interface SignalSummary {
+  signal: string;
+  node: string;
+  unit: string | null;
+  semanticId: string | null;
+  lastAt: string;
+  numValue: number | null;
+  textValue: string | null;
+  count: number;
+}
+
 export interface SampleStore {
   insert(samples: StoredSample[]): Promise<number>;
   recent(modelId: string, signal?: string, limit?: number): Promise<StoredSample[]>;
   count(modelId: string): Promise<number>;
+  /**
+   * 신호별 **마지막 한 건**. 수집 지연을 재는 근거다.
+   *
+   * 최근 N건을 받아 화면에서 묶으면 안 된다 — 수다스러운 신호 하나가 창을 다 채우면
+   * 조용한 신호가 목록에서 사라지고, 멈춘 신호가 그렇게 보이지 않게 된다.
+   */
+  summary(modelId: string): Promise<SignalSummary[]>;
 }
 
 export type StopFn = () => Promise<void>;
@@ -224,6 +243,28 @@ export function createMemorySampleStore(): SampleStore {
     },
     async count(modelId) {
       return rows.filter((r) => r.modelId === modelId).length;
+    },
+    async summary(modelId) {
+      const last = new Map<string, SignalSummary>();
+      for (const r of rows.filter((x) => x.modelId === modelId)) {
+        const prev = last.get(r.signal);
+        const at = r.at.toISOString();
+        if (prev && prev.lastAt > at) {
+          last.set(r.signal, { ...prev, count: prev.count + 1 });
+          continue;
+        }
+        last.set(r.signal, {
+          signal: r.signal,
+          node: r.node,
+          unit: r.unit,
+          semanticId: r.semanticId,
+          lastAt: at,
+          numValue: r.numValue,
+          textValue: r.textValue,
+          count: (prev?.count ?? 0) + 1,
+        });
+      }
+      return [...last.values()].sort((a, b) => a.signal.localeCompare(b.signal));
     },
   };
 }
