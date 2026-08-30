@@ -164,6 +164,10 @@ importers:
         version: 2.1.9(@types/node@22.20.1)(lightningcss@1.32.0)
 
   packages/semantic:
+    dependencies:
+      '@aas/kernel':
+        specifier: workspace:*
+        version: link:../kernel
     devDependencies:
       vitest:
         specifier: ^2.1.3

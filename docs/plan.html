@@ -177,7 +177,7 @@ footer{grid-column:1/-1;border-top:1px solid var(--line);padding-top:20px;margin
     <span class="tag">캔버스 · 트리 · 표 3뷰</span>
     <span class="tag">템플릿 적합성 검사</span>
     <span class="tag">IEC CDD 단독</span>
-    <span class="tag">11단계 · 직렬 21.5주</span>
+    <span class="tag">11단계 · P0~P5 완료</span>
   </div>
 </header>
 
@@ -767,23 +767,36 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
 
 <section id="s11">
   <h2><span class="num">11</span>로드맵</h2>
-  <p class="sub">결정사항 5건을 반영해 <b>직렬 21.5주</b>로 조정했습니다(당초 24주). P9는 별도 워크트리에서 병렬로 돌릴 수 있어 실제로는 18~19주입니다. <b>커널을 건드리는 단계는 절대 병렬로 돌리지 않습니다.</b></p>
+  <p class="sub"><b>주 단위를 걷어냈습니다.</b> 원래 숫자는 사람 개발자 1~2명 기준이었는데, 실제로는 P1~P5가 하루 안에 끝났습니다. 경과 시간을 예측하지 못하는 숫자를 계속 들고 있으면 계획을 잘못 읽게 됩니다.</p>
+
+  <div class="call">
+    <span class="lab">이제 무엇으로 재는가</span>
+    <p>남은 단계에서 실제로 시간을 먹는 것은 코드가 아닙니다. <b>결정·자료·검토</b>입니다. 그래서 각 단계를 두 축으로 표기합니다 — <b>작업</b>(코드로 끝낼 수 있는 분량)과 <b>당신 시간</b>(사람이 판단하거나 자료를 줘야 하는 것). 코드가 빨라져도 뒤쪽은 줄지 않습니다.</p>
+  </div>
 
   <div class="scroll">
   <table>
-    <thead><tr><th>단계</th><th>당초</th><th>조정</th><th>이유</th></tr></thead>
+    <thead><tr><th>단계</th><th>상태</th><th>작업</th><th>당신 시간이 필요한 것</th></tr></thead>
     <tbody>
-      <tr><td class="k">P3 템플릿</td><td class="n">2주</td><td class="n">2.5주</td><td>설비 수십 대 규모에서는 템플릿 품질이 자동화보다 가치가 큼</td></tr>
-      <tr><td class="k">P6 시맨틱</td><td class="n">2주</td><td class="n">1.5주</td><td>사전 어댑터가 IEC CDD 하나. 인터넷 접근 가능해 오프라인 시드 불필요</td></tr>
-      <tr><td class="k">P7 서버</td><td class="n">3주</td><td class="n">2주</td><td>단일 사용자 — 병합 화면·CRDT 준비 제외</td></tr>
-      <tr><td class="k">P8 일괄 생성</td><td class="n">2주</td><td class="n">1주 + α</td><td>수십 대 규모 — CSV는 고정 컬럼 최소 구현. n8n 제외로 값 수집 경로를 따로 정해야 함</td></tr>
-      <tr><td class="k">P10 마무리</td><td class="n">2주</td><td class="n">1.5주</td><td>폐쇄망 오프라인 설치 이미지 제외</td></tr>
+      <tr><td class="k">P0 실측</td><td><span class="pill o">사출성형기 1대</span></td><td>—</td><td>설비를 더 볼지 여부 (지금은 1대로 마무리)</td></tr>
+      <tr><td class="k">P1 커널</td><td><span class="pill o">완료</span></td><td>—</td><td>—</td></tr>
+      <tr><td class="k">P2 메타모델</td><td><span class="pill o">완료</span></td><td>—</td><td>—</td></tr>
+      <tr><td class="k">P3 템플릿</td><td><span class="pill o">완료</span></td><td>—</td><td>템플릿을 더 넣을지 (현재 9종)</td></tr>
+      <tr><td class="k">P4 에디터</td><td><span class="pill o">완료</span></td><td>—</td><td>캔버스 드래그 fps 측정은 남음</td></tr>
+      <tr><td class="k">P5 표·퀵픽스</td><td><span class="pill o">완료</span></td><td>—</td><td>실제로 한 대를 끝까지 입력해 보기</td></tr>
+      <tr><td class="k">P6 시맨틱</td><td><span class="pill next">진행</span></td><td>파서 · ConceptDescription 생성 · 용어 매핑 <b>샘플</b> — 세션 1~2회</td><td><b>사내 용어 20~30개</b>를 실제 값으로 채우기. 샘플 형식에 회사 값을 넣는 작업</td></tr>
+      <tr><td class="k">P7 서버</td><td><span class="pill later">대기</span></td><td>API 골격 · 저장소 · 버전 · AASX — 세션 2~3회</td><td>PostgreSQL·BaSyx 인스턴스 준비, 실제 등록 확인</td></tr>
+      <tr><td class="k">P8 일괄·수집</td><td><span class="pill later">대기</span></td><td>CSV 고정 컬럼 — 세션 1회</td><td><b>값 수집 경로 ①/② 결정</b>, 설비 접점 정보</td></tr>
+      <tr><td class="k">P9 대시보드</td><td><span class="pill later">대기</span></td><td>화면 2종 — 세션 2~3회</td><td><b>무엇을 볼지 결정</b>과 반복 검토. 실제 데이터</td></tr>
+      <tr><td class="k">P10 마무리</td><td><span class="pill later">대기</span></td><td>접근성 · ko/en · 배포 — 세션 1~2회</td><td>키보드만으로 실사용해 보기</td></tr>
     </tbody>
   </table>
   </div>
 
+  <p><b>커널을 건드리는 작업은 여전히 직렬입니다.</b> 병렬로 돌릴 수 있는 것은 대시보드·템플릿·문서뿐입니다.</p>
+
   <div class="ph">
-    <div class="phhead"><span class="phid">P0</span><b>실측 — 계획을 싸게 고치는 단계</b><span class="wk">1주</span></div>
+    <div class="phhead"><span class="phid">P0</span><b>실측 — 계획을 싸게 고치는 단계</b><span class="wk">사출성형기 1대 완료</span></div>
     <div class="phbody">
       <p>지금 프로토타입으로 <b>실제 설비 3대를 끝까지 모델링</b>합니다. 어떤 노드가 없어서 막히는지, 어떤 검증이 성가신지가 그 자리에서 드러납니다. 재작성 범위를 정하는 가장 싼 방법입니다.</p>
       <ul class="dod">
@@ -795,7 +808,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P1</span><b>커널 — 문서 모델 · 명령 · 무손실 왕복</b><span class="wk">2주</span></div>
+    <div class="phhead"><span class="phid">P1</span><b>커널 — 문서 모델 · 명령 · 무손실 왕복</b><span class="wk">완료</span></div>
     <div class="phbody">
       <p>프로토타입의 model·serialize·parse·validate를 <code>@aas/kernel</code>로 옮기면서 <b>order 맵 도입, Layout 분리, 명령 도입, aas-core3.0 위임</b>을 동시에 합니다. 나눠서 하면 두 번 옮기게 됩니다.</p>
       <ul class="dod">
@@ -809,7 +822,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P2</span><b>메타모델 커버리지 — 노드 6종 · 부속 필드</b><span class="wk">2주</span></div>
+    <div class="phhead"><span class="phid">P2</span><b>메타모델 커버리지 — 노드 6종 · 부속 필드</b><span class="wk">완료</span></div>
     <div class="phbody">
       <p>Entity · Relationship · AnnotatedRelationship · Operation · Blob · Capability와 qualifiers · extensions · administration · specificAssetIds. 순서는 <b>model → serialize → parse → validate → 노드 컴포넌트 → 골든 테스트</b>, 하나라도 빠지면 왕복이 깨집니다.</p>
       <ul class="dod">
@@ -820,7 +833,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P3</span><b>템플릿 엔진 — 정의 · 적합성 · 마이그레이션</b><span class="wk">2.5주</span></div>
+    <div class="phhead"><span class="phid">P3</span><b>템플릿 엔진 — 정의 · 적합성 · 마이그레이션</b><span class="wk">완료 · 템플릿 9종</span></div>
     <div class="phbody">
       <p>설비 수십 대 규모에서는 <b>일괄 생성보다 템플릿 품질이 훨씬 큰 가치</b>입니다. 반나절 늘려 harvest 결과를 사양서와 두 번 대조하고, 확인 출처(사양서·페이지)를 템플릿 JSON에 남깁니다.</p>
       <ul class="dod">
@@ -832,7 +845,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P4</span><b>에디터 셸 — 캔버스 · 트리 · 인스펙터 · 실행취소</b><span class="wk">3주</span></div>
+    <div class="phhead"><span class="phid">P4</span><b>에디터 셸 — 캔버스 · 트리 · 인스펙터 · 실행취소</b><span class="wk">완료 · fps 측정 남음</span></div>
     <div class="phbody">
       <ul class="dod">
         <li><label><input type="checkbox"><span>캔버스·트리·인스펙터가 같은 선택 상태를 공유</span></label></li>
@@ -844,7 +857,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P5</span><b>표 편집 · 검증 퀵픽스</b><span class="wk">2주</span></div>
+    <div class="phhead"><span class="phid">P5</span><b>표 편집 · 검증 퀵픽스</b><span class="wk">완료</span></div>
     <div class="phbody">
       <ul class="dod">
         <li><label><input type="checkbox"><span>Nameplate 15항목을 표에서 붙여넣기 한 번으로 채운다</span></label></li>
@@ -854,7 +867,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P6</span><b>시맨틱 — IEC CDD 프록시 · ConceptDescription</b><span class="wk">1.5주</span></div>
+    <div class="phhead"><span class="phid">P6</span><b>시맨틱 — 파서 · ConceptDescription · 용어 매핑</b><span class="wk">진행 · 용어 값은 당신 시간</span></div>
     <div class="phbody">
       <p>어댑터가 IEC CDD 하나뿐이고 오프라인 시드 번들이 빠져 반주 줄었습니다. 대신 <b>사내 용어 ↔ IRDI 매핑 20~30건</b>을 이 단계에서 확보합니다.</p>
       <ul class="dod">
@@ -867,7 +880,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P7</span><b>서버 — 저장소 · 버전 · AASX · BaSyx V2</b><span class="wk">2주</span></div>
+    <div class="phhead"><span class="phid">P7</span><b>서버 — 저장소 · 버전 · AASX · BaSyx V2</b><span class="wk">세션 2~3회 · 환경 준비 필요</span></div>
     <div class="phbody">
       <p>단일 사용자 결정으로 병합 화면과 CRDT 준비가 빠졌습니다. BaSyx는 <b>V2(AAS V3 API)</b> 기준이므로 계획서 09장의 엔드포인트를 그대로 씁니다.</p>
       <ul class="dod">
@@ -880,7 +893,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P8</span><b>최소 일괄 생성 · 값 수집 경로</b><span class="wk">1주 + α</span></div>
+    <div class="phhead"><span class="phid">P8</span><b>최소 일괄 생성 · 값 수집 경로</b><span class="wk">세션 1회 · 경로 결정 필요</span></div>
     <div class="phbody">
       <p>대상이 수십 대이므로 <b>매핑 UI를 만들지 않습니다.</b> 템플릿별 고정 컬럼 CSV만 받고, 실패 행은 건너뛰어 리포트에 남깁니다.</p>
       <div class="call w">
@@ -895,7 +908,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P9</span><b>대시보드 2종</b><span class="wk">3주</span></div>
+    <div class="phhead"><span class="phid">P9</span><b>대시보드 2종</b><span class="wk">세션 2~3회 · 화면 결정 필요</span></div>
     <div class="phbody">
       <p>모델 자산 관리(표준 준수 히트맵·검증 이슈 큐·사전 사용 현황)와 설비 운전 모니터링(수집 지연을 1급 지표로). 화면 설계는 플레이북 06장을 그대로 씁니다.</p>
       <ul class="dod">
@@ -907,7 +920,7 @@ POST /batch                            CSV + 템플릿 + 매핑 → 모델 N개.
   </div>
 
   <div class="ph">
-    <div class="phhead"><span class="phid">P10</span><b>접근성 · 다국어 · 배포</b><span class="wk">1.5주</span></div>
+    <div class="phhead"><span class="phid">P10</span><b>접근성 · 다국어 · 배포</b><span class="wk">세션 1~2회</span></div>
     <div class="phbody">
       <p>키보드 전용 경로 완성, next-intl로 ko/en (UI 언어와 AAS 데이터 언어를 분리해 다룸), Docker Compose 단일 스택 설치. 인터넷 접근이 가능하므로 <b>폐쇄망 오프라인 이미지는 만들지 않습니다</b> — 다만 사전 캐시는 PostgreSQL 볼륨에 남으므로 일시적 단절에는 그대로 견딥니다.</p>
     </div>

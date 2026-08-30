@@ -1,0 +1,343 @@
+{
+  "note": "샘플입니다. 회사 용어와 실제 값으로 바꿔 쓰십시오. origin이 'idta'인 항목은 IDTA 공식 Template JSON에서 대조한 값이고, 'local'은 표준 사전에 없어 자체 IRI로 발급한 개념입니다. 자체 IRI의 도메인(bnb.co.kr)은 회사 도메인으로 바꾸십시오.",
+  "terms": [
+    {
+      "term": "제조사명",
+      "aliases": [
+        "메이커",
+        "제작사"
+      ],
+      "nameEn": "Manufacturer name",
+      "semanticId": "0112/2///61987#ABA565#009",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "제품명",
+      "aliases": [
+        "모델명"
+      ],
+      "nameEn": "Manufacturer product designation",
+      "semanticId": "0112/2///61987#ABA567#009",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "형식",
+      "aliases": [
+        "타입",
+        "제품형식"
+      ],
+      "nameEn": "Manufacturer product type",
+      "semanticId": "0112/2///61987#ABA300#008",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "시리얼번호",
+      "aliases": [
+        "일련번호",
+        "S/N"
+      ],
+      "nameEn": "Serial number",
+      "semanticId": "0112/2///61987#ABA951#009",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "주문코드",
+      "nameEn": "Order code of manufacturer",
+      "semanticId": "0112/2///61987#ABA950#008",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "품번",
+      "aliases": [
+        "제품번호"
+      ],
+      "nameEn": "Product article number of manufacturer",
+      "semanticId": "0112/2///61987#ABA581#007",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "제조연도",
+      "nameEn": "Year of construction",
+      "semanticId": "0112/2///61987#ABP000#002",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "제조일자",
+      "nameEn": "Date of manufacture",
+      "semanticId": "0112/2///61987#ABB757#007",
+      "dataType": "DATE",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "원산지",
+      "nameEn": "Country of origin",
+      "semanticId": "0112/2///61987#ABP462#001",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "하드웨어버전",
+      "nameEn": "Hardware version",
+      "semanticId": "0112/2///61987#ABA926#008",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "펌웨어버전",
+      "nameEn": "Firmware version",
+      "semanticId": "0112/2///61987#ABA302#006",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "소프트웨어버전",
+      "nameEn": "Software version",
+      "semanticId": "0112/2///61987#ABA601#008",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "제품URI",
+      "nameEn": "URI of the product",
+      "semanticId": "0112/2///61987#ABN590#002",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "회사로고",
+      "nameEn": "Company logo",
+      "semanticId": "0112/2///61987#ABP463#001",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02006-3-0 Template JSON"
+    },
+    {
+      "term": "도로명주소",
+      "aliases": [
+        "주소",
+        "거리"
+      ],
+      "nameEn": "Street",
+      "semanticId": "0173-1#02-AAO128#002",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)"
+    },
+    {
+      "term": "우편번호",
+      "nameEn": "Zipcode",
+      "semanticId": "0173-1#02-AAO129#002",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)"
+    },
+    {
+      "term": "도시",
+      "aliases": [
+        "시군구"
+      ],
+      "nameEn": "City / town",
+      "semanticId": "0173-1#02-AAO132#002",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)"
+    },
+    {
+      "term": "국가코드",
+      "nameEn": "National code",
+      "semanticId": "0173-1#02-AAO134#002",
+      "dataType": "STRING",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)"
+    },
+    {
+      "term": "형체력",
+      "aliases": [
+        "클램핑포스",
+        "형체압"
+      ],
+      "nameEn": "Clamping force",
+      "semanticId": "https://bnb.co.kr/ids/cd/ClampingForce/1/0",
+      "unit": "kN",
+      "dataType": "REAL_MEASURE",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의 — 표준 사전에서 대조하지 못함",
+      "definition": "Force applied by the clamping unit to keep the mould closed during injection."
+    },
+    {
+      "term": "스크류직경",
+      "aliases": [
+        "스크류경"
+      ],
+      "nameEn": "Screw diameter",
+      "semanticId": "https://bnb.co.kr/ids/cd/ScrewDiameter/1/0",
+      "unit": "mm",
+      "dataType": "REAL_MEASURE",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의",
+      "definition": "Outer diameter of the injection screw."
+    },
+    {
+      "term": "사출압력",
+      "nameEn": "Max injection pressure",
+      "semanticId": "https://bnb.co.kr/ids/cd/MaxInjectionPressure/1/0",
+      "unit": "MPa",
+      "dataType": "REAL_MEASURE",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의",
+      "definition": "Maximum pressure the injection unit can apply to the melt."
+    },
+    {
+      "term": "배럴온도",
+      "aliases": [
+        "실린더온도",
+        "가열대온도"
+      ],
+      "nameEn": "Barrel temperature",
+      "semanticId": "https://bnb.co.kr/ids/cd/BarrelTemperature/1/0",
+      "unit": "°C",
+      "dataType": "REAL_MEASURE",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의",
+      "definition": "Temperature measured in a barrel heating zone."
+    },
+    {
+      "term": "사이클타임",
+      "aliases": [
+        "싸이클",
+        "주기"
+      ],
+      "nameEn": "Cycle time",
+      "semanticId": "https://bnb.co.kr/ids/cd/CycleTime/1/0",
+      "unit": "s",
+      "dataType": "REAL_MEASURE",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의",
+      "definition": "Elapsed time of one complete moulding cycle."
+    },
+    {
+      "term": "샷카운트",
+      "aliases": [
+        "타수",
+        "생산수"
+      ],
+      "nameEn": "Shot count",
+      "semanticId": "https://bnb.co.kr/ids/cd/ShotCount/1/0",
+      "dataType": "INTEGER_COUNT",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의",
+      "definition": "Cumulative number of moulding shots produced by the machine."
+    },
+    {
+      "term": "쿠션량",
+      "nameEn": "Cushion value",
+      "semanticId": "https://bnb.co.kr/ids/cd/CushionValue/1/0",
+      "unit": "mm",
+      "dataType": "REAL_MEASURE",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의",
+      "definition": "Remaining melt volume, expressed as screw travel, at the end of holding pressure."
+    },
+    {
+      "term": "스크류회전수",
+      "aliases": [
+        "스크류RPM"
+      ],
+      "nameEn": "Screw rotation speed",
+      "semanticId": "https://bnb.co.kr/ids/cd/ScrewRotationSpeed/1/0",
+      "unit": "1/min",
+      "dataType": "REAL_MEASURE",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의",
+      "definition": "Rotational speed of the injection screw during plasticising."
+    },
+    {
+      "term": "형두께",
+      "aliases": [
+        "금형두께"
+      ],
+      "nameEn": "Mold height",
+      "semanticId": "https://bnb.co.kr/ids/cd/MoldHeight/1/0",
+      "unit": "mm",
+      "dataType": "REAL_MEASURE",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의",
+      "definition": "Distance between the platens available for the mould."
+    },
+    {
+      "term": "가동상태",
+      "aliases": [
+        "설비상태",
+        "운전상태"
+      ],
+      "nameEn": "Machine state",
+      "semanticId": "https://bnb.co.kr/ids/cd/MachineState/1/0",
+      "dataType": "STRING",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의",
+      "definition": "Current operating state of the machine."
+    },
+    {
+      "term": "정격출력",
+      "aliases": [
+        "정격전력"
+      ],
+      "nameEn": "Rated power",
+      "semanticId": "https://bnb.co.kr/ids/cd/RatedPower/1/0",
+      "unit": "kW",
+      "dataType": "REAL_MEASURE",
+      "origin": "local",
+      "verified": "none",
+      "provenance": "사내 정의 — eCl@ss 0173-1#02-AAF018#003 후보이나 라이선스가 없어 대조하지 못함",
+      "definition": "Rated electrical power of the machine."
+    }
+  ]
+}
