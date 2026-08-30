@@ -68,26 +68,34 @@ pnpm --filter @aas/api exec tsx scripts/opcua-sim.ts
 `opc.tcp://<호스트>:4841`에 띄웁니다. **Ctrl+C로 내리면 운전 화면에 "붙지 못했습니다"가
 뜹니다** — 그것이 정상 동작입니다.
 
-### 저장소를 클라우드 동기화 폴더에 두지 마십시오
+### dev 서버가 UNKNOWN 오류로 죽을 때
 
-이 저장소는 **`C:\Users\cwro7\dev\aas-composer`** 에 있습니다. 전에는 Dropbox 안에
-있었고, dev 서버가 계속 이렇게 죽었습니다:
+이 저장소는 Dropbox 안(`work262/aas/aas-composer`)에 있습니다. 그래서 가끔 이렇게 죽습니다:
 
 ```
 UNKNOWN: unknown error, open ... .next\static\chunks\app\editor\page.js
 ```
 
-관찰한 사실만 적습니다. 정확한 기전은 확인하지 못했습니다.
+**고치는 법 — 이것은 항상 통합니다.** 서버를 멈추고 `.next`를 지운 뒤 다시 띄웁니다.
 
-- Dropbox 폴더 안에 있을 때만 났습니다. 옮긴 뒤로는 나지 않습니다.
+```powershell
+Remove-Item -Recurse -Force apps\web\.next
+```
+
+관찰한 사실만 적습니다. **정확한 기전은 확인하지 못했습니다.**
+
+- Dropbox 안에 있을 때만 났습니다. 잠시 밖으로 옮겨 본 동안에는 나지 않았지만,
+  **한 번 띄워 본 것뿐이라 해결됐다고 말할 근거는 못 됩니다.**
 - `com.dropbox.ignored` 표시가 **정상적으로 걸린 상태에서도** 계속 났습니다.
   동기화 제외만으로는 부족합니다.
 - Next dev가 매초 수십 개의 청크를 지우고 다시 쓰는 것과 관련이 있어 보입니다.
-  `pnpm build` 직후에 더 자주 났습니다.
+  `pnpm build` 직후와 서버를 죽였다 다시 띄운 직후에 잦았습니다.
 
-`apps/web/scripts/dropbox-ignore.mjs`는 남겨 두었습니다. 경로에 `Dropbox`가 없으면
-아무 일도 하지 않으므로 지금은 그냥 지나갑니다. 다시 동기화 폴더 안에 두게 되면
-그때 다시 동작합니다 — 다만 위와 같이 **완전한 해결은 아닙니다.**
+`apps/web/scripts/dropbox-ignore.mjs`가 `pnpm dev`·`pnpm build` 앞에서 `.next`에
+동기화 제외 표시를 겁니다. 빈도는 줄지만 **없애지는 못합니다.**
+
+확실히 없애려면 빌드 산출물을 동기화 폴더 밖으로 빼야 합니다(`next.config.ts`의
+`distDir`). 아직 하지 않았습니다.
 
 OneDrive·iCloud·Google Drive도 같은 방식이라 마찬가지입니다.
 
