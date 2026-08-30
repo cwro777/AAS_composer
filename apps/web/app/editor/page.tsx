@@ -14,11 +14,13 @@ import { ReactFlowProvider } from '@xyflow/react';
 
 import { Canvas } from '../../components/Canvas';
 import { Drawer } from '../../components/Drawer';
+import { FileMenu } from '../../components/FileMenu';
 import { Inspector } from '../../components/Inspector';
 import { Palette } from '../../components/Palette';
 import { Table } from '../../components/Table';
 import { Tree } from '../../components/Tree';
 import { treeLayout } from '../../lib/layout';
+import { loadLocal, saveLocal } from '../../lib/persist';
 import { useEditor } from '../../lib/store';
 import './editor.css';
 
@@ -31,7 +33,28 @@ export default function EditorPage(): React.JSX.Element {
   const redo = useEditor((s) => s.redo);
   const notify = useEditor((s) => s.notify);
   const arrange = useEditor((s) => s.arrange);
+  const layout = useEditor((s) => s.layout);
+  const load = useEditor((s) => s.load);
   const [view, setView] = useState<'tree' | 'canvas' | 'table'>('tree');
+  const [restored, setRestored] = useState(false);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+
+  /* 새로고침해도 하던 작업이 남아 있어야 한다 */
+  useEffect(() => {
+    const prev = loadLocal();
+    if (prev) load(prev.doc, prev.layout);
+    setRestored(true);
+  }, [load]);
+
+  /**
+   * 자동 저장. 복원이 끝나기 전에 저장하면 빈 문서로 덮어쓴다.
+   * 실행취소 이력은 담지 않는다 — 세션을 넘겨 되돌리는 것은 의미가 없다.
+   */
+  useEffect(() => {
+    if (!restored) return;
+    const t = setTimeout(() => setSavedAt(saveLocal(doc, layout)), 500);
+    return () => clearTimeout(t);
+  }, [restored, doc, layout]);
 
   /* Ctrl+Z / Ctrl+Shift+Z · Ctrl+Y — 입력 중에는 브라우저 기본 동작에 맡긴다 */
   useEffect(() => {
@@ -79,9 +102,14 @@ export default function EditorPage(): React.JSX.Element {
           <button type="button" onClick={redo} disabled={future.length === 0} title="Ctrl+Shift+Z">
             ↷ 다시실행
           </button>
+          <span className="sep" />
+          <FileMenu />
           {past.length ? <span className="last">{past[past.length - 1]!.label}</span> : null}
         </div>
         <div className="stat">
+          <span className="saved" title={savedAt ?? undefined}>
+            {savedAt ? `저장됨 ${savedAt.slice(11, 19)}` : restored ? '저장 안 됨' : '불러오는 중'}
+          </span>
           <span>
             SHELL <b>{counts.shell}</b>
           </span>
