@@ -35,7 +35,7 @@ PostgreSQL 16 · Mosquitto · BaSyx V2를 띄웁니다.
 Docker가 WSL 안에 있으면:
 
 ```bash
-wsl -e bash -lc "cd /mnt/c/Users/<사용자>/…/aas-composer && docker compose up -d"
+wsl -e bash -lc "cd /mnt/c/Users/cwro7/dev/aas-composer && docker compose up -d"
 ```
 
 ### 화면 열기
@@ -68,21 +68,28 @@ pnpm --filter @aas/api exec tsx scripts/opcua-sim.ts
 `opc.tcp://<호스트>:4841`에 띄웁니다. **Ctrl+C로 내리면 운전 화면에 "붙지 못했습니다"가
 뜹니다** — 그것이 정상 동작입니다.
 
-### Windows + Dropbox에서 dev 서버가 죽을 때
+### 저장소를 클라우드 동기화 폴더에 두지 마십시오
 
-`pnpm dev`와 `pnpm build`가 시작 전에 `.next`를 동기화 제외로 표시합니다
-(`apps/web/scripts/dropbox-ignore.mjs`). 보통은 신경 쓰지 않아도 됩니다.
+이 저장소는 **`C:\Users\cwro7\dev\aas-composer`** 에 있습니다. 전에는 Dropbox 안에
+있었고, dev 서버가 계속 이렇게 죽었습니다:
 
-그래도 `UNKNOWN: unknown error, open ... .next\...` 가 뜨면 이미 잠긴 파일이 남은 것입니다.
-서버를 멈추고 아래를 실행한 뒤 다시 띄우십시오.
-
-```powershell
-Remove-Item -Recurse -Force apps\web\.next
-New-Item -ItemType Directory -Force apps\web\.next
-Set-Content -Path apps\web\.next -Stream com.dropbox.ignored -Value 1
+```
+UNKNOWN: unknown error, open ... .next\static\chunks\app\editor\page.js
 ```
 
-`node_modules`에도 같은 표시가 걸려 있습니다. 저장소를 Dropbox 밖으로 옮기면 이 문제는 사라집니다.
+관찰한 사실만 적습니다. 정확한 기전은 확인하지 못했습니다.
+
+- Dropbox 폴더 안에 있을 때만 났습니다. 옮긴 뒤로는 나지 않습니다.
+- `com.dropbox.ignored` 표시가 **정상적으로 걸린 상태에서도** 계속 났습니다.
+  동기화 제외만으로는 부족합니다.
+- Next dev가 매초 수십 개의 청크를 지우고 다시 쓰는 것과 관련이 있어 보입니다.
+  `pnpm build` 직후에 더 자주 났습니다.
+
+`apps/web/scripts/dropbox-ignore.mjs`는 남겨 두었습니다. 경로에 `Dropbox`가 없으면
+아무 일도 하지 않으므로 지금은 그냥 지나갑니다. 다시 동기화 폴더 안에 두게 되면
+그때 다시 동작합니다 — 다만 위와 같이 **완전한 해결은 아닙니다.**
+
+OneDrive·iCloud·Google Drive도 같은 방식이라 마찬가지입니다.
 
 ## 명령어
 
