@@ -20,6 +20,8 @@ import { buildConceptDescriptions, attachConceptDescriptions, serialize } from '
 import { termsResolver } from '@aas/semantic';
 
 import { type FetchLike, publish } from './basyx.js';
+import type { Collector, SampleStore } from './collect/collector.js';
+import { planFor } from './collect/plan.js';
 import { diffLines } from './diff.js';
 import { entriesFromEnvironment } from './dict/harvest.js';
 import { type Dictionary, createDictionary } from './dict/service.js';
@@ -76,14 +78,21 @@ const importSchema = z.object({
   origin: z.string().optional(),
 });
 
-/** 네트워크와 사전은 주입받는다 — 테스트가 실제 BaSyx·사전 없이도 돌아야 한다 */
+/** 네트워크·사전·수집기는 주입받는다 — 테스트가 실제 BaSyx·브로커 없이도 돌아야 한다 */
 export function createApp(
   store: ModelStore,
-  opts?: { fetchLike?: FetchLike; dictionary?: Dictionary },
+  opts?: {
+    fetchLike?: FetchLike;
+    dictionary?: Dictionary;
+    collector?: Collector;
+    samples?: SampleStore;
+  },
 ): Hono {
   const app = new Hono();
   const fetchImpl: FetchLike = opts?.fetchLike ?? ((url, init) => fetch(url, init as RequestInit));
   const dict = opts?.dictionary ?? createDictionary(createMemoryDictStore());
+  const collector = opts?.collector;
+  const samples = opts?.samples;
 
   app.get('/health', (c) => c.json({ ok: true }));
 
@@ -321,6 +330,48 @@ export function createApp(
     const irdi = decodeURIComponent(c.req.param('irdi'));
     const r = await dict.lookup(irdi);
     return c.json({ irdi, ...r }, r.entry ? 200 : 404);
+  });
+
+  /* ── 값 수집 ─────────────────────────────────────────
+     접점은 AID 서브모델이 알고 있다. 따로 설정 파일을 두지 않는다. */
+
+  app.get('/collect/:id/plan', async (c) => {
+    const rec = await store.get(c.req.param('id'));
+    if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
+    return c.json(planFor(rec.doc));
+  });
+
+  app.post('/collect/:id/start', async (c) => {
+    if (!collector) return c.json({ error: 'NO_COLLECTOR' }, 501);
+    const rec = await store.get(c.req.param('id'));
+    if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
+
+    const plan = planFor(rec.doc);
+    if (plan.sources.length === 0) {
+      return c.json({ error: 'NOTHING_TO_COLLECT', problems: plan.problems }, 422);
+    }
+    const status = await collector.start(rec.id, plan);
+    /* 붙지 못한 접점이 있으면 207로 알린다 — 절반만 도는 것을 성공이라 하지 않는다 */
+    return c.json({ ...status, problems: plan.problems }, status.skipped.length ? 207 : 200);
+  });
+
+  app.post('/collect/:id/stop', async (c) => {
+    if (!collector) return c.json({ error: 'NO_COLLECTOR' }, 501);
+    const stopped = await collector.stop(c.req.param('id'));
+    return c.json({ stopped });
+  });
+
+  app.get('/collect/status', (c) =>
+    c.json({ jobs: collector ? collector.status() : [], available: Boolean(collector) }),
+  );
+
+  app.get('/models/:id/timeseries', async (c) => {
+    if (!samples) return c.json({ error: 'NO_SAMPLE_STORE' }, 501);
+    const id = c.req.param('id');
+    const signal = c.req.query('signal');
+    const limit = Math.min(Number(c.req.query('limit') ?? 200) || 200, 5000);
+    const rows = await samples.recent(id, signal, limit);
+    return c.json({ count: rows.length, total: await samples.count(id), samples: rows });
   });
 
   /** 아직 만들지 않은 경로는 501과 함께 어느 단계의 일인지 알려 준다 */

@@ -15,6 +15,13 @@
       "when": 1788080322247,
       "tag": "0001_eager_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788080927279,
+      "tag": "0002_simple_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }

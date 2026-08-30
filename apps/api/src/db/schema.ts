@@ -1,4 +1,13 @@
-import { index, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  doublePrecision,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 /**
  * 스키마 초안.  마이그레이션 생성은 P7에서 한다.
@@ -62,6 +71,33 @@ export const dictConcept = pgTable(
     fetchedAt: timestamp('fetched_at', { withTimezone: true }),
   },
   (t) => ({ byName: index('dict_concept_name_idx').on(t.nameKo, t.nameEn) }),
+);
+
+/**
+ * 수집한 값.
+ *
+ * **AAS에는 마지막 값 한 벌만 두고 이력은 여기에 쌓는다** — P0 실측의 friction 마지막 줄이다.
+ * 지금은 평범한 테이블이다. 설비 10~50대 규모에서는 이것으로 충분하고,
+ * 느려지면 TimescaleDB 하이퍼테이블로 바꾼다(같은 스키마라 옮기기 쉽다).
+ */
+export const samples = pgTable(
+  'samples',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    modelId: uuid('model_id')
+      .notNull()
+      .references(() => models.id, { onDelete: 'cascade' }),
+    /** 신호에 해당하는 우리 노드 — 값을 되쓸 자리를 안다 */
+    node: text('node').notNull(),
+    signal: text('signal').notNull(),
+    semanticId: text('semantic_id'),
+    unit: text('unit'),
+    at: timestamp('at', { withTimezone: true }).notNull().defaultNow(),
+    /** 수치와 문자열을 나눠 담는다 — 평균·최대를 재려면 수치가 수치여야 한다 */
+    numValue: doublePrecision('num_value'),
+    textValue: text('text_value'),
+  },
+  (t) => ({ bySignal: index('samples_model_signal_at_idx').on(t.modelId, t.signal, t.at) }),
 );
 
 /** 사내 용어 ↔ IRDI 매핑. CDD에 한글 표제어가 없어서 필요하다 (P6 완료 기준) */

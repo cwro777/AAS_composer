@@ -32,5 +32,18 @@ services:
       timeout: 5s
       retries: 12
 
+  # 값 수집 시험용 MQTT 브로커.
+  # 운영 브로커는 현장에 따로 있다 — 이것은 우리가 붙는 쪽을 확인하기 위한 것이다.
+  mosquitto:
+    image: eclipse-mosquitto:2
+    command: ['mosquitto', '-c', '/mosquitto-no-auth.conf']
+    ports:
+      - '1883:1883'
+    healthcheck:
+      test: ['CMD-SHELL', 'mosquitto_sub -t healthcheck -C 1 -W 1 -h localhost || exit 0']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 volumes:
   pgdata:

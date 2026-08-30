@@ -15,10 +15,10 @@
 - **게시 대상은 BaSyx V2 (AAS V3 API).** 버전 어댑터를 만들지 않는다.
 - **대상 규모는 설비 10~50대.** 일괄 생성보다 **템플릿 정확도와 표 편집 속도**가 우선이다. CSV 매핑 UI를 만들지 않는다 (고정 컬럼만).
 - **인터넷 접근 가능.** 폐쇄망 오프라인 설치 이미지를 만들지 않는다.
-- **n8n을 쓰지 않는다.** `packages/n8n-nodes`를 만들지 않는다. 값 수집·자동화를 n8n에
-  맡기려던 계획은 취소됐다. **대체 경로는 아직 정해지지 않았다** — P8 착수 시
-  ① `apps/api`가 OPC UA·MQTT로 직접 수집 ② 기존 MES/SCADA가 `POST /ingest`로 밀어 넣기
-  중에서 고른다. 그 전까지 수집 코드를 짐작으로 만들지 말 것.
+- **n8n을 쓰지 않는다.** `packages/n8n-nodes`를 만들지 않는다.
+- **값 수집은 `apps/api`가 직접 한다** (①안 확정). 외부 오케스트레이터도, `POST /ingest`
+  수신 경로도 만들지 않는다. 접점 설정은 **AID 서브모델이 곧 설정 파일**이다 —
+  별도 커넥터 설정 파일·화면을 만들지 말 것.
 
 ## 절대 규칙
 
@@ -107,6 +107,12 @@
   사내 용어집과 IDTA Template JSON의 conceptDescriptions.
   **IDTA CD에는 단위가 거의 없다**(223건 중 1건). 단위는 자체 개념이나 IEC CDD에서 온다.
   일괄 생성만 501이다.
+- **값 수집 — MQTT 경로 완료, OPC UA 어댑터 없음.** `planFor(doc)`가 AID 서브모델에서
+  프로토콜·주소·신호를 읽고, 읽지 못한 것은 `problems`에 남긴다(조용히 넘기지 않는다).
+  **어댑터가 없는 프로토콜은 없다고 말한다** — `/collect/:id/start`가 207과 함께
+  건너뛴 접점과 이유를 돌려준다. 있는 척하지 않는 것이 규칙이다.
+  숫자로 읽히지 않는 페이로드는 `textValue`로 담는다 — **0으로 바꾸지 않는다.**
+  실브로커 점검: `pnpm --filter @aas/api exec tsx scripts/collect-check.ts`
 - **이 PC의 5432는 다른 스택(TimescaleDB)이 쓰고 있다.** 우리 PostgreSQL은 **5433**이다.
   Docker는 WSL 안에서 돈다 — `wsl -e bash -lc "cd /mnt/c/… && docker compose up -d"`.
   살아 있는 스택 점검: `pnpm --filter @aas/api exec tsx scripts/live-check.ts`
@@ -141,6 +147,12 @@ P3에서 확정된 것:
   defaultThumbnail은 1급 필드다.** raw 보존이 아니라 편집 대상이다.
 - 그 밖에 모르는 필드는 `node.raw` / `doc.raw` / `raw.assetInformation` / Reference·Qualifier의
   `raw`에 보존해 그대로 재출력한다.
+- **수집한 값을 저작 문서에 되쓰지 않는다.** 값이 바뀔 때마다 명령 로그에 버전이 생기면
+  버전 비교가 무의미해진다. 저작 모델은 구조의 원본이고, 실행 중 값은 시계열(`samples`)과
+  BaSyx(런타임 사본)가 갖는다.
+- **신호 → 대상 요소 연결은 짐작하지 않는다.** AID는 접점만 기술하고 어느 요소에 값을 쓸지는
+  가리키지 않는다. 그 연결은 IDTA 02027(AIMC)의 몫이고, 그 전까지 BaSyx `PATCH $value`는
+  꽂지 않는다.
 
 다음 작업은 **P3**(템플릿 엔진 — 정의·적합성·마이그레이션). 템플릿 8종으로 늘리고
 (Hierarchical Structures 02011-1-1, Asset Interfaces Description 02017-1-1),
