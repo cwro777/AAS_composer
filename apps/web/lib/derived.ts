@@ -13,9 +13,12 @@ import {
   type AasDoc,
   type NodeId,
   buildConceptDescriptions,
+  identifierIsReferencedInRaw,
   nodeForPath,
   pathIndex,
+  renameIdentifier,
   serialize,
+  suggestIdentifier,
   validate,
   verifyEnvironment,
 } from '@aas/kernel';
@@ -23,6 +26,7 @@ import { checkAllConformance, conformanceFix } from '@aas/templates';
 import { termsResolver } from '@aas/semantic';
 
 import { buildExport } from './persist';
+import { useSettings } from './settings';
 import { useEditor } from './store';
 
 export type IssueLayer = 'core' | 'policy' | 'template' | 'dictionary';
@@ -64,6 +68,7 @@ export function useJson(doc: AasDoc, ms = 100): string {
 
 export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
   const settled = useDebounced(doc, ms);
+  const iriPrefix = useSettings((s) => s.iriPrefix);
   const [issues, setIssues] = useState<UiIssue[]>([]);
 
   useEffect(() => {
@@ -73,7 +78,7 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
     const shells = settled.roots.filter((r) => settled.nodes[r]?.t === 'shell');
 
     /* L2 — 사내 정책. 노드를 알고 있으므로 클릭해서 이동할 수 있다 */
-    for (const i of validate(settled, { iriPrefix: 'https://bnb.co.kr/ids' })) {
+    for (const i of validate(settled, { iriPrefix })) {
       const issue: UiIssue = {
         code: i.code,
         layer: 'policy',
@@ -82,6 +87,55 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
         path: i.path,
         text: i.message.ko,
       };
+
+      /* 커널이 이미 답을 아는 것은 그대로 내보낸다 — 여기서 다시 만들지 않는다 */
+      if (i.quickFix) {
+        const { label, cmds } = i.quickFix;
+        issue.fix = {
+          label: label.ko,
+          run: () => useEditor.getState().run({ t: 'batch', label: label.ko, cmds }, label.ko),
+        };
+      }
+
+      /**
+       * 식별자를 네임스페이스 안으로 옮긴다.
+       *
+       * 명령은 누르는 시점에 만든다. 검증할 때마다 문서 전체를 훑어 참조를 찾으면
+       * 타이핑이 느려진다.
+       */
+      if (i.code === 'POL-IRI-001' && i.node !== null && iriPrefix) {
+        const node = i.node;
+        const next = suggestIdentifier(settled, node, iriPrefix);
+        if (next) {
+          issue.fix = {
+            label: `${next.slice(iriPrefix.length) || next}(으)로 고치기`,
+            run: () => {
+              const s = useEditor.getState();
+              const target = suggestIdentifier(s.doc, node, iriPrefix);
+              if (!target) return;
+              const before = (s.doc.nodes[node] as { identifier?: string } | undefined)?.identifier ?? '';
+              const cmds = renameIdentifier(s.doc, node, target);
+              if (cmds.length === 0) return;
+              const label = '식별자를 사내 네임스페이스로';
+              if (!s.run({ t: 'batch', label, cmds }, label)) return;
+              /* 우리가 고치지 못한 자리가 있으면 침묵하지 않는다 */
+              const refs = cmds.length - 1;
+              if (identifierIsReferencedInRaw(s.doc, before)) {
+                s.notify(
+                  `식별자를 바꿨습니다. 다만 해석하지 못한 원본 필드(raw)에 옛 값이 남아 있어 직접 확인해야 합니다: ${before}`,
+                );
+              } else {
+                s.notify(
+                  refs
+                    ? `식별자와 그것을 가리키던 참조 ${refs}곳을 함께 고쳤습니다.`
+                    : `식별자를 ${target}(으)로 바꿨습니다.`,
+                );
+              }
+            },
+          };
+        }
+      }
+
       /* 독립 서브모델을 유일한 셸에 붙인다 */
       if (i.code === 'POL-STRUCT-003' && i.node !== null && shells.length === 1) {
         const node = i.node;
@@ -177,7 +231,7 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
     const rank = { error: 0, warn: 1, info: 2 } as const;
     out.sort((a, b) => rank[a.severity] - rank[b.severity]);
     setIssues(out);
-  }, [settled]);
+  }, [settled, iriPrefix]);
 
   return issues;
 }
