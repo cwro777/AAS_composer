@@ -15,6 +15,8 @@ import { useEffect, useState } from 'react';
 import { type UiIssue, useIssues, useJson } from '../lib/derived';
 import { DEFAULT_IRI_PREFIX, useSettings } from '../lib/settings';
 import { useEditor } from '../lib/store';
+import { useTerms } from '../lib/terms';
+import { ConceptForm } from './ConceptForm';
 
 const LAYER_LABEL: Record<UiIssue['layer'], string> = {
   core: '규격',
@@ -63,12 +65,16 @@ export function Drawer(): React.JSX.Element {
   const iriPrefix = useSettings((s) => s.iriPrefix);
   const setIriPrefix = useSettings((s) => s.setIriPrefix);
   const restore = useSettings((s) => s.restore);
+  const restoreTerms = useTerms((s) => s.restore);
   const [tab, setTab] = useState<'json' | 'issues'>('json');
   const json = useJson(doc);
   const issues = useIssues(doc);
 
   /* 서버 렌더와 어긋나지 않게 마운트 뒤에 읽는다 */
-  useEffect(() => restore(), [restore]);
+  useEffect(() => {
+    restore();
+    restoreTerms();
+  }, [restore, restoreTerms]);
 
   const errors = issues.filter((i) => i.severity === 'error').length;
   const badge = errors ? 'e' : issues.length ? 'w' : 'o';
@@ -133,6 +139,7 @@ export function Drawer(): React.JSX.Element {
       </div>
 
       <div className="panes">
+        {tab === 'issues' ? <ConceptForm /> : null}
         {tab === 'json' ? (
           <pre className="json">{json}</pre>
         ) : issues.length === 0 ? (

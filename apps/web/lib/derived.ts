@@ -29,6 +29,7 @@ import { selfIssuedIri, termByName, termsResolver } from '@aas/semantic';
 import { buildExport } from './persist';
 import { useSettings } from './settings';
 import { useEditor } from './store';
+import { dataTypeFor, humanize, nameFromIri, useTerms } from './terms';
 
 export type IssueLayer = 'core' | 'policy' | 'template' | 'dictionary';
 
@@ -55,25 +56,28 @@ function useDebounced<T>(value: T, ms: number): T {
 
 export function useJson(doc: AasDoc, ms = 100): string {
   const settled = useDebounced(doc, ms);
+  const entries = useTerms((s) => s.entries);
   const [text, setText] = useState('{}');
   useEffect(() => {
     try {
       /* 내보내기와 같은 것을 보여준다 — conceptDescriptions까지 포함 */
-      setText(JSON.stringify(buildExport(settled).env, null, 2));
+      setText(JSON.stringify(buildExport(settled, useTerms.getState().book()).env, null, 2));
     } catch (e) {
       setText(`// 직렬화 실패: ${(e as Error).message}`);
     }
-  }, [settled]);
+  }, [settled, entries]);
   return text;
 }
 
 export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
   const settled = useDebounced(doc, ms);
   const iriPrefix = useSettings((s) => s.iriPrefix);
+  const entries = useTerms((s) => s.entries);
   const [issues, setIssues] = useState<UiIssue[]>([]);
 
   useEffect(() => {
     const out: UiIssue[] = [];
+    const book = useTerms.getState().book();
 
     /* 셸이 하나뿐이면 "어느 셸에 붙일지"가 자명하다 */
     const shells = settled.roots.filter((r) => settled.nodes[r]?.t === 'shell');
@@ -176,7 +180,9 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
         const name = settled.nodes[target]!.idShort;
 
         /* 목록 항목의 개념은 목록 자신의 개념과 다른 것이다 — 같은 IRI를 쓰면 안 된다 */
-        const term = termByName(listChild ? `${name}Element` : name) ?? (listChild ? undefined : termByName(name));
+        const term = listChild
+          ? termByName(`${name}Element`, book)
+          : termByName(name, book);
         const minted = listChild
           ? selfIssuedIri(iriPrefix, name, 'Element')
           : selfIssuedIri(iriPrefix, name);
@@ -245,15 +251,43 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
     }
 
     /* L4 — 사전. 단위·자료형을 모르는 개념은 내보내도 수신 측이 해석하지 못한다 */
-    for (const i of buildConceptDescriptions(settled, termsResolver()).unresolved) {
-      out.push({
+    for (const i of buildConceptDescriptions(settled, termsResolver(book)).unresolved) {
+      const issue: UiIssue = {
         code: i.code,
         layer: 'dictionary',
         severity: i.severity,
         node: i.node,
         path: i.path,
         text: i.message.ko,
-      });
+      };
+
+      /**
+       * 자체 발행한 개념은 **우리가 뜻을 채울 수 있다.**
+       *
+       * 표준 개념(IEC CDD·eCl@ss)은 정의를 우리가 갖고 있지 않으므로 등록 창을 열지
+       * 않는다 — 지어내는 것보다 남겨 두는 편이 낫다. 그쪽은 사전 프록시의 몫이다.
+       */
+      if (i.path.startsWith(iriPrefix) && iriPrefix) {
+        const semanticId = i.path;
+        const name = nameFromIri(semanticId);
+        const holder = i.node ? settled.nodes[i.node] : undefined;
+        issue.fix = {
+          label: '개념 등록',
+          run: () =>
+            useTerms.getState().openDraft({
+              semanticId,
+              term: '',
+              nameEn: humanize(name),
+              definition: '',
+              unit: '',
+              dataType: dataTypeFor(
+                holder && holder.t === 'prop' ? holder.valueType : undefined,
+              ),
+            }),
+        };
+      }
+
+      out.push(issue);
     }
 
     /* L1 — 규격. aas-core3.0의 경로를 색인으로 우리 노드에 잇는다 */
@@ -294,7 +328,7 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
     const rank = { error: 0, warn: 1, info: 2 } as const;
     out.sort((a, b) => rank[a.severity] - rank[b.severity]);
     setIssues(out);
-  }, [settled, iriPrefix]);
+  }, [settled, iriPrefix, entries]);
 
   return issues;
 }

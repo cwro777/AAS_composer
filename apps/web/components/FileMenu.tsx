@@ -26,6 +26,7 @@ import {
   suggestFilename,
 } from '../lib/persist';
 import { useEditor } from '../lib/store';
+import { useTerms } from '../lib/terms';
 
 export function FileMenu(): React.JSX.Element {
   const doc = useEditor((s) => s.doc);
@@ -91,8 +92,10 @@ export function FileMenu(): React.JSX.Element {
         type="button"
         disabled={empty}
         onClick={() => {
-          const { concepts, unresolved } = buildExport(doc);
-          downloadText(suggestFilename(doc), environmentText(doc));
+          /* 검증 패널과 같은 용어집을 봐야 한다 — 화면과 파일이 갈라지면 손실을 못 알아챈다 */
+          const book = useTerms.getState().book();
+          const { concepts, unresolved } = buildExport(doc, book);
+          downloadText(suggestFilename(doc), environmentText(doc, book));
           notify(
             unresolved
               ? `${suggestFilename(doc)} — 개념 ${concepts}건 포함, ${unresolved}건은 단위·정의를 몰라 빠졌습니다.`
@@ -108,7 +111,7 @@ export function FileMenu(): React.JSX.Element {
         disabled={empty}
         title="OPC 패키지. 첨부까지 한 묶음으로 주고받는 형식입니다."
         onClick={() => {
-          const { bytes, concepts, missingFiles } = buildAasx(doc);
+          const { bytes, concepts, missingFiles } = buildAasx(doc, useTerms.getState().book());
           const name = suggestFilename(doc).replace(/\.json$/, '.aasx');
           downloadBytes(name, bytes, 'application/asset-administration-shell-package');
           notify(
@@ -147,7 +150,7 @@ export function FileMenu(): React.JSX.Element {
         type="button"
         disabled={empty}
         onClick={() => {
-          const text = environmentText(doc);
+          const text = environmentText(doc, useTerms.getState().book());
           navigator.clipboard.writeText(text).then(
             () => notify(`JSON을 복사했습니다 (${text.length.toLocaleString()}자).`),
             () => notify('복사하지 못했습니다. 아래 출력 JSON에서 직접 선택하십시오.'),

@@ -22,7 +22,7 @@ import {
   serialize,
 } from '@aas/kernel';
 import type { Environment } from '@aas/kernel';
-import { termsResolver } from '@aas/semantic';
+import { type TermBook, termsResolver } from '@aas/semantic';
 import { writeAasx } from '@aas/aasx';
 
 const KEY = 'aas-composer/editor/v1';
@@ -76,8 +76,15 @@ export function clearLocal(): void {
  *
  * 해석하지 못한 개념은 조용히 빠지지 않고 건수로 돌려준다 — 사용자가 알아야 한다.
  */
-export function buildExport(doc: AasDoc): { env: unknown; concepts: number; unresolved: number } {
-  const cd = buildConceptDescriptions(doc, termsResolver());
+export function buildExport(
+  doc: AasDoc,
+  book?: TermBook,
+): { env: unknown; concepts: number; unresolved: number } {
+  /**
+   * **미리보기·내보내기·AASX가 같은 용어집을 봐야 한다.**
+   * 화면에서는 해석됐는데 파일에는 개념이 빠지면, 손실을 알아챌 방법이 없다.
+   */
+  const cd = buildConceptDescriptions(doc, termsResolver(book));
   return {
     env: attachConceptDescriptions(serialize(doc), cd.conceptDescriptions),
     concepts: cd.conceptDescriptions.length,
@@ -85,8 +92,8 @@ export function buildExport(doc: AasDoc): { env: unknown; concepts: number; unre
   };
 }
 
-export function environmentText(doc: AasDoc): string {
-  return `${JSON.stringify(buildExport(doc).env, null, 2)}\n`;
+export function environmentText(doc: AasDoc, book?: TermBook): string {
+  return `${JSON.stringify(buildExport(doc, book).env, null, 2)}\n`;
 }
 
 /** 첫 셸의 이름을 파일명으로 쓴다 — 내려받은 파일이 무엇인지 알아볼 수 있게 */
@@ -102,8 +109,11 @@ export function suggestFilename(doc: AasDoc): string {
  * File 요소가 가리키는 첨부는 아직 담지 못한다 — 에디터에 파일을 넣는 자리가 없기 때문이다.
  * 조용히 빠뜨리지 않고 몇 건인지 돌려준다.
  */
-export function buildAasx(doc: AasDoc): { bytes: Uint8Array; concepts: number; missingFiles: number } {
-  const { env, concepts } = buildExport(doc);
+export function buildAasx(
+  doc: AasDoc,
+  book?: TermBook,
+): { bytes: Uint8Array; concepts: number; missingFiles: number } {
+  const { env, concepts } = buildExport(doc, book);
   const missingFiles = Object.keys(doc.nodes).filter(
     (id) => doc.nodes[id]!.t === 'file' && (doc.nodes[id] as { value?: string }).value,
   ).length;

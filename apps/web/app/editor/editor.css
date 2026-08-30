@@ -651,6 +651,109 @@ table.grid td.ops button:disabled {
   background: var(--accent);
   color: var(--accent-ink);
 }
+/* 개념 등록 */
+.cform {
+  margin: 8px 10px 0;
+  border: 1px solid var(--accent);
+  border-radius: var(--r);
+  background: var(--surface);
+  padding: 8px 10px 10px;
+}
+.chead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.chead b {
+  font-size: 12.5px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+.chead code {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chead .mini {
+  margin-left: auto;
+}
+.cgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 8px;
+}
+.cgrid label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.cgrid label.wide {
+  grid-column: 1 / -1;
+}
+.cgrid span {
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.cgrid em {
+  font-style: normal;
+  color: var(--err);
+  margin-left: 3px;
+}
+.cgrid input,
+.cgrid textarea,
+.cgrid select {
+  font: inherit;
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 3px 6px;
+  resize: vertical;
+}
+.cgrid input:focus,
+.cgrid textarea:focus,
+.cgrid select:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+.cfoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+}
+.cfoot .note {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  flex: 1;
+}
+.cfoot .mini {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: var(--r);
+  padding: 3px 9px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.cfoot .primary {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--r);
+  padding: 3px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .issues .copy {
   flex: 0 0 auto;
   border: 1px solid var(--line);
