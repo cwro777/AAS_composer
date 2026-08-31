@@ -285,12 +285,18 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
         path: c.path,
         text: c.message.ko,
       };
-      /* 빠진 필수 요소는 템플릿이 답을 안다 — 눌러서 채운다.
+      /* 빠진 필수 요소도, 이탈한 서브모델 semanticId도 템플릿이 답을 안다 — 눌러서 고친다.
+         T-002(자식 semanticId)는 어느 쪽이 옳은지 우리가 몰라 버튼을 만들지 않는다.
          명령은 누르는 시점에 만든다. 여기서 만들면 검증할 때마다 노드 id가 소모된다. */
-      if (c.code === 'T-001' && c.node !== null) {
-        const missing = c.path.split('/').pop() ?? '요소';
+      const fixLabel =
+        c.code === 'T-001'
+          ? `템플릿에서 ${c.path.split('/').pop() ?? '요소'} 생성`
+          : c.code === 'T-003'
+            ? '템플릿 값으로 되돌리기'
+            : null;
+      if (fixLabel !== null && c.node !== null) {
         issue.fix = {
-          label: `템플릿에서 ${missing} 생성`,
+          label: fixLabel,
           run: () => {
             const s = useEditor.getState();
             const built = conformanceFix(s.doc, c, s.newId);

@@ -253,8 +253,8 @@ export function checkConformance(doc: AasDoc, submodelId: NodeId): Conformance[]
       node: submodelId,
       path: sm.idShort,
       message: {
-        ko: `서브모델 semanticId가 템플릿 ${def.idtaNumber}과 다릅니다.`,
-        en: `Submodel semanticId deviates from template ${def.idtaNumber}.`,
+        ko: `서브모델 semanticId가 템플릿 ${def.idtaNumber}과 다릅니다. 템플릿: ${def.submodel.semanticId}`,
+        en: `Submodel semanticId deviates from template ${def.idtaNumber}. Expected ${def.submodel.semanticId}`,
       },
     });
   }
@@ -412,10 +412,37 @@ export function planMigration(doc: AasDoc, submodelId: NodeId, def: MigrationDef
 }
 
 /**
- * T-001(필수 요소 누락)을 고치는 명령.
+ * T-003(서브모델 semanticId 이탈)을 고치는 명령 — 템플릿 값으로 되돌린다.
  *
- * 계획서 04장 — **지적만 하는 검증은 결국 무시된다.** 빠진 요소가 무엇인지 아는 것은
- * 템플릿이므로, 그것을 눌러서 채울 수 있어야 한다.
+ * **자식은 건드리지 않는다.** 2.0 → 3.0처럼 개정을 건너온 문서는 자식 IRDI도 함께
+ * 바뀌어야 하고, 그 매핑을 아는 것은 `planMigration`이다. 여기서 서브모델만 조용히
+ * 맞추면 T-003은 사라지고 자식의 T-002만 남는데, 그것이 옳다 — 한 줄을 되돌리는 것과
+ * 개정을 옮기는 것은 다른 일이고, 남는 이슈가 다음에 할 일을 가리킨다.
+ */
+function submodelSemanticIdFix(
+  doc: AasDoc,
+  node: NodeId,
+): { label: { ko: string; en: string }; cmds: Cmd[] } | null {
+  const sm = doc.nodes[node];
+  if (sm?.t !== 'submodel' || !sm.origin) return null;
+  const def = BY_ID.get(sm.origin.templateId);
+  if (!def || sm.semanticId === def.submodel.semanticId) return null;
+
+  return {
+    label: { ko: '템플릿 값으로 되돌리기', en: 'Restore the template semanticId' },
+    cmds: [{ t: 'set', node, path: 'semanticId', value: def.submodel.semanticId }],
+  };
+}
+
+/**
+ * T-001(필수 요소 누락)·T-003(서브모델 semanticId 이탈)을 고치는 명령.
+ *
+ * 계획서 04장 — **지적만 하는 검증은 결국 무시된다.** 빠진 요소가 무엇인지도,
+ * 서브모델의 semanticId가 무엇이어야 하는지도 아는 것은 템플릿이므로,
+ * 그것을 눌러서 고칠 수 있어야 한다.
+ *
+ * T-002(자식 semanticId 이탈)에는 만들지 않는다. 자식을 바꿔 쓰는 데에는 이유가 있을 수
+ * 있고(개정 중간 상태·의도적 확장), 어느 쪽이 옳은지 우리가 모른다.
  *
  * 넣는 자리는 템플릿의 형제 순서를 따른다. 이미 있는 형제를 세어 그 뒤에 놓으므로
  * 채워 넣은 요소가 목록 끝에 몰리지 않는다.
@@ -425,7 +452,9 @@ export function conformanceFix(
   issue: Conformance,
   newId: () => NodeId,
 ): { label: { ko: string; en: string }; cmds: Cmd[] } | null {
-  if (issue.code !== 'T-001' || issue.node === null) return null;
+  if (issue.node === null) return null;
+  if (issue.code === 'T-003') return submodelSemanticIdFix(doc, issue.node);
+  if (issue.code !== 'T-001') return null;
   const parent = issue.node;
   if (!doc.nodes[parent]) return null;
 

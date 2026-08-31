@@ -16,8 +16,8 @@ function ids(prefix: string): () => NodeId {
   return () => `${prefix}${++i}`;
 }
 
-/** Nameplate를 넣고 필수 요소 하나를 지운 문서 */
-function withMissingRequired(): { doc: ReturnType<typeof emptyDoc>; sm: NodeId; removed: string } {
+/** 셸 하나에 Nameplate를 그대로 넣은 문서. 같은 id 순서를 쓰므로 두 번 불러도 같다 */
+function withNameplate(): { doc: ReturnType<typeof emptyDoc>; sm: NodeId } {
   const def = getTemplate('idta-02006')!;
   let doc = emptyDoc();
   doc = apply(doc, {
@@ -33,10 +33,15 @@ function withMissingRequired(): { doc: ReturnType<typeof emptyDoc>; sm: NodeId; 
   doc = apply(doc, instantiate(def, { newId: ids('q'), namespace: 'https://bnb.co.kr/ids', shell: 'shell' })).doc;
 
   const sm = Object.keys(doc.nodes).find((id) => doc.nodes[id]!.t === 'submodel')!;
+  return { doc, sm };
+}
+
+/** Nameplate를 넣고 필수 요소 하나를 지운 문서 */
+function withMissingRequired(): { doc: ReturnType<typeof emptyDoc>; sm: NodeId; removed: string } {
+  const { doc, sm } = withNameplate();
   /* 필수(1..1)인 OrderCodeOfManufacturer를 지운다 */
   const victim = childrenOf(doc, sm).find((c) => doc.nodes[c]!.idShort === 'OrderCodeOfManufacturer')!;
-  doc = apply(doc, { t: 'remove', node: victim }).doc;
-  return { doc, sm, removed: 'OrderCodeOfManufacturer' };
+  return { doc: apply(doc, { t: 'remove', node: victim }).doc, sm, removed: 'OrderCodeOfManufacturer' };
 }
 
 describe('T-001 퀵픽스', () => {
@@ -68,19 +73,7 @@ describe('T-001 퀵픽스', () => {
     }).doc;
 
     /* 원본(템플릿 그대로)과 비교 — id만 다르고 내용은 같아야 한다 */
-    const def = getTemplate('idta-02006')!;
-    let fresh = emptyDoc();
-    fresh = apply(fresh, {
-      t: 'insert',
-      parent: null,
-      index: 0,
-      node: newNode('shell', 'shell', {
-        idShort: 'A_AAS',
-        identifier: 'https://bnb.co.kr/ids/aas/a',
-        globalAssetId: 'https://bnb.co.kr/ids/asset/a',
-      }),
-    }).doc;
-    fresh = apply(fresh, instantiate(def, { newId: ids('q'), namespace: 'https://bnb.co.kr/ids', shell: 'shell' })).doc;
+    const { doc: fresh } = withNameplate();
 
     const pick = (d: typeof fresh): unknown => {
       const smId = Object.keys(d.nodes).find((id) => d.nodes[id]!.t === 'submodel')!;
@@ -122,9 +115,65 @@ describe('T-001 퀵픽스', () => {
     expect(r.issues.map((i) => i.message.en)).toEqual([]);
   });
 
-  it('T-002·T-003에는 퀵픽스를 만들지 않는다', () => {
+  it('T-002에는 퀵픽스를 만들지 않는다 — 어느 쪽이 옳은지 우리가 모른다', () => {
     const { doc, sm } = withMissingRequired();
     const issue = { ...checkConformance(doc, sm)[0]!, code: 'T-002' as const };
+    expect(conformanceFix(doc, issue, ids('f'))).toBeNull();
+  });
+});
+
+describe('T-003 퀵픽스', () => {
+  /* Nameplate 2.0의 서브모델 IRI. 3.0에서 zvei → idta로 바뀌었다 */
+  const OLD = 'https://admin-shell.io/zvei/nameplate/2/0/Nameplate';
+  const NEW = 'https://admin-shell.io/idta/nameplate/3/0/Nameplate';
+
+  /** 서브모델 semanticId만 옛 값으로 바꾼 문서 — 자식은 3.0 그대로다 */
+  function withDeviantSemanticId(): { doc: ReturnType<typeof emptyDoc>; sm: NodeId } {
+    const { doc, sm } = withNameplate();
+    return { doc: apply(doc, { t: 'set', node: sm, path: 'semanticId', value: OLD }).doc, sm };
+  }
+
+  it('서브모델 semanticId를 바꾸면 T-003이 뜬다', () => {
+    const { doc, sm } = withDeviantSemanticId();
+    expect(checkConformance(doc, sm).map((i) => i.code)).toEqual(['T-003']);
+  });
+
+  it('메시지가 기대값을 담는다 — 무엇으로 바꿔야 하는지 화면에서 보여야 한다', () => {
+    const { doc, sm } = withDeviantSemanticId();
+    const issue = checkConformance(doc, sm)[0]!;
+    expect(issue.message.ko).toContain(NEW);
+    expect(issue.message.en).toContain(NEW);
+  });
+
+  it('퀵픽스를 적용하면 T-003이 사라진다', () => {
+    const { doc, sm } = withDeviantSemanticId();
+    const issue = checkConformance(doc, sm)[0]!;
+    const fix = conformanceFix(doc, issue, ids('f'))!;
+    expect(fix.label.ko).toBe('템플릿 값으로 되돌리기');
+
+    const fixed = apply(doc, { t: 'batch', label: 'quickfix', cmds: fix.cmds });
+    expect(fixed.rejected).toBeUndefined();
+    expect(fixed.doc.nodes[sm]!.semanticId).toBe(NEW);
+    expect(checkConformance(fixed.doc, sm)).toEqual([]);
+  });
+
+  it('자식은 건드리지 않는다 — 개정 이관은 planMigration의 몫이다', () => {
+    const { doc, sm } = withDeviantSemanticId();
+    const issue = checkConformance(doc, sm)[0]!;
+    const fixed = apply(doc, {
+      t: 'batch',
+      label: 'quickfix',
+      cmds: conformanceFix(doc, issue, ids('f'))!.cmds,
+    }).doc;
+
+    const semantics = (d: typeof doc): (string | undefined)[] =>
+      childrenOf(d, sm).map((c) => d.nodes[c]!.semanticId);
+    expect(semantics(fixed)).toEqual(semantics(doc));
+  });
+
+  it('이미 템플릿 값이면 고칠 것이 없다', () => {
+    const { doc, sm } = withNameplate();
+    const issue = { ...checkConformance(withDeviantSemanticId().doc, sm)[0]!, node: sm };
     expect(conformanceFix(doc, issue, ids('f'))).toBeNull();
   });
 });
