@@ -238,8 +238,7 @@
   background: var(--surface);
   border: 1.6px solid var(--wire);
 }
-.canvas .react-flow__controls button,
-.canvas .react-flow__minimap {
+.canvas .react-flow__controls button {
   background: var(--surface);
   border: 1px solid var(--line);
   fill: var(--ink-2);

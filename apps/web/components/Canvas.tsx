@@ -14,7 +14,6 @@ import {
   Background,
   Controls,
   Handle,
-  MiniMap,
   type Edge,
   type Node,
   type NodeProps,
@@ -191,7 +190,6 @@ export function Canvas(): React.JSX.Element {
       >
         <Background gap={22} />
         <Controls showInteractive={false} />
-        <MiniMap pannable zoomable />
       </ReactFlow>
     </div>
   );
