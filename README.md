@@ -3,6 +3,7 @@
 IEC 63278(AAS) V3.0 자산 관리 셸을 저작·검증·게시하는 웹 플랫폼.
 
 - **작업 규칙은 [CLAUDE.md](CLAUDE.md)에 있습니다.** 코드를 건드리기 전에 먼저 읽으십시오.
+- 실행 명령어 모음: [docs/RUN.md](docs/RUN.md) — 인프라 · dev 서버 · 점검 · 막혔을 때
 - 설계 근거: [docs/plan.html](docs/plan.html) — 고도화 구현 계획 11단계
 - 출발점: [docs/prototype.html](docs/prototype.html), 델타: [docs/prototype-delta.md](docs/prototype-delta.md)
 
@@ -35,7 +36,7 @@ PostgreSQL 16 · Mosquitto · BaSyx V2를 띄웁니다.
 Docker가 WSL 안에 있으면:
 
 ```bash
-wsl -e bash -lc "cd /mnt/c/Users/cwro7/dev/aas-composer && docker compose up -d"
+wsl -e bash -lc "cd /mnt/c/Users/cwro7/Dropbox/work262/aas/aas-composer && docker compose up -d"
 ```
 
 ### 화면 열기
