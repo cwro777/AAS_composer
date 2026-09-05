@@ -1,6 +1,10 @@
 services:
   postgres:
     image: postgres:16-alpine
+    # WSL·Docker가 재시작되면 컨테이너가 Exited로 남는다. 그러면 API는 저장소를 잃고
+    # 웹은 "연결 거부"만 보여주는데, 원인이 우리 코드처럼 보여 찾는 데 시간이 든다.
+    # unless-stopped라 `docker compose stop`으로 직접 내린 것은 그대로 내려 있다.
+    restart: unless-stopped
     environment:
       POSTGRES_USER: aas
       POSTGRES_PASSWORD: aas
@@ -20,6 +24,7 @@ services:
   # 태그를 고정한다. SNAPSHOT은 같은 이름으로 내용이 바뀌어 재현이 안 된다.
   basyx:
     image: eclipsebasyx/aas-environment:2.0.0-milestone-15
+    restart: unless-stopped
     ports:
       - '8081:8081'
     environment:
@@ -36,6 +41,7 @@ services:
   # 운영 브로커는 현장에 따로 있다 — 이것은 우리가 붙는 쪽을 확인하기 위한 것이다.
   mosquitto:
     image: eclipse-mosquitto:2
+    restart: unless-stopped
     command: ['mosquitto', '-c', '/mosquitto-no-auth.conf']
     ports:
       - '1883:1883'
