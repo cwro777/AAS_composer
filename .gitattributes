@@ -3,6 +3,10 @@
 # 그러면 골든 스냅샷이 "이유 없이" 깨진다. 그 사고를 여기서 막는다.
 * text=auto eol=lf
 
+# 배치 파일만 예외다. LF만 있으면 goto·label 처리가 Windows 버전에 따라 어긋난다.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
 *.png binary
 *.jpg binary
 *.pdf binary

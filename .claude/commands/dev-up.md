@@ -6,11 +6,14 @@ description: 개발 스택을 한 번에 살린다 (postgres · web · api). $AR
 기동 순서와 사고 대처가 전부 거기 들어 있고, 두 곳에 적으면 갈라진다.
 
 ```
-powershell -ExecutionPolicy Bypass -File scripts\dev-up.ps1
+scripts\aas
 ```
 
-$ARGUMENTS 에 `full`이 있으면 `-Full`을 붙인다 (BaSyx 8081 · Mosquitto 1883까지).
-`clean`이 있으면 `-Clean`(.next 먼저 삭제), `restart`가 있으면 `-Restart`를 붙인다.
+$ARGUMENTS 를 그대로 넘긴다 — `full`(BaSyx 8081 · Mosquitto 1883까지) ·
+`clean`(.next 먼저 삭제) · `restart`(떠 있는 것도 다시). 섞어 쓸 수 있다: `scripts\aas full restart`.
+
+`scripts\aas`는 `scripts\dev-up.ps1`을 부르는 얇은 래퍼다. 실행 정책 때문에 직접 부를 일이
+생기면 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\dev-up.ps1 [-Full] [-Clean] [-Restart]`.
 
 스크립트가 이미 하는 일이므로 **따로 하지 마라**:
 - WSL 깨우기 → systemd가 docker를 띄우고 `restart: unless-stopped`인 컨테이너가 돌아온다
