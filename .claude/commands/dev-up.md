@@ -1,81 +1,38 @@
 ---
-description: 개발 스택을 살리고 실제로 응답하는지 확인한다 (postgres · web · api)
+description: 개발 스택을 한 번에 살린다 (postgres · web · api). $ARGUMENTS 로 full 지정 가능
 ---
 
-개발 스택을 순서대로 살려줘. **떴다고 말하기 전에 실제 응답을 받아 확인할 것.**
-
-이 PC의 전제:
-- PostgreSQL은 **5433**이다. 5432는 다른 스택(TimescaleDB)이 쓰고 있다.
-- Docker는 **WSL 안에서** 돈다.
-- 저장소가 **Dropbox 폴더** 안에 있다. 이게 `.next` 문제의 원인이다.
-
-## 1. 지금 무엇이 떠 있는지 먼저 본다
-
-3000(web) · 8787(api) · 5433(postgres)를 확인한다. 이미 다 떠 있으면 4번으로 건너뛴다.
+`scripts/dev-up.ps1`을 실행해 개발 스택을 살려줘. 손으로 명령을 나열하지 말고 이 스크립트를 쓴다 —
+기동 순서와 사고 대처가 전부 거기 들어 있고, 두 곳에 적으면 갈라진다.
 
 ```
-netstat -ano | grep -i listening | grep -E ":(3000|8787|5433)\b"
+powershell -ExecutionPolicy Bypass -File scripts\dev-up.ps1
 ```
 
-## 2. PostgreSQL
+$ARGUMENTS 에 `full`이 있으면 `-Full`을 붙인다 (BaSyx 8081 · Mosquitto 1883까지).
+`clean`이 있으면 `-Clean`(.next 먼저 삭제), `restart`가 있으면 `-Restart`를 붙인다.
 
-`restart: unless-stopped`가 붙어 있어 보통은 살아 있다. `Exited`면 WSL이 재시작된 것이다.
+스크립트가 이미 하는 일이므로 **따로 하지 마라**:
+- WSL 깨우기 → systemd가 docker를 띄우고 `restart: unless-stopped`인 컨테이너가 돌아온다
+- 이미 떠 있는 것 건너뛰기 (두 번 실행해도 안전하다)
+- 포트가 아니라 **실제 응답** 확인 — `/editor` 200 · `/dictionary/status`
+- `.next`가 깨졌으면(readlink EINVAL) 지우고 한 번 더 시도
+- 포트는 닫혔는데 남아 있는 `tsx watch`·`next dev` 감시자 정리
 
-```
-wsl -e bash -lc "cd /mnt/c/Users/cwro7/Dropbox/work262/aas/aas-composer && docker compose up -d postgres"
-```
+## 스크립트가 실패로 끝났을 때만 개입한다
 
-`docker ps`로 `healthy`를 확인하고 넘어간다. `pgdata`가 named volume이라
-컨테이너를 다시 만들어도 데이터는 남는다.
+로그는 `%TEMP%\aas-dev\{web,api}.log`다. 종료 코드가 1이면 거기부터 본다.
 
-## 3. web · api — **따로, 세션 밖에서 띄운다**
-
-두 가지를 지킨다. 둘 다 실제로 겪은 사고다.
-
-- **`pnpm dev`(turbo)를 쓰지 마라.** API가 시작 로그도 없이 멈춰 있던 적이 있다.
-  같은 명령을 `--filter`로 따로 돌리면 즉시 뜬다. 두 개를 따로 띄운다.
-- **백그라운드 작업으로 띄우지 마라.** 세션에 묶인 프로세스는 세션이 내려갈 때
-  함께 죽는다. 이 세션에서 세 번 반복됐다. `Start-Process`로 독립 프로세스로 띄운다.
-
-```powershell
-$repo = 'C:\Users\cwro7\Dropbox\work262\aas\aas-composer'
-$log  = "$env:TEMP\aas-dev"; New-Item -ItemType Directory -Force $log | Out-Null
-Start-Process cmd.exe "/c pnpm --filter @aas/web dev > `"$log\web.log`" 2>&1" -WorkingDirectory $repo -WindowStyle Hidden
-Start-Process cmd.exe "/c pnpm --filter @aas/api dev > `"$log\api.log`" 2>&1" -WorkingDirectory $repo -WindowStyle Hidden
-```
-
-## 4. 확인 — 포트가 열린 것으로 끝내지 않는다
-
-```
-curl -s -o /dev/null -w "editor HTTP %{http_code}\n" http://localhost:3000/editor
-curl -s http://localhost:8787/dictionary/status
-```
-
-기대값:
-- `editor HTTP 200`
-- `{"cached":<0보다 큰 수>,"upstream":null}`
-
-API 시작 로그가 **`저장소: PostgreSQL`** 인지 본다. `저장소: 메모리`면 DB에 못 붙은 것이고,
-그대로 두면 껐다 켤 때 모델이 사라진다.
-
-## 5. 증상별 진단
-
-| 증상 | 원인 | 조치 |
+| 로그에 보이는 것 | 원인 | 조치 |
 |---|---|---|
-| 3000 연결 거부, `web.log`에 `readlink EINVAL … .next\build-manifest.json` | 강제 종료로 남은 `.next`를 Dropbox 폴더에서 심볼릭 링크로 오인한다 | `rm -rf apps/web/.next` 후 3번 재실행 |
-| `EADDRINUSE :::3000` | 이전 프로세스가 포트를 잡고 있다 | 그 포트의 PID를 찾아 죽이고 다시 띄운다 |
-| 8787 닫힘, 로그가 `tsx watch`에서 멈춤 | turbo가 출력을 물고 있다 | `pnpm dev` 대신 `--filter`로 따로 띄운다 |
-| API가 `저장소: 메모리`로 뜸 | `.env`의 `DATABASE_URL`을 못 읽었거나 postgres가 안 떠 있다 | 2번을 먼저 확인한다 |
-| 컨테이너 `Exited (255)` | WSL·Docker 재시작 | 2번. 정책이 붙은 뒤로는 대개 스스로 돌아온다 |
-| `/dictionary/status`가 `cached: 0` | 캐시가 비었다 | `docs/idta/*.json`으로 `scripts/dict-seed.ts`를 다시 돌린다 |
-
-BaSyx(8081)·Mosquitto(1883)는 **필요할 때만** 띄운다. 기본 기동에 넣지 마라.
-
-```
-wsl -e bash -lc "cd /mnt/c/Users/cwro7/Dropbox/work262/aas/aas-composer && docker compose up -d basyx mosquitto"
-```
+| `readlink EINVAL … .next\build-manifest.json` | Dropbox 폴더 + 강제 종료로 남은 `.next`. 스크립트가 한 번은 자동으로 고친다 | 두 번째도 실패하면 `.next`를 지우고 `-Clean`으로 다시 |
+| `EADDRINUSE` | 다른 프로세스가 포트 점유 | `-Restart`로 다시 |
+| 시작 로그만 찍고 8787이 닫힘 | 감시자와 새 서버가 싸운다 | `-Restart` (트리째 정리한다) |
+| `저장소: 메모리` | `.env`의 `DATABASE_URL`을 못 읽었거나 postgres 미기동 | postgres 상태부터 확인 |
+| `Docker 데몬이 뜨지 않았습니다` | WSL 안 docker.service | `wsl -e bash -lc "sudo service docker start"` |
+| `cached: 0` | 사전 캐시가 비었다 | `docs/idta/*.json`으로 `apps/api/scripts/dict-seed.ts` 재실행 |
 
 ## 보고
 
-무엇이 이미 떠 있었고 무엇을 새로 띄웠는지, 그리고 4번의 **실제 응답**을 그대로 보여준다.
-하나라도 응답을 못 받았으면 **"떴다"고 말하지 말고** 5번의 어느 항목인지 짚어 보고한다.
+스크립트 출력의 **응답 확인 부분을 그대로** 보여준다.
+하나라도 `FAIL`이면 **"떴다"고 말하지 말고** 위 표의 어느 항목인지 짚어 보고한다.
