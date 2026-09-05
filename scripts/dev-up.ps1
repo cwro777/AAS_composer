@@ -1,6 +1,11 @@
-<#
+﻿<#
 .SYNOPSIS
   개발 스택을 한 번에 올린다 — WSL · 컨테이너 · web · api.
+
+.NOTES
+  **이 파일은 UTF-8 BOM으로 저장한다.** Windows PowerShell 5.1은 BOM이 없는 .ps1을
+  ANSI(이 PC에서는 CP949)로 읽어서 한글이 전부 깨진다. 편집기가 BOM을 떼면 재발한다.
+  확인: 첫 3바이트가 EF BB BF 인지 본다.
 
 .DESCRIPTION
   이 PC의 전제는 세 가지다. 하나라도 다르면 이 스크립트를 고쳐야 한다.
