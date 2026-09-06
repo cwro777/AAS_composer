@@ -12,16 +12,25 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { type TermEntry, formatSemanticId, parseSemanticId, searchTerms, termFor } from '@aas/semantic';
+import {
+  type TermBook,
+  type TermEntry,
+  formatSemanticId,
+  parseSemanticId,
+  searchTerms,
+  termFor,
+} from '@aas/semantic';
+
+import { useTerms } from '../lib/terms';
 
 interface Props {
   value: string;
   onCommit: (v: string) => void;
 }
 
-function Badge({ raw }: { raw: string }): React.JSX.Element | null {
+function Badge({ raw, book }: { raw: string; book: TermBook }): React.JSX.Element | null {
   const ref = useMemo(() => (raw ? parseSemanticId(raw) : null), [raw]);
-  const term = useMemo(() => (raw ? termFor(raw) : undefined), [raw]);
+  const term = useMemo(() => (raw ? termFor(raw, book) : undefined), [raw, book]);
   if (!ref) return null;
 
   if (ref.scheme === 'unknown') {
@@ -61,7 +70,17 @@ export function SemanticField({ value, onCommit }: Props): React.JSX.Element {
 
   useEffect(() => setDraft(value), [value]);
 
-  const hits = useMemo(() => (open ? searchTerms(query) : []), [open, query]);
+  /**
+   * **샘플 + 사내 용어집을 함께 본다.**
+   *
+   * 검증·미리보기·내보내기는 이미 이 책을 보는데 인스펙터만 샘플을 봤다. 그래서
+   * `개념 등록`으로 방금 넣은 용어가 검색에 뜨지 않고, 배지도 계속 "미확인"이었다.
+   * 화면과 파일이 다른 책을 보면 무엇이 빠졌는지 알아챌 방법이 없다.
+   */
+  const entries = useTerms((s) => s.entries);
+  const book = useMemo(() => useTerms.getState().book(), [entries]);
+
+  const hits = useMemo(() => (open ? searchTerms(query, book) : []), [open, query, book]);
 
   const commit = (v: string): void => {
     setDraft(v);
@@ -90,7 +109,7 @@ export function SemanticField({ value, onCommit }: Props): React.JSX.Element {
           if (e.key === 'Escape') setDraft(value);
         }}
       />
-      <Badge raw={draft} />
+      <Badge raw={draft} book={book} />
 
       <button type="button" className="mini" onClick={() => setOpen((v) => !v)}>
         {open ? '용어 검색 닫기' : '한글 용어로 찾기'}
