@@ -5,6 +5,7 @@
 - 설계 근거: `docs/plan.html` (고도화 구현 계획, 11단계)
 - 출발점: `docs/prototype.html` (단일 HTML 프로토타입 — 검증된 로직의 원본)
 - **프로토타입과의 델타: `docs/prototype-delta.md` — 프로토타입을 열기 전에 반드시 먼저 읽는다**
+- semanticId 사용법·개념 등록·CD-001 해소: `docs/semantic-id.md`
 
 ## 확정된 전제 — 다시 논의하지 않는다
 
