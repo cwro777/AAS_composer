@@ -352,7 +352,99 @@ INTEGER_MEASURE · INTEGER_COUNT · BOOLEAN · DATE · TIMESTAMP
 
 ---
 
-## 6. 용어집은 두 겹이다
+## 6. ConceptDescription은 어떻게 만들어지는가
+
+팔레트에 ConceptDescription이 없는 것이 맞다. **손으로 만들지 않는다 — 커널이 만든다.**
+
+```
+문서에서 쓰인 semanticId를 전부 모은다      usedSemanticIds(doc)
+        ↓ 각각을 용어집에서 찾는다           termsResolver(book)
+        ↓ 규격 최소치를 갖췄는지 본다
+conceptDescriptions 배열                   buildConceptDescriptions()
+```
+
+**"CD를 만든다" = "용어집에 항목을 넣는다"** 이다. 넣는 방법은 4장(사전에서 채우기)과
+5장(개념 등록)이고, 이 장은 그것이 언제 파일에 실리는지를 말한다.
+
+### 만들어지는 조건 — 넷 다 있어야 한다
+
+| # | 조건 | 없으면 |
+|---|---|---|
+| 1 | 노드에 `semanticId`가 있다 | `POL-SEM-001` |
+| 2 | 용어집이 그 semanticId를 안다 | `CD-001` "아는 곳이 없습니다" |
+| 3 | **영문 표제어** (AASc-3a-002) | `CD-001` "영문 표제어가 없어…" |
+| 4 | **영문 정의** (AASc-3a-008) | `CD-001` "영문 정의가 없어…" |
+
+하나라도 빠지면 커널은 **CD를 만들지 않고 이유를 남긴다.** 틀린 정의를 실어 보내는 것이
+아무것도 안 보내는 것보다 나쁘다. `unit`과 `dataType`은 선택이다 — 없어도 만들어진다.
+
+### 단위는 값이 아니라 여기에 넣는다
+
+인스펙터에 단위 입력란이 없는 것도 맞다. 규격이 그렇게 되어 있다.
+
+```
+Property           idShort · semanticId · valueType · value · valueId
+                          ↓ 가리킨다
+ConceptDescription   embeddedDataSpecifications
+                       └ DataSpecificationIec61360
+                           ├ preferredName · definition · dataType
+                           └ unit          ← 단위는 여기
+```
+
+**단위는 값의 속성이 아니라 개념의 속성이다.** "공구마모율이 mm 단위"라는 사실은 이
+설비에서만 참인 것이 아니라 그 개념 자체의 성질이다. 그래서 값마다 반복하지 않는다.
+
+값 칸에 단위를 적으면 이렇게 걸린다.
+
+```
+ERROR  POL-VAL-001  …/ToolWearRate
+값 "0.34)"은(는) xs:double 형식이 아닙니다. 단위는 값이 아니라 ConceptDescription에 넣습니다.
+```
+
+**고치는 순서**
+
+1. 값에서 단위·괄호를 뺀다 — `0.34)` → `0.34`. 이것만으로 ERROR는 사라진다
+2. semanticId가 없으면 `사내 개념으로 발행`(1장 C)
+3. 그 개념의 `CD-001`에서 `개념 등록` → **단위** 칸에 `mm`
+
+단위는 **IEC 61360 기호**로 쓴다 — `mm` · `kN` · `°C` · `%` · `s` · `mm/h`.
+한글이나 문장이 아니다. 측정값이면 자료형은 `REAL_MEASURE`다
+(`REAL_COUNT`는 단위 없는 실수).
+
+값에 단위를 남겨 두면 이 프로젝트에서 실제로 두 곳이 깨진다.
+
+- **값 수집** — 숫자로 읽히지 않으면 `numValue`가 아니라 `textValue`로 담긴다.
+  0으로 바꾸지는 않지만, 평균·최댓값·차트가 그 신호를 쓰지 못한다.
+- **BaSyx 게시** — 받는 쪽이 `xs:double`을 기대하는데 문자열이 간다.
+
+### 헷갈리지 않게 알아 둘 것
+
+- **같은 semanticId를 쓰는 요소가 100개여도 CD는 하나다.** Map으로 모은다.
+- **보조 semanticId로는 CD가 만들어지지 않는다.** 주 식별자만 개념이고 보조는 참고다.
+- **출력 순서는 id 사전순으로 고정된다.** 편집 순서에 따라 파일이 달라지면 diff와
+  골든 테스트가 흔들린다.
+- **하나도 없으면 `conceptDescriptions` 키 자체를 내보내지 않는다.** 규격이
+  "설정하지 않거나 최소 1개"를 요구한다. 빈 배열은 위반이다.
+- **목록 직속 자식은 부모의 `semanticIdListElement`에서 만들어진다**(8장).
+
+### 확인
+
+`출력 JSON` 탭 맨 아래에 `conceptDescriptions`가 붙는다. 내보내기 알림도 건수를 말한다.
+
+> `MyAsset_AAS.json — 개념 12건 포함, 3건은 단위·정의를 몰라 빠졌습니다.`
+
+**"빠졌습니다"가 0이 될 때까지가 목표다**(eCl@ss 제외). AASX에도 같은 개념이 담긴다 —
+미리보기·내보내기·AASX·검증이 같은 책을 보기 때문이다(7장).
+
+### 한계 — unitId는 없다
+
+우리는 `unit`(기호 문자열)만 내보낸다. IEC 61360에는 단위를 개념으로 가리키는
+`unitId`도 있지만 구현하지 않았다. 기호만으로 충분한 수신 측이 대부분이지만,
+`unitId`를 요구하는 상대는 아직 맞추지 못한다. **있는 척하지 않는다.**
+
+---
+
+## 7. 용어집은 두 겹이다
 
 ```
 SAMPLE_TERMS (packages/semantic/src/seed/terms.sample.json — 샘플)
@@ -373,7 +465,7 @@ useTerms().book()
 
 ---
 
-## 7. 검증 이슈별 처리
+## 8. 검증 이슈별 처리
 
 | 코드 | 메시지 | 조치 |
 |---|---|---|
