@@ -11,7 +11,7 @@
  */
 
 import type { Json, LangText } from './model.js';
-import { type Issue, type Severity, sortIssues } from './issue.js';
+import { type Issue, sortIssues } from './issue.js';
 import type { AasDoc, AasNodeType, NodeId } from './model.js';
 import type { Environment } from './serialize.js';
 
@@ -22,15 +22,11 @@ import type { Environment } from './serialize.js';
  * **값이 있는 요소에만** 해당한다. 컬렉션·목록·엔티티·오퍼레이션은 담는 그릇이라
  * 단위라는 것이 없다.
  *
- * 그릇에까지 같은 경고를 띄우면 두 가지를 잃는다. 첫째, 사실이 아닌 말을 한다.
- * 둘째, 정말 고쳐야 할 Property 경고가 그릇 경고에 묻힌다. 그래서 그릇은 `info`로
- * 내려 둔다 — **지우지는 않는다.** 그릇의 개념이 빠지면 수신 측은 그 묶음이 무엇인지
- * 알 수 없고, 그것을 조용히 넘기는 것은 이 저장소의 규칙이 아니다.
+ * 그릇에까지 그 문장을 쓰면 사실이 아닌 말을 하게 된다. 그래서 **문구만 나눈다.**
  *
- * IDTA가 IRI만 쓰고 ConceptDescription을 발행하지 않은 자리가 실제로 있다
- * (예: `…/zvei/nameplate/1/0/ContactInformations/AddressInformation`). 그런 항목은
- * 우리가 고칠 수 없고 — 남의 네임스페이스에 정의를 지어 붙일 수는 없다 —
- * 경고로 남겨 봐야 할 일이 없다.
+ * **심각도는 나누지 않는다.** 개념이 빠진 것은 그릇이든 값이든 같은 무게다 —
+ * 그릇의 개념이 없으면 수신 측은 그 묶음이 무엇인지 알 수 없다. 다른 것은
+ * 무엇을 잃느냐뿐이고, 그것은 문장이 말한다.
  */
 const VALUE_BEARING: ReadonlySet<AasNodeType> = new Set<AasNodeType>([
   'prop',
@@ -90,17 +86,12 @@ export function buildConceptDescriptions(doc: AasDoc, resolver: ConceptResolver)
   const hasEnglish = (texts: LangText[] | undefined): boolean =>
     (texts ?? []).some((t) => t.language.toLowerCase().startsWith('en') && t.text.trim() !== '');
 
-  const report = (
-    node: NodeId | null,
-    semanticId: string,
-    severity: Severity,
-    ko: string,
-    en: string,
-  ): void => {
+  const report = (node: NodeId | null, semanticId: string, ko: string, en: string): void => {
     unresolved.push({
       code: 'CD-001',
       layer: 'dictionary',
-      severity,
+      /* 그릇이든 값이든 개념이 빠진 것은 같은 무게다. 다른 것은 무엇을 잃느냐뿐이다. */
+      severity: 'warn',
       node,
       path: semanticId,
       message: { ko, en },
@@ -109,25 +100,23 @@ export function buildConceptDescriptions(doc: AasDoc, resolver: ConceptResolver)
 
   for (const [semanticId, nodes] of used) {
     const node = nodes[0] ?? null;
-    /* 하나라도 값을 담는 요소가 이 개념을 쓰면 경고다. 그릇만 쓰면 알림이다. */
+    /* 하나라도 값을 담는 요소가 이 개념을 쓰면 값 쪽 문구다 */
     const carriesValue = nodes.some((n) => {
       const t = doc.nodes[n]?.t;
       return !!t && VALUE_BEARING.has(t);
     });
-    const severity: Severity = carriesValue ? 'warn' : 'info';
 
     const info = resolver.resolve(semanticId);
     if (!info) {
       report(
         node,
         semanticId,
-        severity,
         carriesValue
           ? '이 semanticId를 아는 곳이 없습니다. 단위·자료형 없이 나가면 수신 측이 값을 해석하지 못합니다.'
-          : '이 묶음의 개념을 아는 곳이 없습니다. 값이 없어 단위는 필요 없지만, 수신 측은 이 묶음이 무엇인지 알 수 없습니다.',
+          : '이 묶음의 개념을 아는 곳이 없습니다. 수신 측은 이 묶음이 무엇인지 알 수 없습니다.',
         carriesValue
           ? 'Nothing knows this semanticId; without unit and data type the receiver cannot interpret the value.'
-          : 'Nothing knows this semanticId. The element carries no value, so no unit is needed, but the receiver cannot tell what this grouping means.',
+          : 'Nothing knows this semanticId. The receiver cannot tell what this grouping means.',
       );
       continue;
     }
@@ -140,7 +129,6 @@ export function buildConceptDescriptions(doc: AasDoc, resolver: ConceptResolver)
       report(
         node,
         semanticId,
-        severity,
         '영문 표제어가 없어 ConceptDescription을 만들 수 없습니다 (AASc-3a-002).',
         'No English preferred name; a ConceptDescription cannot be built (AASc-3a-002).',
       );
@@ -150,7 +138,6 @@ export function buildConceptDescriptions(doc: AasDoc, resolver: ConceptResolver)
       report(
         node,
         semanticId,
-        severity,
         '영문 정의가 없어 ConceptDescription을 만들 수 없습니다 (AASc-3a-008). 표준 개념은 사전 프록시가 채웁니다.',
         'No English definition; a ConceptDescription cannot be built (AASc-3a-008).',
       );
