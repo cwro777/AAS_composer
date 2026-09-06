@@ -10,13 +10,13 @@
  * 드래그를 클릭으로 보기 때문에, 선택만 믿지 말고 복사 버튼을 따로 둔다.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { API_BASE, type ApiError, lookupConcepts } from '../lib/api';
 import { type UiIssue, useIssues, useJson } from '../lib/derived';
 import { DEFAULT_IRI_PREFIX, useSettings } from '../lib/settings';
 import { useEditor } from '../lib/store';
-import { entryFromDict, useTerms } from '../lib/terms';
+import { entriesFromFile, entryFromDict, useTerms } from '../lib/terms';
 import { ConceptForm } from './ConceptForm';
 
 const LAYER_LABEL: Record<UiIssue['layer'], string> = {
@@ -69,6 +69,7 @@ export function Drawer(): React.JSX.Element {
   const restoreTerms = useTerms((s) => s.restore);
   const [tab, setTab] = useState<'json' | 'issues'>('json');
   const [busy, setBusy] = useState(false);
+  const termFileRef = useRef<HTMLInputElement>(null);
   const json = useJson(doc);
   const issues = useIssues(doc);
   const fixable = issues.filter((i) => i.fix);
@@ -147,6 +148,39 @@ export function Drawer(): React.JSX.Element {
       .finally(() => setBusy(false));
   };
 
+  /**
+   * 용어집 파일을 사내 용어집에 넣는다.
+   *
+   * 서버를 거치지 않는 유일한 길이다. 사전에서 채우기는 서버 사전이 아는 것만
+   * 가져오므로, 회사 용어집을 파일로 받았을 때는 여기로 들어와야 한다.
+   *
+   * **이미 있는 것은 덮지 않는다**(`addMany`) — 손으로 등록한 것이 이긴다.
+   * 무엇이 들어가고 무엇이 안 들어갔는지 건수로 말한다.
+   */
+  const importTerms = (file: File): void => {
+    void file
+      .text()
+      .then((raw) => {
+        const { entries, unusable } = entriesFromFile(raw, file.name);
+        if (entries.length === 0) {
+          notify(
+            unusable
+              ? `${file.name}: 쓸 수 있는 항목이 없습니다. 영문 이름과 정의가 있어야 합니다 (${unusable}건 건너뜀).`
+              : `${file.name}: 용어 항목을 찾지 못했습니다.`,
+          );
+          return;
+        }
+        const added = useTerms.getState().addMany(entries);
+        const already = entries.length - added;
+        notify(
+          `${file.name}: ${entries.length}건 중 ${added}건을 용어집에 넣었습니다.` +
+            (already ? ` 이미 있던 것 ${already}건.` : '') +
+            (unusable ? ` 영문 이름·정의가 없어 못 쓴 것 ${unusable}건.` : ''),
+        );
+      })
+      .catch((e: Error) => notify(`${file.name}을(를) 읽지 못했습니다: ${e.message}`));
+  };
+
   const copyAll = (): void => {
     const text = `${['심각도', '코드', '경로', '내용'].join('\t')}\n${issues.map(asText).join('\n')}\n`;
     void copy(text).then((ok) =>
@@ -202,6 +236,25 @@ export function Drawer(): React.JSX.Element {
             >
               {busy ? '…' : '사전에서 채우기'}
             </button>
+            <button
+              type="button"
+              className="mini"
+              title="용어집 파일(terms.local.json 등)을 사내 용어집에 넣습니다. 이미 있는 것은 덮지 않습니다."
+              onClick={() => termFileRef.current?.click()}
+            >
+              용어집 가져오기
+            </button>
+            <input
+              ref={termFileRef}
+              type="file"
+              accept=".json,application/json"
+              hidden
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = '';
+                if (f) importTerms(f);
+              }}
+            />
             <button
               type="button"
               className="mini"

@@ -69,6 +69,71 @@ export function humanize(name: string): string {
   return spaced ? spaced[0]!.toUpperCase() + spaced.slice(1).toLowerCase() : '';
 }
 
+const VERIFIED = new Set(['spec', 'dict', 'none']);
+
+function text(v: unknown): string {
+  return typeof v === 'string' ? v.trim() : '';
+}
+
+/**
+ * 용어집 파일을 읽는다 — `용어집 내보내기`가 만든 것, 또는 회사 용어집.
+ *
+ * `{ terms: [...] }`와 맨 배열 둘 다 받는다. 내보내기가 앞의 모양으로 쓰고,
+ * 사람이 손으로 만든 파일은 뒤가 되기 쉽다.
+ *
+ * **받는 기준은 `entryFromDict`와 같다** — 영문 이름과 정의가 있어야 한다. 규격이
+ * 요구하므로(AASc-3a-002 · AASc-3a-008) 없는 항목을 넣어 봐야 ConceptDescription이
+ * 만들어지지 않고 경고만 모양을 바꾼다. 못 쓴 것은 세어서 돌려준다 — 조용히 버리면
+ * 넣었다고 생각한 것이 왜 안 나오는지 알 수 없다.
+ *
+ * `verified`는 파일이 적은 값을 그대로 둔다. 회사 용어집이 사양서와 대조한 항목을
+ * 가져올 수 있어야 하기 때문이다. 대신 어디서 왔는지를 `provenance`에 남긴다.
+ */
+export function entriesFromFile(
+  raw: string,
+  origin: string,
+): { entries: TermEntry[]; unusable: number } {
+  const parsed: unknown = JSON.parse(raw);
+  const list: unknown = Array.isArray(parsed) ? parsed : (parsed as { terms?: unknown })?.terms;
+  if (!Array.isArray(list)) throw new Error('terms 배열을 찾지 못했습니다.');
+
+  const entries: TermEntry[] = [];
+  let unusable = 0;
+
+  for (const item of list) {
+    const t = item as Record<string, unknown>;
+    const semanticId = text(t['semanticId']);
+    const nameEn = text(t['nameEn']);
+    const definition = text(t['definition']);
+    const term = text(t['term']) || nameEn;
+
+    if (!semanticId || !nameEn || !definition) {
+      unusable += 1;
+      continue;
+    }
+
+    const verified = text(t['verified']);
+    const aliases = Array.isArray(t['aliases'])
+      ? (t['aliases'] as unknown[]).map(text).filter(Boolean)
+      : [];
+
+    entries.push({
+      term,
+      nameEn,
+      semanticId,
+      definition,
+      ...(aliases.length ? { aliases } : {}),
+      ...(text(t['unit']) ? { unit: text(t['unit']) } : {}),
+      ...(text(t['dataType']) ? { dataType: text(t['dataType']) } : {}),
+      origin: t['origin'] === 'idta' ? 'idta' : 'local',
+      verified: (VERIFIED.has(verified) ? verified : 'none') as TermEntry['verified'],
+      provenance: text(t['provenance']) || `파일에서 가져옴 (${origin})`,
+    });
+  }
+
+  return { entries, unusable };
+}
+
 /**
  * 서버 사전이 아는 것을 용어집 항목으로.
  *
