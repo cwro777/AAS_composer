@@ -28,6 +28,19 @@ interface Props {
   onCommit: (v: string) => void;
 }
 
+/**
+ * 근거의 세기를 있는 그대로 보인다. 센 것부터 본다.
+ *
+ * `dict`는 **사전이 답했다**는 뜻이지 사양서를 대조했다는 뜻이 아니다. 둘을 한 배지로
+ * 뭉치면, 대조한 것과 받아 적은 것을 구분할 방법이 화면에서 사라진다.
+ */
+function verdictOf(term: TermEntry): { cls: string; label: string } {
+  if (term.verified === 'spec') return { cls: 'v-spec', label: '사양서 확인' };
+  if (term.verified === 'dict') return { cls: 'v-dict', label: '사전 확인' };
+  if (term.origin === 'local') return { cls: 'v-none', label: '자체 발급' };
+  return { cls: 'v-none', label: '미확인' };
+}
+
 function Badge({ raw, book }: { raw: string; book: TermBook }): React.JSX.Element | null {
   const ref = useMemo(() => (raw ? parseSemanticId(raw) : null), [raw]);
   const term = useMemo(() => (raw ? termFor(raw, book) : undefined), [raw, book]);
@@ -45,11 +58,8 @@ function Badge({ raw, book }: { raw: string; book: TermBook }): React.JSX.Elemen
     <span className="sembadges">
       <span className={`sembadge s-${ref.scheme}`}>{formatSemanticId(ref)}</span>
       {term ? (
-        <span
-          className={`sembadge v-${term.verified === 'spec' ? 'spec' : 'none'}`}
-          title={term.provenance ?? ''}
-        >
-          {term.verified === 'spec' ? '사양서 확인' : term.origin === 'local' ? '자체 발급' : '미확인'}
+        <span className={`sembadge ${verdictOf(term).cls}`} title={term.provenance ?? ''}>
+          {verdictOf(term).label}
           {' · '}
           {term.term}
         </span>

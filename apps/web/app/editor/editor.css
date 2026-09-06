@@ -995,6 +995,11 @@ table.grid td.ops button:disabled {
   background: var(--ok-bg);
   color: var(--ok);
 }
+/* 사전이 답한 것. 사양서 대조(v-spec)와 색을 나눠 둘을 구분한다 */
+.sembadge.v-dict {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
 .sembadge.v-none {
   background: var(--warn-bg);
   color: var(--warn);

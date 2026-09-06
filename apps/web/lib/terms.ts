@@ -93,7 +93,14 @@ export function entryFromDict(d: {
     ...(d.unit ? { unit: d.unit } : {}),
     ...(d.dataType ? { dataType: d.dataType } : {}),
     origin: 'idta',
-    verified: 'none',
+    /**
+     * `dict` — **사전이 답했다**는 뜻이지, 우리가 사양서를 대조했다는 뜻이 아니다.
+     *
+     * `none`으로 두면 배지가 "미확인"으로 남아, 사전이 이름·정의·단위까지 준 개념도
+     * 아무 근거 없는 것과 같아 보인다. 그렇다고 `spec`으로 올리면 하지 않은 대조를
+     * 했다고 말하는 것이다. 근거의 세기를 있는 그대로 적는 자리가 이 값이다.
+     */
+    verified: 'dict',
     provenance: `사전에서 받음${d.origin ? ` (${d.origin})` : ''}`,
   };
 }
