@@ -1,0 +1,1019 @@
+{
+  "_MOCK": {
+    "ko": "가정: eCl@ss 라이선스가 있다. 이 파일은 그 가정 아래 만든 가짜 사전 내보내기다.",
+    "en": "ASSUMPTION: an eCl@ss licence exists. This file is a FAKE dictionary export made under that assumption.",
+    "warning": "여기 적힌 표제어·정의·단위는 eCl@ss에서 온 값이 아니다. 개발·시연용이며 실데이터가 아니다.",
+    "entries": 21
+  },
+  "assetAdministrationShells": [],
+  "submodels": [],
+  "conceptDescriptions": [
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#01-AHF578#003",
+      "idShort": "HandoverDocumentation",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Handover documentation"
+              },
+              {
+                "language": "ko",
+                "text": "인수인계 문서"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Collection of documents handed over with the asset, such as manuals, certificates and drawings."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAF018#003",
+      "idShort": "RatedPower",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Rated power"
+              },
+              {
+                "language": "ko",
+                "text": "정격출력"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Power the equipment is designed to deliver in continuous operation under the declared reference conditions."
+              }
+            ],
+            "unit": "kW",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAH252#003",
+      "idShort": "OperatingHours",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Operating hours"
+              },
+              {
+                "language": "ko",
+                "text": "가동시간"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Accumulated time the equipment has been in operation since commissioning."
+              }
+            ],
+            "unit": "h",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAN466#004",
+      "idShort": "Description",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Description"
+              },
+              {
+                "language": "ko",
+                "text": "설명"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Free text describing the object in the language of the reader."
+              }
+            ],
+            "dataType": "STRING_TRANSLATABLE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAO099#004",
+      "idShort": "DocumentIdentifier",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Document identifier"
+              },
+              {
+                "language": "ko",
+                "text": "문서식별자"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Identifier of the document within the domain given by the document domain id."
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAP003#005",
+      "idShort": "Version",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Version"
+              },
+              {
+                "language": "ko",
+                "text": "버전"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Version indicator of the document, unique within its document identifier."
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABG940#003",
+      "idShort": "Title",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Title"
+              },
+              {
+                "language": "ko",
+                "text": "제목"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Title of the document in the language of the reader."
+              }
+            ],
+            "dataType": "STRING_TRANSLATABLE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABH789#001",
+      "idShort": "MachineState",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Machine state"
+              },
+              {
+                "language": "ko",
+                "text": "설비상태"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Current operating state of the machine, for example running, idle, stopped or faulted."
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABH994#003",
+      "idShort": "DocumentDomainId",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Document domain id"
+              },
+              {
+                "language": "ko",
+                "text": "문서도메인식별자"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Identifier of the organisational domain in which the document identifier is unique."
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABH995#003",
+      "idShort": "DocumentIsPrimary",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Document is primary"
+              },
+              {
+                "language": "ko",
+                "text": "주문서여부"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Indicates whether this identifier is the primary one among the identifiers of the document."
+              }
+            ],
+            "dataType": "BOOLEAN"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABH996#003",
+      "idShort": "ClassId",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Class id"
+              },
+              {
+                "language": "ko",
+                "text": "분류코드"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Code of the document class within the classification system."
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABH997#003",
+      "idShort": "ClassificationSystem",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Classification system"
+              },
+              {
+                "language": "ko",
+                "text": "분류체계"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Name and version of the classification system the class id belongs to."
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABI500#003",
+      "idShort": "Documents",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Documents"
+              },
+              {
+                "language": "ko",
+                "text": "문서 목록"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "List of documents handed over with the asset."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABI501#003",
+      "idShort": "DocumentIds",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Document ids"
+              },
+              {
+                "language": "ko",
+                "text": "문서식별자 목록"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "List of identifiers under which the document is known in different domains."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABI502#003",
+      "idShort": "DocumentClassifications",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Document classifications"
+              },
+              {
+                "language": "ko",
+                "text": "문서분류 목록"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "List of classifications assigned to the document."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABI503#003",
+      "idShort": "DocumentVersions",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Document versions"
+              },
+              {
+                "language": "ko",
+                "text": "문서버전 목록"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "List of versions in which the document has been issued."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABJ219#002",
+      "idShort": "ClassName",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Class name"
+              },
+              {
+                "language": "ko",
+                "text": "분류명"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Name of the document class in the language of the reader."
+              }
+            ],
+            "dataType": "STRING_TRANSLATABLE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABK126#002",
+      "idShort": "DigitalFiles",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Digital files"
+              },
+              {
+                "language": "ko",
+                "text": "디지털파일 목록"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "List of files carrying the content of one document version."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-BAA092#002",
+      "idShort": "CurrentTemperature",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Current temperature"
+              },
+              {
+                "language": "ko",
+                "text": "현재온도"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Temperature measured at the reference point at the time of reading."
+              }
+            ],
+            "unit": "°C",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-BAA120#008",
+      "idShort": "AmbientTemperature",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Ambient temperature"
+              },
+              {
+                "language": "ko",
+                "text": "주변온도"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Temperature of the environment surrounding the equipment during operation."
+              }
+            ],
+            "unit": "°C",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-BAF161#004",
+      "idShort": "RotationSpeed",
+      "description": [
+        {
+          "language": "en",
+          "text": "MOCK DATA — not from eCl@ss. Do not ship."
+        },
+        {
+          "language": "ko",
+          "text": "MOCK 데이터 — eCl@ss에서 온 값이 아니다. 외부로 내보내지 말 것."
+        }
+      ],
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Rotation speed"
+              },
+              {
+                "language": "ko",
+                "text": "회전속도"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Number of revolutions of the rotating part per unit of time."
+              }
+            ],
+            "unit": "1/min",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    }
+  ]
+}
