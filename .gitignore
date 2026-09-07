@@ -7,6 +7,11 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 _to_delete/
+
+# 손으로 열어 보려고 받아 둔 파일. 교재는 docs/samples/가 원본이고,
+# 사본을 커밋하면 두 벌이 되어 조용히 갈라진다.
+test_sample/
+
 .env
 .env.local
 .DS_Store
