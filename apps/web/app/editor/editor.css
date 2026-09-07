@@ -650,6 +650,158 @@ table.grid td.ops button:disabled {
   background: var(--accent);
   color: var(--accent-ink);
 }
+/* 용어집 */
+.terms {
+  padding: 8px 10px;
+}
+.terms .thead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.terms .thead input[type='search'] {
+  flex: 0 1 300px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.terms .thead input[type='search']:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.terms .chk {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.terms .chk.hot {
+  color: var(--warn);
+  font-weight: 600;
+}
+.terms .grow {
+  flex: 1 1 auto;
+}
+/* 전역 .mini가 width:100%다(팔레트용). 도구줄에서는 글자만큼만 차지해야 한다 */
+.terms .mini {
+  flex: 0 0 auto;
+  width: auto;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: var(--r);
+  padding: 4px 9px;
+  font-size: 11.5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.terms .mini:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.terms .mini:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.tlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tlist li {
+  display: grid;
+  grid-template-columns: minmax(90px, 1.1fr) minmax(110px, 1.4fr) 54px 130px 38px minmax(140px, 1.6fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  font-size: 11.5px;
+  background: var(--surface-2);
+}
+/* grid 항목은 기본 min-width가 auto라, 긴 식별자 한 줄이 표 전체를 늘린다 */
+.tlist li > * {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tlist li.bad {
+  border-color: var(--warn);
+  background: var(--warn-bg);
+}
+/* 문제 사유는 다음 줄 전체를 쓴다 — 여기만 줄바꿈을 허용한다 */
+.tlist li.bad .why {
+  grid-column: 1 / -1;
+  color: var(--warn);
+  font-size: 11px;
+  white-space: normal;
+  overflow: visible;
+}
+.tlist .tm {
+  font-weight: 600;
+  color: var(--ink);
+}
+.tlist .en {
+  color: var(--ink-2);
+}
+.tlist .un {
+  font-family: var(--mono);
+  color: var(--accent);
+  text-align: right;
+}
+.tlist .dt {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+}
+.tlist .org {
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 3px;
+  padding: 1px 0;
+}
+.tlist .org.local {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.tlist .org.sample {
+  background: var(--surface-3);
+  color: var(--ink-3);
+}
+.tlist .sem {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tlist .del {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-3);
+  border-radius: 3px;
+  padding: 1px 7px;
+  font-size: 10.5px;
+  cursor: pointer;
+}
+.tlist .del:hover {
+  border-color: var(--err);
+  color: var(--err);
+}
+
 /* 개념 등록 */
 .cform {
   margin: 8px 10px 0;
