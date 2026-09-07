@@ -21,6 +21,7 @@ import {
   type ConceptResolver,
   type NodeId,
   apply,
+  attachConceptDescriptions,
   buildConceptDescriptions,
   emptyDoc,
   newNode,
@@ -119,10 +120,19 @@ async function auditOne(
   }
   /* CD-001은 따로 센다 — 개념을 아는지는 템플릿의 책임이 아니다 */
   const resolver = useDict ? await dictResolver(doc) : termsResolver(SAMPLE_TERMS);
-  for (const i of buildConceptDescriptions(doc, resolver).unresolved) {
+  const cd = buildConceptDescriptions(doc, resolver);
+  for (const i of cd.unresolved) {
     rows.push({ bucket: '사전', severity: i.severity, code: i.code, where: i.path });
   }
-  const r = verifyEnvironment(serialize(doc));
+
+  /**
+   * **내보내는 것을 그대로 검증한다.**
+   *
+   * serialize(doc)만 보면 conceptDescriptions가 빠져 규격 위반을 놓친다 —
+   * 예: AASc-3a-009(측정형 자료형인데 단위 없음)는 개념 쪽에서만 난다.
+   * 화면의 buildExport와 같은 것을 봐야 한다.
+   */
+  const r = verifyEnvironment(attachConceptDescriptions(serialize(doc), cd.conceptDescriptions));
   if (r.deserializationError) {
     rows.push({ bucket: '결함', severity: 'error', code: 'AAS-CORE', where: r.deserializationError });
   }

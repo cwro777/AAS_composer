@@ -54,6 +54,20 @@ export interface ConceptResolver {
 
 const DATA_SPEC_IEC61360 = 'https://admin-shell.io/aas/3/0/DataSpecificationIec61360';
 
+/**
+ * 단위가 있어야 하는 자료형 (AASc-3a-009).
+ *
+ * 측정값과 통화는 단위 없이는 뜻이 없다 — "15.0"이 kW인지 kN인지 모른다.
+ * 규격이 `unit` 또는 `unitId` 중 하나를 요구한다. 우리는 `unit`(기호)만 내보낸다.
+ */
+const UNIT_REQUIRED: ReadonlySet<string> = new Set([
+  'INTEGER_MEASURE',
+  'REAL_MEASURE',
+  'RATIONAL_MEASURE',
+  'INTEGER_CURRENCY',
+  'REAL_CURRENCY',
+]);
+
 function extRef(value: string): Json {
   return { type: 'ExternalReference', keys: [{ type: 'GlobalReference', value }] };
 }
@@ -149,7 +163,31 @@ export function buildConceptDescriptions(doc: AasDoc, resolver: ConceptResolver)
     content['definition'] = info.definition as unknown as Json;
     if (info.shortName?.length) content['shortName'] = info.shortName as unknown as Json;
     if (info.unit) content['unit'] = info.unit;
-    if (info.dataType) content['dataType'] = info.dataType;
+
+    /**
+     * 측정·통화형인데 단위를 모르면 **자료형을 빼고 내보낸다** (AASc-3a-009).
+     *
+     * 자료형만 실으면 규격 위반이라 받는 쪽이 파일 전체를 거부한다 — 개념 하나 때문에
+     * 모델이 통째로 막히는 것이 가장 나쁘다. 이름과 정의는 그대로 나가므로 뜻은 전해진다.
+     *
+     * 지어낸 단위를 붙이지는 않는다. 대신 CD-002로 무엇을 뺐는지 말한다 —
+     * 조용히 빼면 왜 자료형이 없는지 알 방법이 없다.
+     */
+    if (info.dataType && UNIT_REQUIRED.has(info.dataType) && !info.unit) {
+      unresolved.push({
+        code: 'CD-002',
+        layer: 'dictionary',
+        severity: 'warn',
+        node,
+        path: semanticId,
+        message: {
+          ko: `자료형이 ${info.dataType}인데 단위가 없어 자료형을 빼고 내보냅니다 (AASc-3a-009). 용어집에서 단위를 채우십시오.`,
+          en: `Data type ${info.dataType} requires a unit; the data type is omitted from the export (AASc-3a-009). Fill in the unit in the glossary.`,
+        },
+      });
+    } else if (info.dataType) {
+      content['dataType'] = info.dataType;
+    }
 
     cds.push({
       id: semanticId,

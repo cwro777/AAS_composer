@@ -160,4 +160,62 @@ describe('Environment에 붙이기', () => {
     const env = serialize(docWith([UNKNOWN]));
     expect(attachConceptDescriptions(env, [])).not.toHaveProperty('conceptDescriptions');
   });
+
+  /**
+   * 사람이 `개념 등록`에서 자료형만 고르고 단위를 비워 두면 여기로 온다.
+   * 자료형을 그대로 실으면 AASc-3a-009 위반이라 받는 쪽이 **파일 전체를 거부한다.**
+   */
+  describe('AASc-3a-009 — 측정형에는 단위가 있어야 한다', () => {
+    const NOUNIT = 'https://bnb.co.kr/ids/cd/ToolWearRate/1/0';
+    const noUnit: ConceptResolver = {
+      resolve: (id) =>
+        id === NOUNIT
+          ? {
+              preferredName: [{ language: 'en', text: 'Tool wear rate' }],
+              definition: [{ language: 'en', text: 'Wear of the tool per 1000 shots.' }],
+              dataType: 'REAL_MEASURE',
+            }
+          : undefined,
+    };
+
+    it('단위를 모르면 자료형을 빼고 내보내 규격을 지킨다', () => {
+      const doc = docWith([NOUNIT]);
+      const { conceptDescriptions } = buildConceptDescriptions(doc, noUnit);
+      expect(conceptDescriptions).toHaveLength(1);
+
+      const spec = (
+        (conceptDescriptions[0] as Record<string, unknown>)[
+          'embeddedDataSpecifications'
+        ] as Array<Record<string, unknown>>
+      )[0]!;
+      const content = spec['dataSpecificationContent'] as Record<string, unknown>;
+      expect(content).not.toHaveProperty('dataType');
+      expect(content['definition']).toBeDefined();
+
+      const r = verifyEnvironment(attachConceptDescriptions(serialize(doc), conceptDescriptions));
+      expect(r.issues.map((i) => i.code)).toEqual([]);
+    });
+
+    it('무엇을 뺐는지 말한다 — 조용히 빼지 않는다', () => {
+      const { unresolved } = buildConceptDescriptions(docWith([NOUNIT]), noUnit);
+      expect(unresolved.map((i) => i.code)).toEqual(['CD-002']);
+      expect(unresolved[0]!.message.ko).toContain('단위');
+    });
+
+    it('단위가 있으면 자료형을 그대로 싣는다', () => {
+      const { conceptDescriptions, unresolved } = buildConceptDescriptions(
+        docWith([TEMP]),
+        resolver,
+      );
+      const spec = (
+        (conceptDescriptions[0] as Record<string, unknown>)[
+          'embeddedDataSpecifications'
+        ] as Array<Record<string, unknown>>
+      )[0]!;
+      const content = spec['dataSpecificationContent'] as Record<string, unknown>;
+      expect(content['dataType']).toBe('REAL_MEASURE');
+      expect(content['unit']).toBe('°C');
+      expect(unresolved).toEqual([]);
+    });
+  });
 });
