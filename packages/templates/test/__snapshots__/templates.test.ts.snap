@@ -2608,7 +2608,7 @@ exports[`IDTA 템플릿 > local-operational > 출력 JSON 골든 1`] = `
         "keys": [
           {
             "type": "GlobalReference",
-            "value": "https://admin-shell.io/idta/OperationalData/1/0",
+            "value": "https://bnb.co.kr/ids/cd/OperationalData/1/0",
           },
         ],
         "type": "ExternalReference",

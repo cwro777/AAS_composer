@@ -346,11 +346,11 @@
         "가동데이터"
       ],
       "nameEn": "Machine operational data",
-      "semanticId": "https://bnb.co.kr/ids/cd/MachineOperationalData/1/0",
+      "semanticId": "https://bnb.co.kr/ids/cd/OperationalData/1/0",
       "dataType": "STRING",
       "origin": "local",
       "verified": "none",
-      "provenance": "사내 정의 — 서브모델 수준 개념. docs/samples/AAS1-clean.json이 이것을 쓴다",
+      "provenance": "사내 정의 — 서브모델 수준 개념. Operational Data 템플릿과 docs/samples/AAS1-clean.json이 이것을 쓴다",
       "definition": "Submodel grouping the operational readings of a machine, such as power, cycle time and machine state."
     }
   ]

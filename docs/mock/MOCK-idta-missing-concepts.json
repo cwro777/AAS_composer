@@ -3,7 +3,7 @@
     "ko": "가정: 이 IRI들의 개념 정의가 있다고 친다. 실제로는 없다.",
     "en": "ASSUMPTION: pretend a ConceptDescription exists for these IRIs. In reality none was ever published.",
     "warning": "eCl@ss mock과 전제가 다르다. 그쪽은 정의가 실재하는데 라이선스가 없어 못 볼 뿐이고, 이쪽은 IDTA·OPC Foundation이 IRI만 쓰고 정의를 발행하지 않았다. 즉 여기 적힌 문장은 대조할 원본조차 없는 우리 창작이다. 남의 네임스페이스이므로 더 위험하다. 개발·시연 전용.",
-    "entries": 13
+    "entries": 12
   },
   "assetAdministrationShells": [],
   "submodels": [],
@@ -238,53 +238,6 @@
               {
                 "language": "en",
                 "text": "Submodel carrying the product and transport carbon footprint of the asset."
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "modelType": "ConceptDescription",
-      "id": "https://admin-shell.io/idta/OperationalData/1/0",
-      "idShort": "OperationalData",
-      "description": [
-        {
-          "language": "en",
-          "text": "MOCK DATA — invented by us. IDTA/OPC Foundation never published a ConceptDescription for this IRI. Do not ship."
-        },
-        {
-          "language": "ko",
-          "text": "MOCK 데이터 — 우리가 지어낸 값이다. 이 IRI의 개념 정의는 어디에도 발행된 적이 없다. 외부로 내보내지 말 것."
-        }
-      ],
-      "embeddedDataSpecifications": [
-        {
-          "dataSpecification": {
-            "type": "ExternalReference",
-            "keys": [
-              {
-                "type": "GlobalReference",
-                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
-              }
-            ]
-          },
-          "dataSpecificationContent": {
-            "modelType": "DataSpecificationIec61360",
-            "preferredName": [
-              {
-                "language": "en",
-                "text": "Operational data"
-              },
-              {
-                "language": "ko",
-                "text": "운전 데이터"
-              }
-            ],
-            "definition": [
-              {
-                "language": "en",
-                "text": "Submodel carrying the operational readings of the asset during production."
               }
             ]
           }
