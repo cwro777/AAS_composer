@@ -301,6 +301,41 @@ pnpm --filter @aas/api exec tsx scripts/dict-seed.ts ../../docs/mock/MOCK-eclass
 라이선스가 실제로 생기면 이 파일을 **지우고** 정식 내보내기로 갈아 끼운다.
 파일 이름과 `_MOCK` 블록은 그때 무엇을 버려야 하는지 알아보라고 있는 것이다.
 
+### mock이 하나 더 있다 — 전제가 다르므로 파일을 나눴다
+
+```
+docs/mock/MOCK-idta-missing-concepts.json    13건
+```
+
+> **가정: 이 IRI들의 개념 정의가 있다고 친다. 실제로는 없다.**
+
+**eCl@ss mock과 전제가 다르다.** 그쪽은 정의가 **실재하는데 라이선스가 없어 못 보는** 것이고,
+이쪽은 IDTA와 OPC Foundation이 **IRI만 쓰고 정의를 발행하지 않은** 것이다.
+즉 여기 적힌 문장은 대조할 원본조차 없는 **우리 창작**이고, 게다가 **남의 네임스페이스**다.
+그래서 더 위험하다 — 실수로 내보내면 IDTA가 정의한 것처럼 보인다.
+
+담긴 것은 템플릿 9종이 쓰는데 아무도 정의하지 않은 IRI들이다.
+
+```
+admin-shell.io/idta/nameplate/3/0/Nameplate
+admin-shell.io/zvei/nameplate/1/0/ContactInformations/AddressInformation
+admin-shell.io/idta/TimeSeries/1/1 · …/TimeSeries/UtcTime/1/1
+admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0
+admin-shell.io/idta/OperationalData/1/0
+admin-shell.io/idta/HierarchicalStructures/…            (5건)
+opcfoundation.org/UA/WoT-Binding/…                       (2건)
+```
+
+둘 다 심으면 **템플릿 9종의 CD-001이 전부 0이 된다.** 확인은 이것으로 한다.
+
+```
+pnpm --filter @aas/api exec tsx scripts/audit-templates.ts --dict
+```
+
+**실무 모델에는 쓰지 마라.** 시연과 화면 확인 전용이다. 정식 정의가 필요하면
+회사가 자체 정의를 정해 용어집에 넣되, 그것이 IDTA의 정의가 아니라는 것을
+`provenance`에 남긴다.
+
 ---
 
 ## 5. 개념 등록 템플릿
