@@ -180,7 +180,7 @@ export function ConceptForm(): React.JSX.Element | null {
         <label>
           <span>자료형</span>
           <select value={draft.dataType} onChange={(e) => patch({ dataType: e.target.value })}>
-            {draft.dataType ? null : <option value="">(없음)</option>}
+            <option value="">(없음 — 묶음·서브모델 개념)</option>
             {types.map((d) => (
               <option key={d} value={d}>
                 {d}

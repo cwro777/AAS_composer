@@ -15,6 +15,7 @@
 
 import { create } from 'zustand';
 
+import { type AasDoc, type NodeId, subtreeOf } from '@aas/kernel';
 import { SAMPLE_TERMS, type TermBook, type TermEntry, mergeBooks } from '@aas/semantic';
 
 import { lookupConcepts } from './api';
@@ -170,6 +171,130 @@ export function entryFromDict(d: {
     verified: 'dict',
     provenance: `사전에서 받음${d.origin ? ` (${d.origin})` : ''}`,
   };
+}
+
+function langText(v: unknown, lang: string): string {
+  if (!Array.isArray(v)) return '';
+  for (const t of v as Array<{ language?: unknown; text?: unknown }>) {
+    if (typeof t?.language === 'string' && t.language.toLowerCase().startsWith(lang)) {
+      const s = text(t.text);
+      if (s) return s;
+    }
+  }
+  return '';
+}
+
+/**
+ * 파일에 실려 온 ConceptDescription 하나를 용어집 항목으로.
+ *
+ * 규격이 요구하는 영문 이름·정의가 없으면 만들지 않는다(가져오기와 같은 기준).
+ * 내용은 **파일에 적힌 그대로** 옮긴다 — 오타나 틀린 한글 이름이 있어도 고치지 않는다.
+ * 용어집 탭에 올라오면 사람이 보고 `고치기`로 바로잡는다.
+ */
+export function entryFromConceptDescription(cd: unknown, iriPrefix: string): TermEntry | null {
+  const o = cd as { id?: unknown; embeddedDataSpecifications?: unknown } | null;
+  const id = text(o?.id);
+  if (!id || !Array.isArray(o?.embeddedDataSpecifications)) return null;
+  const content = (o.embeddedDataSpecifications as Array<{ dataSpecificationContent?: Record<string, unknown> }>)
+    .map((s) => s?.dataSpecificationContent)
+    .find((c) => c?.['modelType'] === 'DataSpecificationIec61360');
+  if (!content) return null;
+
+  const nameEn = langText(content['preferredName'], 'en');
+  const definition = langText(content['definition'], 'en');
+  if (!nameEn || !definition) return null;
+
+  return {
+    term: langText(content['preferredName'], 'ko') || nameEn,
+    nameEn,
+    semanticId: id,
+    definition,
+    ...(text(content['unit']) ? { unit: text(content['unit']) } : {}),
+    ...(text(content['dataType']) ? { dataType: text(content['dataType']) } : {}),
+    origin: iriPrefix && id.startsWith(iriPrefix) ? 'local' : 'idta',
+    verified: 'none',
+    provenance: '모델 파일에 실려 있던 ConceptDescription에서 옮김',
+  };
+}
+
+export interface ModelImportPlan {
+  /** 용어집에 넣을 것 */
+  entries: TermEntry[];
+  /** 살펴본 semanticId 수 */
+  seen: number;
+  /** 이미 사내 용어집에 있다 */
+  already: number;
+  /** 샘플 용어집이 이미 뜻까지 안다 — 옮기면 같은 것이 두 벌이 된다 */
+  inSample: number;
+  /** 파일에 개념은 있는데 영문 이름·정의가 없어 못 옮긴다 */
+  noDefinition: number;
+  /** 용어집·사전·파일 어디에도 없다 — 검증 탭의 CD-001로 등록한다 */
+  unknown: string[];
+  /** 넣을 것 중 mock 시드에서 온 것 */
+  mock: number;
+}
+
+/**
+ * 모델(또는 선택한 요소 아래)에서 쓰는 개념을 용어집에 옮길 계획.
+ *
+ * 파일이 싣고 온 개념과 사전이 답한 개념은 **검증을 통과시키지만 용어집에는 없다.**
+ * 그래서 용어집 탭에 보이지 않고, 고칠 수도, 회사 용어집으로 내보낼 수도 없었다.
+ *
+ * 어디서 가져오나 — 내보내기와 같은 순서다(같은 id면 사전 답이 파일 개념을 이긴다):
+ *   사전 층의 답 → 파일의 ConceptDescription. 샘플이 이미 아는 것은 옮기지 않는다.
+ */
+export function planModelImport(
+  doc: AasDoc,
+  root: NodeId | null,
+  iriPrefix: string,
+  state: { entries: TermEntry[]; dict: TermEntry[] },
+): ModelImportPlan {
+  const nodes = root && doc.nodes[root] ? subtreeOf(doc, root) : Object.keys(doc.nodes);
+  const ids = new Set<string>();
+  for (const n of nodes) {
+    const node = doc.nodes[n] as { semanticId?: string; semanticIdListElement?: string } | undefined;
+    if (node?.semanticId) ids.add(node.semanticId);
+    if (node?.semanticIdListElement) ids.add(node.semanticIdListElement);
+  }
+
+  const mine = new Set(state.entries.map((e) => e.semanticId));
+  const dict = new Map(state.dict.map((e) => [e.semanticId, e]));
+  const sample = new Map(SAMPLE_TERMS.terms.map((e) => [e.semanticId, e]));
+  const carried = new Map<string, unknown>();
+  const rawList = doc.raw?.['conceptDescriptions'];
+  if (Array.isArray(rawList)) {
+    for (const cd of rawList) {
+      const id = text((cd as { id?: unknown } | null)?.id);
+      if (id) carried.set(id, cd);
+    }
+  }
+
+  const plan: ModelImportPlan = { entries: [], seen: ids.size, already: 0, inSample: 0, noDefinition: 0, unknown: [], mock: 0 };
+  for (const id of ids) {
+    if (mine.has(id)) {
+      plan.already += 1;
+      continue;
+    }
+    const d = dict.get(id);
+    if (d) {
+      plan.entries.push(d);
+      if (/mock/i.test(d.provenance ?? '')) plan.mock += 1;
+      continue;
+    }
+    const s = sample.get(id);
+    if (s?.nameEn && s.definition) {
+      plan.inSample += 1;
+      continue;
+    }
+    if (carried.has(id)) {
+      const e = entryFromConceptDescription(carried.get(id), iriPrefix);
+      if (e) plan.entries.push(e);
+      else plan.noDefinition += 1;
+      continue;
+    }
+    plan.unknown.push(id);
+  }
+  return plan;
 }
 
 /** 이 목록에 있는 id는 이번 세션에 이미 물어봤다 — 답이 없던 것도 다시 묻지 않는다 */

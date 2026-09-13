@@ -18,7 +18,7 @@ import { type TermEntry, formatSemanticId, parseSemanticId } from '@aas/semantic
 import { downloadText } from '../lib/persist';
 import { useSettings } from '../lib/settings';
 import { useEditor } from '../lib/store';
-import { entriesFromFile, useTerms } from '../lib/terms';
+import { entriesFromFile, planModelImport, useTerms } from '../lib/terms';
 
 /** 단위가 있어야 하는 자료형 (AASc-3a-009) — 커널의 UNIT_REQUIRED와 같은 목록이다 */
 const UNIT_REQUIRED = new Set([
@@ -47,6 +47,10 @@ export function TermsPane(): React.JSX.Element {
   const dict = useTerms((s) => s.dict);
   const remove = useTerms((s) => s.remove);
   const openDraft = useTerms((s) => s.openDraft);
+  const doc = useEditor((s) => s.doc);
+  const selected = useEditor((s) => s.selected);
+  const selectedName = selected ? doc.nodes[selected]?.idShort || null : null;
+  const scopeLabel = selectedName ? `${selectedName} 아래` : '모델 전체';
   const iriPrefix = useSettings((s) => s.iriPrefix);
   const notify = useEditor((s) => s.notify);
   const [q, setQ] = useState('');
@@ -73,6 +77,8 @@ export function TermsPane(): React.JSX.Element {
     (mine.has(t.semanticId) && t.origin === 'local');
 
   const originOf = (t: TermEntry): { cls: string; label: string } => {
+    /* 용어집에 옮겨 담아도 mock은 mock이다 — 표시가 사라지면 진짜 정의와 구별할 수 없다 */
+    if (/mock/i.test(t.provenance ?? '')) return { cls: 'mock', label: 'mock' };
     if (mine.has(t.semanticId)) return { cls: 'local', label: '사내' };
     if (fromDict.has(t.semanticId)) {
       return /mock/i.test(t.provenance ?? '')
@@ -100,6 +106,23 @@ export function TermsPane(): React.JSX.Element {
   }, [book, q, onlyBad, mine]);
 
   const badCount = useMemo(() => book.terms.filter((t) => problemOf(t)).length, [book]);
+
+  const importFromModel = (): void => {
+    const s = useTerms.getState();
+    const plan = planModelImport(doc, selected, iriPrefix, { entries: s.entries, dict: s.dict });
+    const added = plan.entries.length ? s.addMany(plan.entries) : 0;
+    const parts = [
+      plan.already ? `이미 용어집 ${plan.already}` : '',
+      plan.inSample ? `샘플에 있음 ${plan.inSample}` : '',
+      plan.noDefinition ? `영문 이름·정의 없어 못 옮김 ${plan.noDefinition}` : '',
+      plan.unknown.length ? `아무도 모름 ${plan.unknown.length} (검증 탭 CD-001로 등록)` : '',
+    ].filter(Boolean);
+    notify(
+      `${scopeLabel}: 개념 ${plan.seen}건 중 ${added}건을 용어집에 넣었습니다.` +
+        (plan.mock ? ` 그중 mock ${plan.mock}건 — 진짜 정의가 아닙니다.` : '') +
+        (parts.length ? ` (${parts.join(' · ')})` : ''),
+    );
+  };
 
   const importFile = (file: File): void => {
     void file
@@ -136,6 +159,15 @@ export function TermsPane(): React.JSX.Element {
           고칠 것만 ({badCount})
         </label>
         <span className="grow" />
+        <button
+          type="button"
+          className="mini"
+          disabled={Object.keys(doc.nodes).length === 0}
+          title={`${scopeLabel}에서 쓰는 개념 중 용어집에 없는 것을 옮깁니다 — 파일에 실려 온 개념과 사전이 답한 개념. 트리에서 요소를 고르면 그 아래만 옮깁니다.`}
+          onClick={importFromModel}
+        >
+          {selectedName ? `${selectedName}에서 가져오기` : '모델에서 가져오기'}
+        </button>
         <button type="button" className="mini" onClick={() => fileRef.current?.click()}>
           가져오기
         </button>

@@ -347,9 +347,11 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
               nameEn: humanize(name),
               definition: '',
               unit: '',
-              dataType: dataTypeFor(
-                holder && holder.t === 'prop' ? holder.valueType : undefined,
-              ),
+              /* 값을 담는 요소만 자료형이 있다. 컬렉션·서브모델 개념에 STRING을 붙이면 틀린 정보다 */
+              dataType:
+                holder && (holder.t === 'prop' || holder.t === 'range')
+                  ? dataTypeFor(holder.valueType)
+                  : '',
             }),
         };
       }
