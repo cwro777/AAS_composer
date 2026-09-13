@@ -197,7 +197,7 @@ IEC 기술위원회가 표준화 절차로 관리한다. 새 개념은 국가위
 |---|---|---|
 | ① | 검증 탭의 `사전에서 채우기` | IDTA 공식 템플릿에 CD가 있는 개념 |
 | ② | **자체 발행 + 용어집 등록** | 표준에 없는 사내 개념 |
-| ③ | `dict-seed`에 회사 사전 파일 추가 | 회사가 이미 가진 사전이 있을 때 |
+| ③ | `dict-seed`에 파일 추가 | 회사 사전, 사람이 CDD에서 옮겨 적은 개념 (아래 "IEC CDD 개념을 사람이 옮겨 넣는다") |
 
 ### ① 사전에서 채우기
 
@@ -264,6 +264,81 @@ pnpm --filter @aas/api exec tsx scripts/dict-seed.ts ../../docs/idta/*.json
 
 `GET /dictionary/status`가 `{"cached":0}`이면 시드가 안 된 것이다.
 `scripts\aas`도 이 경우를 감지해 경고한다.
+
+### IEC CDD 개념을 사람이 옮겨 넣는다
+
+`cdd.iec.ch`는 프로그램 접근만 막고 **브라우저로는 열린다.** 그래서 CDD 개념은 사람이 화면에서
+옮겨 적은 파일로 넣는다. `dict-seed`는 파일 모양을 보고 알아서 읽는다 — Environment JSON
+(`conceptDescriptions`)이면 IDTA 템플릿처럼, `{ "terms": [...] }`이면 용어 파일로.
+
+**먼저 이미 있는지 본다.** IDTA 템플릿에 들어 있는 CDD 개념은 `docs/idta/*.json` 시드로
+**이미 사전에 있다** — IDTA가 CDD의 이름·정의를 템플릿에 실어 두었다. 실측: Nameplate의
+IEC CDD IRDI 14건 중 13건이 사전에 있었고, 없던 1건(`61360_7#AAS002#001`)은 보조 식별자라
+CD-001을 내지 않는다. **옮겨 적을 대상은 템플릿 밖에서 직접 붙인 CDD IRDI뿐이다.**
+
+```
+POST http://localhost:8787/dictionary/lookup   { "ids": ["0112/2///61987#ABA951#009"] }
+```
+
+`missing`에 나오는 것만 옮긴다.
+
+**1. 양식을 복사한다** — `docs/dict/TEMPLATE-cdd-concepts.json`을 `docs/dict/cdd-concepts.json`
+같은 이름으로 복사한다. 항목은 필요한 만큼 늘린다.
+
+**2. CDD 화면에서 옮긴다** — 영문 용어로 검색해 Property를 열고:
+
+| CDD 화면 | 파일 칸 | 주의 |
+|---|---|---|
+| IRDI | `semanticId` | **버전 접미사(`#009`)까지** 그대로. 빠지면 시드가 받지 않는다 |
+| Preferred name | `nameEn` | 필수 (AASc-3a-002) |
+| Definition | `definition` | 필수 (AASc-3a-008). **요약하거나 고치지 않는다** |
+| Unit | `unit` | 있을 때만. 기호 그대로 (`mm`, `°C`) |
+| Data type | `dataType` | IEC 61360 자료형 (`STRING`, `REAL_MEASURE` …) |
+| — | `term`, `aliases` | 한글 용어·별칭. 인스펙터 `한글 용어로 찾기`가 이것으로 찾는다 |
+| — | `provenance` | 언제 어디서 옮겼는지. CDD 버전이 바뀌면 대조할 근거다 |
+
+```json
+{
+  "terms": [
+    {
+      "semanticId": "0112/2///61987#ABC123#001",
+      "term": "정격전압",
+      "aliases": ["정격 전압"],
+      "nameEn": "(CDD의 Preferred name 그대로)",
+      "definition": "(CDD의 Definition 그대로)",
+      "unit": "V",
+      "dataType": "REAL_MEASURE",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "cdd.iec.ch에서 옮겨 적음 (2026-09-13 확인)"
+    }
+  ]
+}
+```
+
+(위 IRDI와 괄호 안 문구는 자리표시다. 그대로 넣지 않는다.)
+
+**3. 넣는다** — 둘 중 하나.
+
+| 방법 | 명령·위치 | 범위 |
+|---|---|---|
+| 서버 사전 | `pnpm --filter @aas/api exec tsx scripts/dict-seed.ts ../../docs/dict/cdd-concepts.json` | 서버를 쓰는 모든 사람. 에디터가 자동 조회로 받는다 |
+| 이 브라우저만 | 용어집 탭 → `가져오기` | 이 브라우저 |
+
+시드는 받지 못한 항목을 **이유와 함께** 찍는다.
+
+```
+cdd-concepts.json   용어 파일 · 개념 12건 · 한글 용어 12건 · 건너뜀 2건
+                    [3] 0112/2///61987#ABA951 — 식별자 모양을 알아보지 못했습니다 (IRDI 버전 접미사 #009 등을 확인)
+                    [7] 0112/2///61987#ABB100#002 — 영문 정의(definition)가 비었습니다 — AASc-3a-008
+```
+
+받는 기준은 웹의 `가져오기`와 같다 — 어디로 넣든 같은 파일이 같은 결과를 낸다.
+같은 IRDI를 다시 넣으면 덮어쓰므로, 고친 파일을 다시 돌리면 된다.
+
+**4. 확인한다** — 에디터를 새로고침하면 그 IRDI의 `CD-001`이 사라지고 용어집 탭에 `사전`으로 뜬다.
+
+CDD 내용을 회사 파일로 옮겨 배포하기 전에 IEC CDD 이용 조건을 확인한다.
 
 ### eCl@ss는 풀리지 않는다
 

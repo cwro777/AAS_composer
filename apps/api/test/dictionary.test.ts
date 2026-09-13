@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { SAMPLE_TERMS } from '@aas/semantic';
 
 import { createApp } from '../src/app.js';
-import { entriesFromEnvironment, entriesFromTermBook } from '../src/dict/harvest.js';
+import { entriesFromEnvironment, entriesFromTermBook, entriesFromTermsFile } from '../src/dict/harvest.js';
 import { createDictionary } from '../src/dict/service.js';
 import { type DictEntry, createMemoryDictStore } from '../src/dict/store.js';
 import { createMemoryStore } from '../src/store.js';
@@ -89,6 +89,52 @@ describe('사내 용어집에서 씨앗 긁기', () => {
     expect(entries.length).toBe(SAMPLE_TERMS.terms.length);
     expect(terms.some((t) => t.term === '형체력')).toBe(true);
     expect(terms.some((t) => t.term === '클램핑포스' && t.note === '별칭')).toBe(true);
+  });
+});
+
+/**
+ * 용어 파일 — IEC CDD 화면에서 사람이 옮겨 적은 개념, 회사 용어집, 에디터 내보내기.
+ * 받는 기준이 웹의 가져오기와 같아야 한다. 서버는 받고 웹은 버리면(또는 반대) 같은 파일이
+ * 어디서 넣느냐에 따라 다른 결과를 낸다.
+ */
+describe('용어 파일에서 씨앗 긁기', () => {
+  const file = {
+    terms: [
+      {
+        semanticId: '0112/2///61987#ABA951#009',
+        term: '시리얼번호',
+        aliases: ['S/N'],
+        nameEn: 'serial number',
+        definition: 'Unique combination of numbers and letters used to identify the device.',
+        dataType: 'STRING',
+        provenance: 'cdd.iec.ch에서 옮겨 적음',
+      },
+      { semanticId: '0112/2///61987#ABA565#009', term: '제조사명', nameEn: '', definition: '' },
+      { semanticId: '0112/2///61987#ABA951', term: '버전 빠짐', nameEn: 'x', definition: 'x' },
+      { term: 'id 없음', nameEn: 'x', definition: 'x' },
+    ],
+  };
+
+  it('영문 이름·정의가 있는 것만 받고, 못 받은 이유를 남긴다', () => {
+    const r = entriesFromTermsFile(file, 'terms:cdd.json');
+    expect(r.entries.map((e) => e.irdi)).toEqual(['0112/2///61987#ABA951#009']);
+    expect(r.entries[0]).toMatchObject({ scheme: 'iec-cdd', source: '61987', nameKo: '시리얼번호', origin: 'terms:cdd.json' });
+    expect(r.skipped.map((s) => s.index)).toEqual([1, 2, 3]);
+    expect(r.skipped[0]!.reason).toContain('AASc-3a-002');
+    expect(r.skipped[1]!.reason).toContain('버전');
+  });
+
+  it('한글 용어와 별칭이 링크된다 — 한글로 찾힌다', async () => {
+    const store = createMemoryDictStore();
+    const dict = createDictionary(store);
+    const r = entriesFromTermsFile(file.terms, 'terms:cdd.json');
+    await dict.importEntries(r.entries, r.terms);
+    expect((await dict.lookup('0112/2///61987#ABA951#009')).entry?.definition).toContain('identify');
+    expect((await dict.search('S/N', 3)).entries[0]?.irdi).toBe('0112/2///61987#ABA951#009');
+  });
+
+  it('모양이 틀리면 알아볼 수 있게 거절한다', () => {
+    expect(() => entriesFromTermsFile({ foo: 1 }, 'x')).toThrow('terms');
   });
 });
 

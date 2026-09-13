@@ -1,0 +1,17 @@
+{
+  "note": "빈칸 양식이다. cdd.iec.ch에서 IRDI를 열어 Preferred name → nameEn, Definition → definition, Unit → unit, Data type → dataType을 그대로 옮기고 provenance에 확인 날짜를 적는다. 필요한 만큼 항목을 복사해 늘린다. semanticId·nameEn·definition 중 하나라도 빈 항목은 시드와 가져오기가 건너뛴다. 채운 파일은 이름을 바꿔 저장한다(예: docs/dict/cdd-concepts.json). 넣기 전에 사전 조회로 이미 있는지 먼저 본다 — IDTA 템플릿에 들어 있는 CDD 개념은 이미 사전에 있다.",
+  "terms": [
+    {
+      "semanticId": "",
+      "term": "",
+      "aliases": [],
+      "nameEn": "",
+      "definition": "",
+      "unit": "",
+      "dataType": "",
+      "origin": "idta",
+      "verified": "spec",
+      "provenance": "cdd.iec.ch에서 옮겨 적음 (YYYY-MM-DD 확인)"
+    }
+  ]
+}
