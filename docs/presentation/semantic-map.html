@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>semanticId 개념 지도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #e9ecf1;
+  --frame: #ffffff;
+  --panel: #f3f6f9;
+  --panel-2: #e7ecf2;
+  --line: #c6d0dc;
+  --line-soft: #dee4ec;
+  --ink: #111823;
+  --ink-2: #4c596a;
+  --ink-3: #6f7c8d;
+  --accent: #a85400;
+  --accent-soft: #f5e5d2;
+  --cdd: #1c6aac;
+  --cdd-soft: #dde9f5;
+  --eclass: #9a3a70;
+  --eclass-soft: #f2e0ea;
+  --idta: #0c7370;
+  --idta-soft: #d9eeec;
+  --own: #a85400;
+  --own-soft: #f5e5d2;
+  --ok: #1b7350;
+  --ok-bg: #dcf0e6;
+  --warn: #7f5900;
+  --warn-bg: #f7ebcf;
+  --err: #a82920;
+  --err-bg: #f7dedb;
+  --sans: 'IBM Plex Sans KR', 'IBM Plex Sans', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f131a; --frame: #161c24; --panel: #1c232d; --panel-2: #232b36;
+    --line: #2f3a48; --line-soft: #242d38;
+    --ink: #dbe3ec; --ink-2: #a2aebd; --ink-3: #7c8a9b;
+    --accent: #e59a3e; --accent-soft: #33250f;
+    --cdd: #6aaae3; --cdd-soft: #172b3f; --eclass: #df86b8; --eclass-soft: #36182a;
+    --idta: #4cc0ba; --idta-soft: #10302e; --own: #e59a3e; --own-soft: #33250f;
+    --ok: #4fc08d; --ok-bg: #12291f; --warn: #deb24c; --warn-bg: #2c2410; --err: #ee857c; --err-bg: #2e1614;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f131a; --frame: #161c24; --panel: #1c232d; --panel-2: #232b36;
+  --line: #2f3a48; --line-soft: #242d38;
+  --ink: #dbe3ec; --ink-2: #a2aebd; --ink-3: #7c8a9b;
+  --accent: #e59a3e; --accent-soft: #33250f;
+  --cdd: #6aaae3; --cdd-soft: #172b3f; --eclass: #df86b8; --eclass-soft: #36182a;
+  --idta: #4cc0ba; --idta-soft: #10302e; --own: #e59a3e; --own-soft: #33250f;
+  --ok: #4fc08d; --ok-bg: #12291f; --warn: #deb24c; --warn-bg: #2c2410; --err: #ee857c; --err-bg: #2e1614;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+code, .mono { font-family: var(--mono); font-size: 0.92em; word-break: normal; overflow-wrap: anywhere; }
+h1, h2, h3 { text-wrap: balance; margin: 0; line-height: 1.25; }
+p { margin: 0; }
+
+.deck {
+  display: grid;
+  gap: 28px;
+  padding: 28px 20px 96px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.slide {
+  position: relative;
+  background: var(--frame);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  min-height: min(675px, calc((100vw - 40px) * 0.5625));
+  padding: 44px 56px 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  scroll-margin-top: 20px;
+}
+.slide > .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+}
+.slide > .meta b { color: var(--accent); font-weight: 600; }
+.slide h2 { font-size: 34px; font-weight: 700; letter-spacing: -0.01em; }
+.slide h2 .en { display: block; font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--ink-3); letter-spacing: 0.02em; margin-top: 6px; }
+.lede { font-size: 18px; color: var(--ink-2); max-width: 64ch; }
+.grow { flex: 1; }
+.foot {
+  position: absolute; left: 56px; right: 56px; bottom: 18px;
+  font-size: 12px; color: var(--ink-3);
+  display: flex; justify-content: space-between; gap: 16px;
+}
+
+/* 표지 */
+.cover { justify-content: space-between; background:
+  linear-gradient(var(--frame), var(--frame)) padding-box; }
+.cover h1 { font-size: clamp(38px, 5.4vw, 64px); font-weight: 700; letter-spacing: -0.02em; max-width: 22ch; }
+.cover h1 em { font-style: normal; color: var(--accent); font-family: var(--mono); font-weight: 600; letter-spacing: -0.03em; }
+.cover .sub { font-size: 19px; color: var(--ink-2); max-width: 56ch; }
+.cover .strip {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0;
+  border-top: 1px solid var(--line);
+}
+.cover .strip div { padding: 14px 16px 0 0; display: grid; gap: 4px; }
+.cover .strip span { font-size: 12.5px; letter-spacing: 0.02em; color: var(--ink-2); font-weight: 600; }
+.cover .strip code { font-size: 13px; color: var(--ink); overflow-wrap: anywhere; }
+.fam-cdd { --fam: var(--cdd); --fam-soft: var(--cdd-soft); }
+.fam-eclass { --fam: var(--eclass); --fam-soft: var(--eclass-soft); }
+.fam-idta { --fam: var(--idta); --fam-soft: var(--idta-soft); }
+.fam-own { --fam: var(--own); --fam-soft: var(--own-soft); }
+.cover .strip div { border-top: 3px solid var(--fam); margin-top: -2px; }
+
+/* 값과 뜻 */
+.pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.25fr); gap: 22px; align-items: center; }
+.el {
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--panel);
+  padding: 18px 20px; display: grid; gap: 10px;
+}
+.el .kind { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: 0.04em; }
+.el .row { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 10px; font-size: 14px; align-items: baseline; }
+.el .row > span:first-child { color: var(--ink-3); font-family: var(--mono); font-size: 12.5px; }
+.el .row code { overflow-wrap: anywhere; }
+.el .big { font-family: var(--mono); font-size: 44px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
+.el.cd { border-color: var(--accent); background: var(--frame); }
+.arrow { font-family: var(--mono); color: var(--accent); font-size: 13px; text-align: center; display: grid; gap: 4px; justify-items: center; }
+.arrow i { display: block; width: 64px; height: 2px; background: var(--accent); position: relative; }
+.arrow i::after { content: ""; position: absolute; right: -1px; top: -4px; border: 5px solid transparent; border-left: 7px solid var(--accent); border-right: 0; }
+.callouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.callouts > div { display: grid; gap: 6px; align-content: start; }
+.callouts b { font-size: 15px; }
+.callouts p { font-size: 14px; color: var(--ink-2); }
+
+/* 식별자 가족 */
+.families { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.fam {
+  border: 1px solid var(--line); border-top: 4px solid var(--fam); border-radius: var(--r);
+  padding: 16px 16px 18px; display: grid; gap: 10px; align-content: start; background: var(--frame);
+}
+.fam h3 { font-size: 19px; }
+.fam .who { font-size: 13px; color: var(--ink-3); }
+.fam code.id { display: block; background: var(--fam-soft); color: var(--ink); padding: 7px 9px; border-radius: 4px; font-size: 12.5px; overflow-wrap: anywhere; }
+.fam ul { margin: 0; padding-left: 1.1em; font-size: 13.5px; color: var(--ink-2); display: grid; gap: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+  border: 1px solid currentColor; line-height: 1.5; white-space: nowrap;
+}
+.chip.ok { color: var(--ok); background: var(--ok-bg); border-color: transparent; }
+.chip.warn { color: var(--warn); background: var(--warn-bg); border-color: transparent; }
+.chip.err { color: var(--err); background: var(--err-bg); border-color: transparent; }
+.chip.plain { color: var(--ink-2); background: var(--panel); border-color: var(--line); }
+.chip.lock::before { content: "🔒 "; font-size: 11px; }
+
+/* 해부 */
+.anatomy { display: grid; gap: 30px; }
+.anat { display: grid; gap: 10px; }
+.anat .title { display: flex; gap: 10px; align-items: baseline; font-size: 14px; color: var(--ink-2); }
+.anat .title b { color: var(--fam); font-size: 15px; }
+.parts { display: flex; flex-wrap: wrap; row-gap: 12px; font-family: var(--mono); font-size: clamp(20px, 2.6vw, 32px); font-weight: 500; }
+.part { display: grid; gap: 6px; justify-items: start; }
+.part .t { padding: 0 1px; border-bottom: 3px solid var(--seg, var(--line)); line-height: 1.25; }
+.part .t.sep { border-color: transparent; color: var(--ink-3); }
+.part small { font-family: var(--sans); font-size: 12px; color: var(--ink-3); font-weight: 500; white-space: nowrap; }
+.seg-a { --seg: var(--fam); }
+.seg-b { --seg: var(--ink-3); }
+.seg-c { --seg: var(--accent); }
+.seg-d { --seg: var(--ok); }
+.anat .note { font-size: 13.5px; color: var(--ink-2); }
+
+/* 표 */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line-soft); vertical-align: top; }
+thead th { border-top: 0; background: var(--panel); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; white-space: nowrap; }
+td code { font-size: 12.5px; overflow-wrap: anywhere; }
+td.num { font-variant-numeric: tabular-nums; font-family: var(--mono); white-space: nowrap; }
+tr.own td:first-child { box-shadow: inset 3px 0 0 var(--own); }
+
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+.two-wide { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; }
+.stack { display: grid; gap: 12px; align-content: start; }
+.kv { display: grid; gap: 10px; }
+.kv > div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 12px; font-size: 14.5px; }
+.kv > div > b { font-size: 13px; color: var(--ink-3); font-weight: 600; }
+.trap {
+  border: 1px solid var(--warn); background: var(--warn-bg); border-radius: var(--r);
+  padding: 16px 18px; display: grid; gap: 8px; font-size: 14.5px;
+}
+.trap h3 { font-size: 16px; color: var(--warn); }
+.trap code { overflow-wrap: anywhere; }
+
+/* 판정 사다리 */
+.ladder { display: grid; gap: 8px; }
+.rung { display: grid; grid-template-columns: 8.5em minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--r); background: var(--frame); font-size: 14.5px; }
+.rung .src { font-size: 13px; color: var(--ink-3); }
+
+/* 용어집 층 */
+.layers { display: grid; gap: 0; }
+.layer {
+  display: grid; grid-template-columns: 5.5em minmax(0, 1fr) auto; gap: 16px; align-items: center;
+  padding: 14px 18px; border: 1px solid var(--line); background: var(--frame);
+  font-size: 14.5px;
+}
+.layer + .layer { border-top: 0; }
+.layer:first-child { border-radius: var(--r) var(--r) 0 0; }
+.layer:last-child { border-radius: 0 0 var(--r) var(--r); background: var(--accent-soft); border-color: var(--accent); }
+.layer b { font-size: 15px; }
+.layer .where { font-size: 12.5px; color: var(--ink-3); }
+.merge { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); padding: 8px 0 0; }
+
+/* 개념 등록 */
+.form {
+  border: 1px solid var(--accent); border-radius: var(--r); background: var(--frame);
+  padding: 14px 16px; display: grid; gap: 10px; align-content: start;
+}
+.form .head { display: flex; gap: 10px; align-items: baseline; }
+.form .head b { font-size: 15px; }
+.form .head code { font-size: 11.5px; color: var(--ink-3); overflow-wrap: anywhere; }
+.field { display: grid; grid-template-columns: 8em minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 13.5px; }
+.field > span:first-child { color: var(--ink-3); font-size: 12.5px; }
+.field .val { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; min-width: 0; overflow-wrap: anywhere; }
+.field .req { color: var(--err); font-size: 11.5px; font-weight: 600; }
+.unitchips { display: flex; flex-wrap: wrap; gap: 5px; padding-left: calc(8em + 10px); }
+.unitchips span { font-family: var(--mono); font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 1px 7px; background: var(--frame); }
+.unitchips span.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+pre.json {
+  margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 14px 16px; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; overflow-x: auto; color: var(--ink-2);
+}
+pre.json .k { color: var(--ink); }
+pre.json .s { color: var(--accent); }
+.map { display: grid; gap: 6px; font-size: 13.5px; }
+.map div { display: grid; grid-template-columns: minmax(0, 1fr) 1.2em minmax(0, 1.2fr); gap: 8px; align-items: baseline; }
+.map div > span:nth-child(2) { color: var(--ink-3); text-align: center; }
+.map code { overflow-wrap: anywhere; }
+
+/* 흐름 */
+.flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; align-items: stretch; }
+.step {
+  position: relative; padding: 16px 18px 16px 16px; border: 1px solid var(--line); background: var(--frame);
+  display: grid; gap: 6px; align-content: start; font-size: 13.5px;
+}
+.step + .step { border-left: 0; }
+.step:first-child { border-radius: var(--r) 0 0 var(--r); }
+.step:last-child { border-radius: 0 var(--r) var(--r) 0; background: var(--ok-bg); border-color: var(--ok); }
+.step .n { font-family: var(--mono); font-size: 12px; color: var(--accent); font-weight: 600; }
+.step b { font-size: 15px; }
+.step p { color: var(--ink-2); }
+.tally { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.tally > div { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 2px; }
+.tally .v { font-family: var(--mono); font-size: 36px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.tally .v small { font-size: 16px; color: var(--ink-3); font-weight: 500; }
+.tally p { font-size: 13.5px; color: var(--ink-2); }
+
+.rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 32px; }
+.rules > div { display: grid; gap: 6px; padding-top: 12px; border-top: 2px solid var(--ink); }
+.rules b { font-size: 18px; }
+.rules p { font-size: 14.5px; color: var(--ink-2); }
+
+.navhint {
+  position: fixed; right: 18px; bottom: 16px; z-index: 10;
+  font-family: var(--mono); font-size: 12px; color: var(--ink-2);
+  background: var(--frame); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px;
+  display: flex; gap: 10px; align-items: center;
+}
+.navhint button {
+  font: inherit; color: var(--ink); background: transparent; border: 0; cursor: pointer; padding: 0 2px;
+}
+.navhint button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+@media (max-width: 900px) {
+  .slide { padding: 30px 22px 48px; min-height: 0; }
+  .foot { left: 22px; right: 22px; }
+  .slide h2 { font-size: 26px; }
+  .families, .callouts, .tally, .flow, .rules, .cover .strip { grid-template-columns: minmax(0, 1fr); }
+  .pair, .two, .two-wide { grid-template-columns: minmax(0, 1fr); }
+  .arrow i { transform: rotate(90deg); margin: 18px 0; }
+  .step + .step { border-left: 1px solid var(--line); border-top: 0; }
+  .step:first-child, .step:last-child { border-radius: var(--r); }
+  .unitchips { padding-left: 0; }
+  .field { grid-template-columns: 6.5em minmax(0, 1fr) auto; }
+}
+@media print {
+  body { background: #fff; }
+  .deck { padding: 0; gap: 0; max-width: none; }
+  .slide { border: 0; border-radius: 0; break-after: page; min-height: 100vh; }
+  .navhint { display: none; }
+}
+</style>
+</head>
+<body>
+<main class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide cover" id="s1" aria-label="표지">
+  <div class="meta"><span><b>01</b> / 12</span><span>AAS Composer · IEC 63278 V3.0</span></div>
+  <div class="stack" style="gap:18px">
+    <h1>값 <em>0.34</em>에 뜻을 붙이는 법</h1>
+    <p class="sub">semanticId, 네 식별자 가족, IDTA 템플릿, 용어집과 개념 등록(Concept definition)이 한 흐름으로 어떻게 이어지는지 — AAS Composer에서 실제로 부딪히고 고친 것들로 정리했습니다.</p>
+  </div>
+  <div class="strip">
+    <div class="fam-cdd"><span>IEC CDD</span><code>0112/2///61987#ABA951#009</code></div>
+    <div class="fam-eclass"><span>eCl@ss · 라이선스</span><code>0173-1#02-BAA120#008</code></div>
+    <div class="fam-idta"><span>IDTA IRI</span><code>https://admin-shell.io/idta/nameplate/3/0/Nameplate</code></div>
+    <div class="fam-own"><span>사내 IRI</span><code>https://cw1.co.kr/ids/cd/Timestamp/1/0</code></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" id="s2" aria-label="값만으로는 뜻이 없다">
+  <div class="meta"><span><b>02</b> / 12</span><span>문제</span></div>
+  <h2>값만으로는 뜻이 없다<span class="en">A value is not a meaning</span></h2>
+  <div class="pair">
+    <div class="el">
+      <div class="kind">Property — 모델에 들어가는 것</div>
+      <div class="big">0.34</div>
+      <div class="row"><span>idShort</span><code>ToolWearRate</code></div>
+      <div class="row"><span>valueType</span><code>xs:double</code></div>
+      <div class="row"><span>semanticId</span><code>https://cw1.co.kr/ids/cd/ToolWearRate/1/0</code></div>
+    </div>
+    <div class="arrow"><span>가리킨다</span><i></i></div>
+    <div class="el cd">
+      <div class="kind">ConceptDescription — 뜻이 들어가는 곳 (IEC 61360)</div>
+      <div class="row"><span>preferredName</span><span>공구 마모 폭 · <em>Flank wear width</em></span></div>
+      <div class="row"><span>definition</span><span>Flank wear width VB of the cutting tool (ISO 3685).</span></div>
+      <div class="row"><span>unit</span><code>mm</code></div>
+      <div class="row"><span>dataType</span><code>REAL_MEASURE</code></div>
+    </div>
+  </div>
+  <div class="callouts">
+    <div><b>단위는 값이 아니라 개념에</b><p>값 칸에 <code>"0.34 mm"</code>를 쓰면 <code>xs:double</code>이 깨집니다. 단위는 ConceptDescription의 <code>unit</code>으로 나갑니다.</p></div>
+    <div><b>semanticId는 가리키기만 한다</b><p>뜻이 파일에 함께 실리지 않으면 받는 쪽은 <code>0.34</code>가 mm인지 %인지 알 수 없습니다 — 그게 <code>CD-001</code> 경고입니다.</p></div>
+    <div><b>정의는 사람이 정한다</b><p>위 정의·단위는 발표용 예시입니다. MX200의 ToolWearRate는 계측 사양으로 뜻을 먼저 확정해야 합니다.</p></div>
+  </div>
+  <div class="foot"><span>예시 값: MX200_Line1 · OperationalData/ProcessQuality/ToolWearRate</span><span>AASc-3a-002 · 3a-008 · 3a-009</span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide" id="s3" aria-label="식별자 네 가족">
+  <div class="meta"><span><b>03</b> / 12</span><span>semanticId에 쓰는 이름</span></div>
+  <h2>이름의 주인은 넷이다<span class="en">Four families of semantic identifiers</span></h2>
+  <div class="families">
+    <article class="fam fam-cdd">
+      <h3>IEC CDD</h3>
+      <div class="who">IEC 기술위원회 · IEC 61360 공용 데이터 사전</div>
+      <code class="id">0112/2///61987#ABA951#009</code>
+      <div class="chips"><span class="chip ok">열람 무료</span><span class="chip plain">IRDI</span></div>
+      <ul>
+        <li><code>cdd.iec.ch</code>는 브라우저로 열리지만 프로그램 접근은 403</li>
+        <li>회사가 직접 등록할 수 없다 — TC/SC 표준화 제안</li>
+        <li>Nameplate가 쓰는 IRDI 14건 중 13건은 IDTA JSON이 정의까지 실어 사전에 있다</li>
+      </ul>
+    </article>
+    <article class="fam fam-eclass">
+      <h3>eCl@ss</h3>
+      <div class="who">ECLASS e.V. · 산업 제품 분류·속성 사전</div>
+      <code class="id">0173-1#02-BAA120#008</code>
+      <div class="chips"><span class="chip err lock">라이선스 필요</span><span class="chip plain">IRDI</span></div>
+      <ul>
+        <li>라이선스가 없어 <b>파싱·보존·출력만</b> 하고 조회·검증하지 않는다 (P0 결정)</li>
+        <li>템플릿의 eCl@ss 후보 7건은 유지하되 <b>미확인</b>으로 보고</li>
+        <li>개발용 mock은 "라이선스가 있다고 가정"한 자료 — 내보내기 금지</li>
+      </ul>
+    </article>
+    <article class="fam fam-idta">
+      <h3>IDTA IRI</h3>
+      <div class="who">Industrial Digital Twin Association · 서브모델 템플릿</div>
+      <code class="id">https://admin-shell.io/idta/TimeSeries/Segment/StartTime/1/1</code>
+      <div class="chips"><span class="chip ok">공개</span><span class="chip plain">IRI</span></div>
+      <ul>
+        <li>근거는 공식 Template JSON과 사양서 본문뿐</li>
+        <li>표기가 제각각이다 — <code>idta</code>·<code>zvei</code>·<code>ZVEI</code>, <code>http</code>·<code>https</code></li>
+        <li>한 글자도 "정리"하지 않고 그대로 복사</li>
+      </ul>
+    </article>
+    <article class="fam fam-own">
+      <h3>사내 IRI</h3>
+      <div class="who">우리 회사 · 표준에 없는 개념</div>
+      <code class="id">https://cw1.co.kr/ids/cd/ToolWearRate/1/0</code>
+      <div class="chips"><span class="chip warn">자체 발급</span><span class="chip plain">{ns}/cd/이름/1/0</span></div>
+      <ul>
+        <li>근거가 없다는 것을 밝히는 선언 — 표준 IRDI를 지어내지 않는다</li>
+        <li>뜻은 용어집 → 개념 등록으로 채운다</li>
+        <li>접두어는 루트 <code>.env</code>의 <code>IRI_PREFIX</code> 한 곳</li>
+      </ul>
+    </article>
+  </div>
+  <div class="foot"><span>IRDI = International Registration Data Identifier (ISO/IEC 11179-6)</span><span>IRI = Internationalized Resource Identifier</span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide" id="s4" aria-label="식별자 해부">
+  <div class="meta"><span><b>04</b> / 12</span><span>읽는 법</span></div>
+  <h2>식별자를 뜯어 보면<span class="en">Anatomy of an identifier</span></h2>
+  <div class="anatomy">
+    <div class="anat fam-cdd">
+      <div class="title"><b>IEC CDD</b><span>시리얼번호 · serial number</span></div>
+      <div class="parts">
+        <span class="part seg-a"><span class="t">0112</span><small>등록 기관 (IEC)</small></span>
+        <span class="part"><span class="t sep">/2///</span><small>&nbsp;</small></span>
+        <span class="part seg-b"><span class="t">61987</span><small>사전 (IEC 61987)</small></span>
+        <span class="part"><span class="t sep">#</span><small>&nbsp;</small></span>
+        <span class="part seg-c"><span class="t">ABA951</span><small>항목 코드</small></span>
+        <span class="part"><span class="t sep">#</span><small>&nbsp;</small></span>
+        <span class="part seg-d"><span class="t">009</span><small>버전 — 바꾸지 않는다</small></span>
+      </div>
+    </div>
+    <div class="anat fam-eclass">
+      <div class="title"><b>eCl@ss</b><span>주변 온도 후보 · 대조하지 못함</span></div>
+      <div class="parts">
+        <span class="part seg-a"><span class="t">0173-1</span><small>등록 기관 (ECLASS)</small></span>
+        <span class="part"><span class="t sep">#</span><small>&nbsp;</small></span>
+        <span class="part seg-b"><span class="t">02</span><small>종류 (02 = 속성)</small></span>
+        <span class="part"><span class="t sep">-</span><small>&nbsp;</small></span>
+        <span class="part seg-c"><span class="t">BAA120</span><small>항목 코드</small></span>
+        <span class="part"><span class="t sep">#</span><small>&nbsp;</small></span>
+        <span class="part seg-d"><span class="t">008</span><small>버전</small></span>
+      </div>
+    </div>
+    <div class="anat fam-idta">
+      <div class="title"><b>IDTA IRI</b><span>Digital Nameplate 3.0 서브모델</span></div>
+      <div class="parts">
+        <span class="part seg-a"><span class="t">https://admin-shell.io</span><small>IDTA 네임스페이스</small></span>
+        <span class="part seg-b"><span class="t">/idta/nameplate</span><small>템플릿</small></span>
+        <span class="part seg-d"><span class="t">/3/0</span><small>버전</small></span>
+        <span class="part seg-c"><span class="t">/Nameplate</span><small>이름</small></span>
+      </div>
+    </div>
+    <div class="anat fam-own">
+      <div class="title"><b>사내 IRI</b><span>우리가 발행한 개념</span></div>
+      <div class="parts">
+        <span class="part seg-a"><span class="t">https://cw1.co.kr/ids</span><small>사내 네임스페이스 {ns}</small></span>
+        <span class="part seg-b"><span class="t">/cd</span><small>개념 (식별자는 /aas /sm /asset)</small></span>
+        <span class="part seg-c"><span class="t">/Timestamp</span><small>이름 (대소문자 유지)</small></span>
+        <span class="part seg-d"><span class="t">/1/0</span><small>버전</small></span>
+      </div>
+    </div>
+  </div>
+  <p class="anat note">IRI는 웹 주소처럼 보여도 <b>이름</b>입니다. 열리지 않아도 되고, 받는 쪽은 문자열이 정확히 같은지만 봅니다 — <code>#009</code>를 빼거나 <code>ZVEI</code>를 소문자로 바꾸면 다른 개념이 됩니다.</p>
+</section>
+
+<!-- 5 -->
+<section class="slide" id="s5" aria-label="누구의 이름인가">
+  <div class="meta"><span><b>05</b> / 12</span><span>판정</span></div>
+  <h2>문자열로는 주인을 알 수 없다<span class="en">Evidence decides, not the string</span></h2>
+  <div class="two-wide">
+    <div class="stack">
+      <div class="ladder">
+        <div class="rung"><b>사양서 확인</b><span>IDTA 공식 Template JSON · 사양서 본문에 그 IRI가 있다</span><span class="chip ok">verified: spec</span></div>
+        <div class="rung"><b>사전 확인</b><span>서버 사전이 이름·정의를 답했다 — 대조했다는 뜻은 아니다</span><span class="chip ok">verified: dict</span></div>
+        <div class="rung"><b>자체 발급</b><span>사내 네임스페이스 아래 — 우리 이름이라는 선언</span><span class="chip warn">{ns}</span></div>
+        <div class="rung"><b>미확인</b><span>근거 없음 · mock에만 있음 · eCl@ss 후보</span><span class="chip err">verified: none</span></div>
+      </div>
+      <p class="lede" style="font-size:15px">인스펙터의 semanticId 칸 옆 배지가 이 네 단계입니다. 용어집 탭에는 출처가 <code>사내 · 사전 · mock · 샘플</code>로 붙습니다.</p>
+    </div>
+    <div class="trap">
+      <h3><code>/idta/</code>가 들어 있다고 IDTA 개념이 아니다</h3>
+      <p>Operational Data 템플릿의 Timestamp는 <code>https://admin-shell.io/idta/TimeSeries/UtcTime/1/1</code>이었습니다.</p>
+      <p>IDTA 02008 1.1 공식 JSON의 시간 IRI는 <code>Segment/StartTime</code> · <code>Segment/EndTime</code> · <code>RelativePointInTime</code>뿐 — <b>UtcTime은 없었습니다.</b></p>
+      <p>그래서 <code>{ns}/cd/Timestamp/1/0</code>으로 바꿨습니다. 반대로 도메인만 바꾼 <code>https://cw1.co.kr/idta/…</code>는 아무도 정의하지 않은 이름이 되어 CD-001이 뜹니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" id="s6" aria-label="IDTA 템플릿">
+  <div class="meta"><span><b>06</b> / 12</span><span>@aas/templates</span></div>
+  <h2>IDTA 템플릿 9종<span class="en">Submodel templates in the palette</span></h2>
+  <p class="lede">사람이 PDF를 옮겨 적지 않고 <b>공식 Template JSON에서 기계로 추출</b>합니다 (admin-shell-io/submodel-templates, published/…). 서브모델 semanticId와 요소 구조가 그대로 들어옵니다.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>템플릿</th><th>번호</th><th>버전</th><th>서브모델 semanticId</th></tr></thead>
+      <tbody>
+        <tr><td>Digital Nameplate</td><td class="num">02006-3-0</td><td class="num">3.0</td><td><code>https://admin-shell.io/idta/nameplate/3/0/Nameplate</code></td></tr>
+        <tr><td>Technical Data</td><td class="num">02003-1-2</td><td class="num">1.2</td><td><code>https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2</code></td></tr>
+        <tr><td>Handover Documentation</td><td class="num">02004-2-0</td><td class="num">2.0</td><td>IDTA 공식</td></tr>
+        <tr><td>Time Series Data</td><td class="num">02008-1-1</td><td class="num">1.1</td><td><code>https://admin-shell.io/idta/TimeSeries/1/1</code></td></tr>
+        <tr><td>Carbon Footprint</td><td class="num">02023-1-0</td><td class="num">1.0</td><td>IDTA 공식</td></tr>
+        <tr><td>Hierarchical Structures enabling BoM</td><td class="num">02011-1-1</td><td class="num">1.1</td><td>IDTA 공식</td></tr>
+        <tr><td>Asset Interfaces Description — MQTT</td><td class="num">02017-1-1</td><td class="num">1.1</td><td>IDTA 공식 · 값 수집 설정이 곧 이 서브모델</td></tr>
+        <tr><td>Asset Interfaces Description — OPC UA</td><td class="num">02017-1-1</td><td class="num">1.1</td><td>IDTA 공식</td></tr>
+        <tr class="own"><td>Operational Data</td><td class="num">사내 정의</td><td class="num">1.0</td><td><code>{ns}/cd/OperationalData/1/0</code> — 넣을 때 사내 네임스페이스로 치환</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="foot"><span>Technical Data의 대문자 <code>ZVEI</code>도 공식 표기 그대로</span><span>팔레트 → IDTA 템플릿에서 삽입</span></div>
+</section>
+
+<!-- 7 -->
+<section class="slide" id="s7" aria-label="템플릿이 지키는 것">
+  <div class="meta"><span><b>07</b> / 12</span><span>템플릿 = 계약</span></div>
+  <h2>넣은 뒤에도 템플릿이 지킨다<span class="en">Conformance, {ns}, and what stays unverified</span></h2>
+  <div class="two">
+    <div class="stack">
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>코드</th><th>뜻</th><th>누르면</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip err">T-001</span></td><td>필수 요소가 없다</td><td>템플릿에서 그 요소를 제자리에 생성</td></tr>
+            <tr><td><span class="chip err">T-002</span></td><td>자식 semanticId가 템플릿과 다르다</td><td>버튼 없음 — 어느 쪽이 옳은지 모른다</td></tr>
+            <tr><td><span class="chip warn">T-003</span></td><td>서브모델 semanticId가 다르다</td><td>템플릿 값으로 되돌리기</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="kv">
+        <div><b>{ns}</b><span>사내 정의 템플릿의 개념은 <code>{ns}/cd/…</code>로 적고 삽입 때 치환합니다. 적합성 검사는 그 자리에 어느 네임스페이스든 받아, 네임스페이스를 바꿔도 경고로 뒤덮이지 않습니다.</span></div>
+        <div><b>되돌리기</b><span>네임스페이스는 서브모델 식별자에서 되읽습니다. 못 읽으면 버튼을 만들지 않습니다.</span></div>
+        <div><b>autoInsert</b><span>인스턴스 데이터 없이 규격을 못 채우는 요소(Relationship의 first·second)는 가짜 참조를 심지 않습니다.</span></div>
+      </div>
+    </div>
+    <div class="stack">
+      <h3 style="font-size:17px">미확인 semanticId 7건 — 전부 eCl@ss 후보</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>요소</th><th>IRDI</th></tr></thead>
+          <tbody>
+            <tr><td>Operational/CurrentTemperature</td><td><code>0173-1#02-BAA092#002</code></td></tr>
+            <tr><td>Operational/RotationSpeed</td><td><code>0173-1#02-BAF161#004</code></td></tr>
+            <tr><td>Operational/OperatingHours</td><td><code>0173-1#02-AAH252#003</code></td></tr>
+            <tr><td>Operational/MachineState</td><td><code>0173-1#02-ABH789#001</code></td></tr>
+            <tr><td>TechnicalProperties/RatedPower</td><td><code>0173-1#02-AAF018#003</code></td></tr>
+            <tr><td>TechnicalProperties/MaxSpindleSpeed</td><td><code>0173-1#02-BAF161#004</code></td></tr>
+            <tr><td>TechnicalProperties/AmbientTemperature</td><td><code>0173-1#02-BAA120#008</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:13.5px;color:var(--ink-2)">라이선스를 확보하면 대조해 <code>verified</code>를 올립니다. 사내 개념(<code>{ns}</code>)은 우리 이름이라는 선언이라 미확인에 세지 않습니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" id="s8" aria-label="용어집">
+  <div class="meta"><span><b>08</b> / 12</span><span>Glossary</span></div>
+  <h2>용어집 — 검증과 내보내기가 보는 책<span class="en">Glossary: the book every check reads</span></h2>
+  <div class="two">
+    <div class="stack">
+      <div class="layers">
+        <div class="layer"><span class="chip plain">샘플</span><div><b>terms.sample.json</b><div class="where">파일 · IDTA 공식 정의를 글자 그대로 옮긴 표준 개념 포함</div></div><span class="mono" style="font-size:12px;color:var(--ink-3)">1</span></div>
+        <div class="layer"><span class="chip ok">사전</span><div><b>서버 사전의 답</b><div class="where">CD-001이 나면 자동 조회 · 세션 메모리에만 (mock은 따로 표시)</div></div><span class="mono" style="font-size:12px;color:var(--ink-3)">2</span></div>
+        <div class="layer"><span class="chip warn">사내</span><div><b>브라우저 사내 용어집</b><div class="where">사람이 등록·고친 것 · 내보내기로 회사 용어집에</div></div><span class="mono" style="font-size:12px;color:var(--ink-3)">3</span></div>
+      </div>
+      <div class="merge">mergeBooks(샘플, 사전, 사내) — 뒤가 이긴다 · 미리보기 = 내보내기 = AASX = 검증</div>
+      <div class="trap" style="border-color:var(--line);background:var(--panel)">
+        <h3 style="color:var(--ink)">용어집은 IEC CDD가 아니다</h3>
+        <p>CDD는 개념의 원본, 용어집은 우리 쪽 사본이자 사내 개념 장부입니다. 서버 사전 캐시에도 CDD에서 받아 온 데이터는 없습니다 — IDTA JSON·사내 용어집·mock으로 채웁니다.</p>
+      </div>
+    </div>
+    <div class="stack">
+      <h3 style="font-size:17px">용어집 탭에서 하는 일</h3>
+      <div class="kv">
+        <div><b>고칠 것만</b><span>단위 없는 측정형(AASc-3a-009), 영문 이름·정의 없는 항목을 위로 올리고 사유를 붙입니다.</span></div>
+        <div><b>고치기</b><span>값이 채워진 창을 엽니다. 같은 semanticId를 덮어써 지우고 다시 만들 필요가 없습니다. 우리 개념에만 붙습니다.</span></div>
+        <div><b>모델에서 가져오기</b><span>트리에서 고른 요소 아래 개념을 옮깁니다. 실측: MX200 OperationalData 9건(사전 mock 6 · 파일의 사내 개념 3).</span></div>
+        <div><b>가져오기</b><span><code>{"terms":[…]}</code> 파일. 서버 공용이면 <code>dict-seed</code>로 같은 파일을 시드합니다.</span></div>
+        <div><b>내보내기</b><span>사내 항목만 <code>terms.local.json</code>으로 — 브라우저에 갇히지 않게.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" id="s9" aria-label="개념 등록 Concept definition">
+  <div class="meta"><span><b>09</b> / 12</span><span>개념 등록 · Concept definition</span></div>
+  <h2>개념 등록 · Concept definition<span class="en">From a form to a ConceptDescription</span></h2>
+  <div class="two">
+    <div class="stack">
+      <div class="form" role="img" aria-label="개념 등록 창 예시">
+        <div class="head"><b>개념 등록 · Concept definition</b><code>https://cw1.co.kr/ids/cd/SurfaceRoughnessRa/1/0</code></div>
+        <div class="field"><span>사내 용어 (한글)</span><span class="val">표면 거칠기</span><span></span></div>
+        <div class="field"><span>영문 이름</span><span class="val">Surface roughness Ra</span><span class="req">필수</span></div>
+        <div class="field"><span>영문 정의</span><span class="val">Arithmetic mean roughness of the machined surface.</span><span class="req">필수</span></div>
+        <div class="field"><span>자료형</span><span class="val mono">REAL_MEASURE</span><span></span></div>
+        <div class="field"><span>단위 종류</span><span class="val">길이 — 추천</span><span></span></div>
+        <div class="unitchips"><span>mm</span><span class="on">µm</span><span>cm</span><span>m</span><span>nm</span><span>in</span></div>
+      </div>
+      <div class="map">
+        <div><span>사내 용어</span><span>→</span><code>preferredName[ko]</code></div>
+        <div><span>영문 이름 · AASc-3a-002</span><span>→</span><code>preferredName[en]</code></div>
+        <div><span>영문 정의 · AASc-3a-008</span><span>→</span><code>definition[en]</code></div>
+        <div><span>단위 · AASc-3a-009</span><span>→</span><code>unit</code> (측정·통화형은 필수)</div>
+        <div><span>자료형</span><span>→</span><code>dataType</code> (묶음·서브모델은 없음)</div>
+      </div>
+    </div>
+    <div class="stack">
+<pre class="json" aria-label="내보내기에 실리는 ConceptDescription"><span class="k">"conceptDescriptions"</span>: [{
+  <span class="k">"modelType"</span>: <span class="s">"ConceptDescription"</span>,
+  <span class="k">"id"</span>: <span class="s">"https://cw1.co.kr/ids/cd/SurfaceRoughnessRa/1/0"</span>,
+  <span class="k">"embeddedDataSpecifications"</span>: [{
+    <span class="k">"dataSpecification"</span>: { … <span class="s">"DataSpecificationIec61360"</span> },
+    <span class="k">"dataSpecificationContent"</span>: {
+      <span class="k">"modelType"</span>: <span class="s">"DataSpecificationIec61360"</span>,
+      <span class="k">"preferredName"</span>: [
+        { <span class="k">"language"</span>: <span class="s">"ko"</span>, <span class="k">"text"</span>: <span class="s">"표면 거칠기"</span> },
+        { <span class="k">"language"</span>: <span class="s">"en"</span>, <span class="k">"text"</span>: <span class="s">"Surface roughness Ra"</span> }
+      ],
+      <span class="k">"definition"</span>: [{ <span class="k">"language"</span>: <span class="s">"en"</span>,
+        <span class="k">"text"</span>: <span class="s">"Arithmetic mean roughness of …"</span> }],
+      <span class="k">"unit"</span>: <span class="s">"µm"</span>,
+      <span class="k">"dataType"</span>: <span class="s">"REAL_MEASURE"</span>
+    }
+  }]
+}]</pre>
+      <div class="kv">
+        <div><b>어디서 열리나</b><span>검증 탭 <code>CD-001</code>의 <code>개념 등록</code> · AASc-3a-009 오류의 <code>단위 넣기</code> · 용어집 탭 <code>고치기</code></span></div>
+        <div><b>열리지 않는 곳</b><span>표준 개념(IEC CDD·eCl@ss·IDTA) — 정의를 우리가 지어 넣지 않습니다</span></div>
+        <div><b>단위 없으면</b><span>자료형을 빼고 내보내 규격을 지키고 <code>CD-002</code>로 알립니다</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" id="s10" aria-label="CD-001을 없애는 길">
+  <div class="meta"><span><b>10</b> / 12</span><span>CD-001</span></div>
+  <h2>"이 semanticId를 아는 곳이 없습니다"가 사라지기까지<span class="en">How a concept gets known</span></h2>
+  <div class="flow">
+    <div class="step"><span class="n">1 · 파일</span><b>불러온 파일이 싣고 옴</b><p>파일의 ConceptDescription은 그대로 나가므로 경고하지 않습니다.</p></div>
+    <div class="step"><span class="n">2 · 사전</span><b>서버 사전 자동 조회</b><p>물어본 적 없는 id만. IDTA JSON 시드 · 옮겨 적은 CDD 파일.</p></div>
+    <div class="step"><span class="n">3 · 용어집</span><b>샘플 · 사내 용어집</b><p>영문 이름·정의가 있어야 개념이 만들어집니다.</p></div>
+    <div class="step"><span class="n">4 · 등록</span><b>개념 등록 · Concept definition</b><p>사내 개념만. 표준 개념은 사전을 채웁니다.</p></div>
+    <div class="step"><span class="n">내보내기</span><b>ConceptDescription 실림</b><p>미리보기 · JSON · AASX · 검증이 같은 책을 봅니다.</p></div>
+  </div>
+  <div class="tally">
+    <div><span class="v">64 <small>→</small> 0</span><p>MX200 모델의 CD-001 — 사실인 경고는 0건이었습니다</p></div>
+    <div><span class="v">38</span><p>파일에 개념이 이미 실려 있었는데 용어집만 보고 경고</p></div>
+    <div><span class="v">26</span><p>서버 사전이 답을 갖고 있었음 — 전부 mock이라 용어집에 <code>mock</code>으로 표시</p></div>
+  </div>
+  <div class="foot"><span>eCl@ss는 라이선스 없이 해소되지 않는 것이 정상 — mock은 가정 자료</span><span>dict-seed: Environment JSON · {"terms":[…]}</span></div>
+</section>
+
+<!-- 11 -->
+<section class="slide" id="s11" aria-label="사내 네임스페이스">
+  <div class="meta"><span><b>11</b> / 12</span><span>{ns}</span></div>
+  <h2>사내 네임스페이스는 값이다<span class="en">One prefix, everywhere it matters</span></h2>
+  <div class="two">
+    <div class="stack">
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>대상</th><th>규칙</th><th>따라감</th></tr></thead>
+          <tbody>
+            <tr><td>Shell · Submodel 식별자</td><td><code>{ns}/aas/…</code> · 템플릿 <code>idPattern</code></td><td><span class="chip ok">예</span></td></tr>
+            <tr><td>자산 식별자</td><td><code>{ns}/asset/…</code></td><td><span class="chip ok">예</span></td></tr>
+            <tr><td>자체 발행 개념</td><td><code>{ns}/cd/이름/1/0</code></td><td><span class="chip ok">예</span></td></tr>
+            <tr><td>사내 정의 템플릿</td><td><code>{ns}/cd/OperationalData/1/0</code></td><td><span class="chip ok">예</span></td></tr>
+            <tr><td>IEC CDD · eCl@ss · IDTA</td><td>발표된 문자열 그대로</td><td><span class="chip err">절대 아니오</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="kv">
+        <div><b>설정</b><span>저장소 루트 <code>.env</code>의 <code>IRI_PREFIX</code> · <code>NEXT_PUBLIC_IRI_PREFIX</code> — 웹·API가 같은 파일을 읽습니다 (기본 <code>https://cw1.co.kr/ids</code>)</span></div>
+        <div><b>브라우저</b><span>검증 탭 입력칸이 <code>.env</code>보다 우선 · <code>기본값</code>으로 되돌림</span></div>
+      </div>
+    </div>
+    <div class="stack">
+      <h3 style="font-size:17px">네임스페이스 옮기기</h3>
+      <div class="form" style="border-color:var(--line)">
+        <div class="head"><b>옮기기…</b><code>https://cw.co.kr/ids → https://cw1.co.kr/ids</code></div>
+        <div class="kv">
+          <div><b>모델</b><span>식별자 2 (참조까지) · 자산 1 · 개념 2</span></div>
+          <div><b>용어집</b><span>옮김 2 · 샘플·파일의 뜻을 새 IRI로 담음 0</span></div>
+          <div><b>그대로</b><span>admin-shell.io · IEC CDD · eCl@ss · raw</span></div>
+        </div>
+      </div>
+      <p style="font-size:14px;color:var(--ink-2)">미리 보고 한 번에 적용합니다. 모델은 <b>Ctrl+Z 한 번</b>, 용어집은 <b>용어집 되돌리기</b>로 원래대로 돌아갑니다. admin-shell.io를 옮기려 하거나 두 접두어가 서로 품으면 거절합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide" id="s12" aria-label="원칙">
+  <div class="meta"><span><b>12</b> / 12</span><span>정리</span></div>
+  <h2>네 가지 원칙<span class="en">What the tool refuses to do</span></h2>
+  <div class="rules">
+    <div><b>추측하지 않는다</b><p>semanticId를 지어내지 않고, 모르는 것은 <code>verified: none</code>으로 남겨 보고합니다. 파서는 모양이 맞지 않으면 <code>unknown</code>입니다.</p></div>
+    <div><b>남의 이름은 한 글자도 바꾸지 않는다</b><p>IRDI 버전 접미사, <code>zvei</code>/<code>ZVEI</code>, <code>http</code>/<code>https</code>까지 발표된 그대로 둡니다.</p></div>
+    <div><b>우리 개념은 우리 이름으로</b><p>표준에 없으면 <code>{ns}/cd/…</code>로 발행하고 개념 등록 · Concept definition으로 뜻을 채웁니다. admin-shell.io 아래에 붙이지 않습니다.</p></div>
+    <div><b>경고는 사실일 때만</b><p>파일이 싣고 온 개념, 사전이 아는 개념에는 CD-001을 내지 않습니다. 경고가 많으면 진짜 경고가 묻힙니다.</p></div>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>이슈</th><th>뜻</th><th>할 일</th></tr></thead>
+      <tbody>
+        <tr><td><code>CD-001</code></td><td>아는 곳이 없다</td><td>사전(API) 확인 → 사내 개념이면 개념 등록 · Concept definition</td></tr>
+        <tr><td><code>CD-002</code></td><td>측정형인데 단위가 없어 자료형을 뺐다</td><td>용어집 탭 고치기 → 단위 고르기</td></tr>
+        <tr><td><code>AASc-3a-009</code></td><td>파일의 측정형 개념에 단위 없음</td><td>단위 넣기</td></tr>
+        <tr><td><code>POL-SEM-001</code></td><td>semanticId가 없다</td><td>용어집에 같은 이름이 있으면 지정, 없으면 사내 개념으로 발행</td></tr>
+        <tr><td><code>POL-IRI-001</code></td><td>식별자가 사내 네임스페이스 밖</td><td>퀵픽스 또는 네임스페이스 옮기기</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="foot"><span>상세: docs/semantic-id.md</span><span>AAS Composer · 2026-09</span></div>
+</section>
+
+</main>
+
+<nav class="navhint" aria-label="슬라이드 이동">
+  <button type="button" id="prev" aria-label="이전 슬라이드">←</button>
+  <span id="pos">1 / 12</span>
+  <button type="button" id="next" aria-label="다음 슬라이드">→</button>
+</nav>
+
+<script>
+(() => {
+  const slides = [...document.querySelectorAll('.slide')];
+  const pos = document.getElementById('pos');
+  let current = 0;
+  const go = (i) => {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides[current].scrollIntoView({ block: 'start' });
+  };
+  const nearest = () => {
+    let best = 0, dist = Infinity;
+    slides.forEach((s, i) => {
+      const d = Math.abs(s.getBoundingClientRect().top - 20);
+      if (d < dist) { dist = d; best = i; }
+    });
+    return best;
+  };
+  const update = () => { current = nearest(); pos.textContent = `${current + 1} / ${slides.length}`; };
+  addEventListener('scroll', update, { passive: true });
+  document.getElementById('prev').addEventListener('click', () => go(nearest() - 1));
+  document.getElementById('next').addEventListener('click', () => go(nearest() + 1));
+  addEventListener('keydown', (e) => {
+    if (e.target.closest && e.target.closest('input, textarea')) return;
+    if (['ArrowRight', 'PageDown'].includes(e.key) || (e.key === ' ' && !e.shiftKey)) { e.preventDefault(); go(nearest() + 1); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key) || (e.key === ' ' && e.shiftKey)) { e.preventDefault(); go(nearest() - 1); }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+  });
+  update();
+})();
+</script>
+</body>
+</html>
