@@ -6,13 +6,98 @@
  * 규격이 요구하는 최소치가 **영문 표제어(AASc-3a-002)와 영문 정의(AASc-3a-008)**다.
  * 그래서 그 둘은 비워 둘 수 없다. 없는 것을 지어내지 않는 대신, 채울 자리를 준다.
  *
- * 여기 넣은 것은 이 브라우저에만 쌓인다. 회사 용어집으로 옮겨야 여러 사람이 쓰므로
- * 내보내기를 같은 자리에 둔다.
+ * 여기 넣은 것은 이 브라우저에만 쌓인다. 회사 용어집으로 옮기는 내보내기는 용어집 탭에
+ * 한 곳만 둔다(여기에도 두었더니 전역 `.mini`의 width:100%를 물려받아 안내문이 한 글자 폭으로
+ * 짜부라졌다).
  */
 
+import { useMemo, useState } from 'react';
+
 import { DATA_TYPES, useTerms } from '../lib/terms';
-import { downloadText } from '../lib/persist';
 import { useEditor } from '../lib/store';
+import { UNIT_KINDS, type UnitOption, kindOfUnit, suggestKind } from '../lib/units';
+
+const USED = 'used';
+
+/**
+ * 단위 고르기. 종류를 고르면 그 종류의 기호가 버튼으로 뜨고, 누르면 단위 칸에 들어간다.
+ *
+ * 처음 보이는 종류는 ① 이미 적힌 단위의 종류 ② 개념 이름에서 찾은 종류(추천)
+ * ③ 용어집에서 이미 쓰는 단위 순이다. **값을 대신 채우지 않는다** — 고르는 것은 사람이다.
+ * 용어집에서 쓰는 단위를 따로 보이는 이유는 같은 단위를 같은 기호로 쓰게 하려는 것이다.
+ */
+function UnitPicker({
+  text,
+  dataType,
+  value,
+  onPick,
+}: {
+  text: string;
+  dataType: string;
+  value: string;
+  onPick: (unit: string) => void;
+}): React.JSX.Element {
+  const entries = useTerms((s) => s.entries);
+  const dict = useTerms((s) => s.dict);
+  const used = useMemo<UnitOption[]>(() => {
+    const symbols = new Set(
+      useTerms
+        .getState()
+        .book()
+        .terms.map((t) => t.unit?.trim())
+        .filter((x): x is string => !!x),
+    );
+    return [...symbols].sort().map((symbol) => ({
+      symbol,
+      name: kindOfUnit(symbol)?.label ?? '용어집에서 쓰는 단위',
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entries, dict]);
+
+  const suggested = suggestKind(text, dataType);
+  const [kind, setKind] = useState<string>(
+    () => kindOfUnit(value)?.id ?? suggested?.id ?? (used.length ? USED : UNIT_KINDS[0]!.id),
+  );
+  const options = kind === USED ? used : (UNIT_KINDS.find((k) => k.id === kind)?.units ?? []);
+
+  return (
+    <div className="upick wide">
+      <label className="ukind">
+        <span>단위 종류</span>
+        <select value={kind} onChange={(e) => setKind(e.target.value)}>
+          {used.length ? <option value={USED}>용어집에서 쓰는 단위 ({used.length})</option> : null}
+          {UNIT_KINDS.map((k) => (
+            <option key={k.id} value={k.id}>
+              {k.label}
+              {k.id === suggested?.id ? ' — 추천' : ''}
+            </option>
+          ))}
+        </select>
+      </label>
+      <div className="uchips" role="listbox" aria-label="단위">
+        {options.map((o) => (
+          <button
+            key={o.symbol}
+            type="button"
+            role="option"
+            aria-selected={o.symbol === value}
+            className={o.symbol === value ? 'on' : undefined}
+            title={o.name}
+            onClick={() => onPick(o.symbol)}
+          >
+            <b>{o.symbol}</b>
+            <small>{o.name}</small>
+          </button>
+        ))}
+        {value ? (
+          <button type="button" className="clear" title="단위를 비웁니다" onClick={() => onPick('')}>
+            비우기
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 export function ConceptForm(): React.JSX.Element | null {
   const draft = useTerms((s) => s.draft);
@@ -83,7 +168,7 @@ export function ConceptForm(): React.JSX.Element | null {
           />
         </label>
         <label>
-          <span>단위</span>
+          <span>단위 — 아래에서 고르거나 직접 입력</span>
           <input
             /* 파일에서 이름·정의를 옮겨 온 경우 남은 것은 단위뿐이다 */
             autoFocus={!!draft.term && !!draft.definition && !draft.unit}
@@ -103,28 +188,20 @@ export function ConceptForm(): React.JSX.Element | null {
             ))}
           </select>
         </label>
+        <UnitPicker
+          key={draft.semanticId}
+          text={`${draft.nameEn} ${draft.term} ${draft.semanticId}`}
+          dataType={draft.dataType}
+          value={draft.unit}
+          onPick={(unit) => patch({ unit })}
+        />
       </div>
 
       <div className="cfoot">
         <span className="note">
           규격이 영문 표제어와 정의를 요구합니다. 이 브라우저에 저장되며, 등록한 {entries.length}건은
-          내보내 회사 용어집에 옮기십시오.
+          용어집 탭의 내보내기로 회사 용어집에 옮기십시오.
         </span>
-        {entries.length ? (
-          <button
-            type="button"
-            className="mini"
-            onClick={() => {
-              downloadText(
-                'terms.local.json',
-                `${JSON.stringify({ note: '에디터에서 등록한 사내 용어. 회사 용어집에 합치십시오.', terms: entries }, null, 2)}\n`,
-              );
-              notify(`용어 ${entries.length}건을 내보냈습니다.`);
-            }}
-          >
-            용어집 내보내기 ({entries.length})
-          </button>
-        ) : null}
         <button type="button" className="primary" onClick={save}>
           {editing ? '고친 내용 저장' : '등록'}
         </button>

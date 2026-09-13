@@ -844,6 +844,9 @@ table.grid td.ops button:disabled {
   white-space: nowrap;
 }
 .chead .mini {
+  /* 전역 .mini는 팔레트용 width:100%다 — 물려받으면 제목 옆을 다 차지한다 */
+  width: auto;
+  flex: 0 0 auto;
   margin-left: auto;
 }
 .cgrid {
@@ -885,6 +888,64 @@ table.grid td.ops button:disabled {
 .cgrid select:focus {
   border-color: var(--accent);
   outline: none;
+}
+.upick {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px 10px;
+  padding: 6px 8px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+}
+.upick .ukind {
+  flex: 0 0 11rem;
+}
+.upick .ukind select {
+  width: 100%;
+}
+.uchips {
+  flex: 1 1 14rem;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-content: flex-start;
+  padding-top: 15px;
+}
+.uchips button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--r);
+  padding: 2px 7px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.uchips button b {
+  font-family: var(--mono);
+  font-weight: 600;
+}
+.uchips button small {
+  font-size: 10px;
+  color: var(--ink-3);
+}
+.uchips button:hover {
+  border-color: var(--accent);
+}
+.uchips button.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.uchips button.clear {
+  color: var(--ink-3);
+  border-style: dashed;
 }
 .cfoot {
   display: flex;
