@@ -780,6 +780,11 @@ table.grid td.ops button:disabled {
   background: var(--surface-3);
   color: var(--ink-3);
 }
+.tlist .acts {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
 .tlist .org.dict {
   background: var(--ok-bg);
   color: var(--ok);

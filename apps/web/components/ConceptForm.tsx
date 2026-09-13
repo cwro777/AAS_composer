@@ -24,19 +24,27 @@ export function ConceptForm(): React.JSX.Element | null {
 
   if (!draft) return null;
 
+  /* 이미 책에 있는 id면 고치기다. 등록은 같은 id를 덮어쓰므로 지우고 다시 만들 필요가 없다 */
+  const editing = useTerms.getState().book().terms.some((e) => e.semanticId === draft.semanticId);
+  /* 목록 밖의 자료형(INTEGER_CURRENCY 등)을 가진 항목을 열어도 값이 바뀌지 않게 한다 */
+  const types: string[] = [...DATA_TYPES];
+  if (draft.dataType && !types.includes(draft.dataType)) types.push(draft.dataType);
+
   const save = (): void => {
     const r = commit();
     notify(
       r.ok
-        ? `“${r.entry.term}”을(를) 사내 용어집에 등록했습니다. 이제 내보낼 때 개념도 함께 나갑니다.`
+        ? editing
+          ? `“${r.entry.term}”을(를) 고쳤습니다.`
+          : `“${r.entry.term}”을(를) 사내 용어집에 등록했습니다. 이제 내보낼 때 개념도 함께 나갑니다.`
         : r.reason,
     );
   };
 
   return (
-    <div className="cform" role="dialog" aria-label="개념 등록">
+    <div className="cform" role="dialog" aria-label={editing ? '개념 고치기' : '개념 등록'}>
       <div className="chead">
-        <b>개념 등록</b>
+        <b>{editing ? '개념 고치기' : '개념 등록'}</b>
         <code>{draft.semanticId}</code>
         <button type="button" className="mini" onClick={close} aria-label="닫기">
           닫기
@@ -87,7 +95,8 @@ export function ConceptForm(): React.JSX.Element | null {
         <label>
           <span>자료형</span>
           <select value={draft.dataType} onChange={(e) => patch({ dataType: e.target.value })}>
-            {DATA_TYPES.map((d) => (
+            {draft.dataType ? null : <option value="">(없음)</option>}
+            {types.map((d) => (
               <option key={d} value={d}>
                 {d}
               </option>
@@ -117,7 +126,7 @@ export function ConceptForm(): React.JSX.Element | null {
           </button>
         ) : null}
         <button type="button" className="primary" onClick={save}>
-          등록
+          {editing ? '고친 내용 저장' : '등록'}
         </button>
       </div>
     </div>

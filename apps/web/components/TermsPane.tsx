@@ -16,6 +16,7 @@ import { useMemo, useRef, useState } from 'react';
 import { type TermEntry, formatSemanticId, parseSemanticId } from '@aas/semantic';
 
 import { downloadText } from '../lib/persist';
+import { useSettings } from '../lib/settings';
 import { useEditor } from '../lib/store';
 import { entriesFromFile, useTerms } from '../lib/terms';
 
@@ -45,6 +46,8 @@ export function TermsPane(): React.JSX.Element {
   const entries = useTerms((s) => s.entries);
   const dict = useTerms((s) => s.dict);
   const remove = useTerms((s) => s.remove);
+  const openDraft = useTerms((s) => s.openDraft);
+  const iriPrefix = useSettings((s) => s.iriPrefix);
   const notify = useEditor((s) => s.notify);
   const [q, setQ] = useState('');
   const [onlyBad, setOnlyBad] = useState(false);
@@ -60,6 +63,15 @@ export function TermsPane(): React.JSX.Element {
    * 어디서 온 개념인가. **mock은 따로 표시한다** — 개발용 가정 자료가 사전 답으로
    * 들어와 파일에 실린다. 표시가 없으면 진짜 정의와 구별할 수 없다.
    */
+  /**
+   * 고칠 수 있는 것은 **우리 개념**뿐이다 — 사내 네임스페이스로 발행했거나 에디터에서 등록한 것.
+   * 표준 개념(IEC CDD·eCl@ss·IDTA)의 정의·단위를 여기서 바꾸면 원본과 다른 설명이
+   * 표준 식별자를 달고 나간다. 그쪽은 사전을 고친다.
+   */
+  const editable = (t: TermEntry): boolean =>
+    (!!iriPrefix && t.semanticId.startsWith(iriPrefix)) ||
+    (mine.has(t.semanticId) && t.origin === 'local');
+
   const originOf = (t: TermEntry): { cls: string; label: string } => {
     if (mine.has(t.semanticId)) return { cls: 'local', label: '사내' };
     if (fromDict.has(t.semanticId)) {
@@ -174,20 +186,46 @@ export function TermsPane(): React.JSX.Element {
                 {formatSemanticId(parseSemanticId(t.semanticId))}
               </span>
               {problem ? <span className="why">{problem}</span> : null}
-              {mine.has(t.semanticId) ? (
-                <button
-                  type="button"
-                  className="del"
-                  aria-label={`${t.term} 지우기`}
-                  title="이 브라우저의 용어집에서 지웁니다"
-                  onClick={() => {
-                    remove(t.semanticId);
-                    notify(`“${t.term}”을(를) 용어집에서 지웠습니다.`);
-                  }}
-                >
-                  지우기
-                </button>
-              ) : null}
+              <span className="acts">
+                {editable(t) ? (
+                  <button
+                    type="button"
+                    className="del"
+                    aria-label={`${t.term} 고치기`}
+                    title={
+                      mine.has(t.semanticId)
+                        ? '등록 창을 열어 고칩니다'
+                        : '샘플은 파일이라 그대로 두고, 고친 것을 이 브라우저의 용어집에 올립니다 (뒤가 이깁니다)'
+                    }
+                    onClick={() =>
+                      openDraft({
+                        semanticId: t.semanticId,
+                        term: t.term,
+                        nameEn: t.nameEn ?? '',
+                        definition: t.definition ?? '',
+                        unit: t.unit ?? '',
+                        dataType: t.dataType ?? '',
+                      })
+                    }
+                  >
+                    고치기
+                  </button>
+                ) : null}
+                {mine.has(t.semanticId) ? (
+                  <button
+                    type="button"
+                    className="del"
+                    aria-label={`${t.term} 지우기`}
+                    title="이 브라우저의 용어집에서 지웁니다"
+                    onClick={() => {
+                      remove(t.semanticId);
+                      notify(`“${t.term}”을(를) 용어집에서 지웠습니다.`);
+                    }}
+                  >
+                    지우기
+                  </button>
+                ) : null}
+              </span>
             </li>
           ))}
         </ul>

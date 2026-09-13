@@ -229,7 +229,7 @@ export function Drawer(): React.JSX.Element {
       </div>
 
       <div className="panes">
-        {tab === 'issues' ? <ConceptForm /> : null}
+        {tab === 'issues' || tab === 'terms' ? <ConceptForm /> : null}
         {tab === 'json' ? (
           <pre className="json">{json}</pre>
         ) : tab === 'terms' ? (

@@ -78,19 +78,24 @@ dev 서버가 이렇게 죽었습니다:
 UNKNOWN: unknown error, open ... .next\static\chunks\app\editor\page.js   (errno -4094)
 ```
 
-**원인:** Dropbox 폴더는 Windows 클라우드 파일 필터(재분석 태그 `0x9000f01a`)가 관리합니다.
-Next dev가 청크를 다시 쓸 때 필터가 파일을 붙잡습니다. **Dropbox 앱이 꺼져 있어도 필터는
-남아 있어서** `com.dropbox.ignored` 표시만으로는 막지 못했습니다.
-
-**해결:** `apps/web/scripts/dropbox-ignore.mjs`가 `pnpm dev`·`pnpm build` 앞에서
+`apps/web/scripts/dropbox-ignore.mjs`가 `pnpm dev`·`pnpm build` 앞에서
 `apps\web\.next`를 **`%LOCALAPPDATA%\aas-composer\web-next`로 가는 junction**으로 만듭니다.
-빌드 산출물이 동기화 루트 밖에 쓰이므로 필터를 거치지 않습니다. `next.config`의 `distDir`은
-프로젝트 밖을 가리키지 못해서 링크로 풀었습니다. 무엇이 `.next`를 진짜 폴더로 되돌려도
-다음 기동 때 다시 junction으로 바뀝니다.
+빌드 산출물(수백 MB, 매초 바뀜)이 Dropbox에 올라가지 않습니다. `next.config`의 `distDir`은
+프로젝트 밖을 가리키지 못해서 링크로 풀었습니다.
 
-확인: 소스를 8번 연달아 고쳐 재컴파일시켰을 때 실패 0건 (예전에는 한두 번 만에 죽었습니다).
+**그러나 위 오류는 이것으로 없어지지 않았습니다.** 확인한 사실만 적습니다.
 
-그래도 죽으면 `scripts\aas clean restart`를 씁니다 — junction은 두고 산출물만 비웁니다.
+- junction으로 옮긴 뒤에도 소스를 실제로 고치자 같은 오류가 다시 났습니다.
+  (파일 시각만 바꾼 8회 시험은 통과해서, 처음에는 고쳐졌다고 잘못 판단했습니다.)
+- 오류가 난 뒤에 그 `page.js`를 직접 열면 **정상으로 열립니다.** 그런데 서버는 다시 띄울
+  때까지 계속 500을 냅니다. 재컴파일 중 파일을 여는 짧은 경쟁에서 한 번 실패하면 Next dev가
+  그 실패를 붙들고 있는 것으로 보입니다.
+- 그때 Dropbox 앱은 꺼져 있었습니다. 그래서 원인이 Dropbox라는 근거는 없습니다.
+  errno -4094는 libuv가 매핑하지 못한 Windows 오류이고, 삭제 대기 중인 파일을 열 때 흔히
+  나옵니다 — 백신 실시간 검사가 새로 쓴 6MB 청크를 붙잡고 있는 경우가 대표적입니다.
+  **확인하지는 않았습니다.**
+
+죽으면 `scripts\aas clean restart`를 씁니다 — junction은 두고 산출물만 비웁니다.
 **`Remove-Item -Recurse apps\web\.next`는 쓰지 마십시오.** junction에 대고 하면
 PowerShell 5.1이 링크 대상을 헤집을 수 있습니다. 링크만 지우려면 `cmd /c rmdir apps\web\.next`.
 

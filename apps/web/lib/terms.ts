@@ -267,16 +267,21 @@ export const useTerms = create<TermsState>()((set, get) => ({
       return { ok: false as const, reason: '영문 정의가 있어야 합니다 (AASc-3a-008).' };
     }
 
+    /* 같은 id면 고치기다 — 창에 없는 별칭은 그대로 둔다. 지우고 다시 만들 필요가 없다 */
+    const prev = get().book().terms.find((e) => e.semanticId === d.semanticId);
     const entry: TermEntry = {
       term: d.term.trim(),
       nameEn: d.nameEn.trim(),
       semanticId: d.semanticId,
       definition: d.definition.trim(),
+      ...(prev?.aliases?.length ? { aliases: prev.aliases } : {}),
       ...(d.unit.trim() ? { unit: d.unit.trim() } : {}),
       ...(d.dataType ? { dataType: d.dataType } : {}),
       origin: 'local',
       verified: 'none',
-      provenance: '에디터에서 등록 — 표준 사전에서 대조하지 않았습니다.',
+      provenance: prev
+        ? '에디터에서 고침 — 표준 사전에서 대조하지 않았습니다.'
+        : '에디터에서 등록 — 표준 사전에서 대조하지 않았습니다.',
     };
 
     const entries = [...get().entries.filter((e) => e.semanticId !== entry.semanticId), entry];
