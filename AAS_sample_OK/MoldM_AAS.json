@@ -1,0 +1,1708 @@
+{
+  "assetAdministrationShells": [
+    {
+      "modelType": "AssetAdministrationShell",
+      "idShort": "MoldM_AAS",
+      "description": [
+        {
+          "language": "ko",
+          "text": "1공장 1라인 CNC 가공기 MX-200 노철우"
+        }
+      ],
+      "id": "https://bnb.co.kr/ids/aas/mold-m-aas",
+      "assetInformation": {
+        "assetKind": "Instance",
+        "globalAssetId": "https://bnb.co.kr/ids/asset/mx200-line1-001"
+      },
+      "submodels": [
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/nameplate"
+            }
+          ]
+        },
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://bnb.co.kr/ids/sm/operational-data"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "submodels": [
+    {
+      "modelType": "Submodel",
+      "idShort": "Nameplate",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://admin-shell.io/idta/nameplate/3/0/Nameplate"
+          }
+        ]
+      },
+      "id": "https://bnb.co.kr/ids/sm/nameplate",
+      "kind": "Template",
+      "submodelElements": [
+        {
+          "modelType": "Property",
+          "idShort": "URIOfTheProduct",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABN590#002"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-ABH173#003"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:anyURI",
+          "value": "https://example.com/products/MX-200/0001"
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerName",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA565#009"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO677#004"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "ACME Machinery"
+            },
+            {
+              "language": "ko",
+              "text": "사출성형"
+            }
+          ]
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerProductDesignation",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA567#009"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAW338#003"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "CNC Milling Center MX-200"
+            }
+          ]
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "AddressInformation",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/AddressInformation"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0112/2///61360_7#AAS002#001"
+                }
+              ]
+            },
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAQ837#008"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "Street",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO128#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "ko",
+                  "text": "과학산단로 123"
+                }
+              ]
+            },
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "Zipcode",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO129#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "ko",
+                  "text": "46744"
+                }
+              ]
+            },
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "CityTown",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO132#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "ko",
+                  "text": "부산"
+                }
+              ]
+            },
+            {
+              "modelType": "MultiLanguageProperty",
+              "idShort": "NationalCode",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "0173-1#02-AAO134#002"
+                  }
+                ]
+              },
+              "value": [
+                {
+                  "language": "en",
+                  "text": "KR"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerProductRoot",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61360_7#AAS011#001"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAU732#003"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "Milling machine"
+            }
+          ]
+        },
+        {
+          "modelType": "MultiLanguageProperty",
+          "idShort": "ManufacturerProductFamily",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP464#002"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAU731#003"
+                }
+              ]
+            }
+          ],
+          "value": [
+            {
+              "language": "en",
+              "text": "MX series"
+            }
+          ]
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ManufacturerProductType",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA300#008"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO057#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "MX-200"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "OrderCodeOfManufacturer",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA950#008"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO227#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "MX200-KR-2026"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ProductArticleNumberOfManufacturer",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA581#007"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO676#005"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "MX-200-STD"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "SerialNumber",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABA951#009"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAM556#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "MX200-L1-0001"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "YearOfConstruction",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP000#002"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAP906#003"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "2026"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "DateOfManufacture",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABB757#007"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAR972#004"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:date",
+          "value": "2026-03-14"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "CountryOfOrigin",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP462#001"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-AAO259#007"
+                }
+              ]
+            }
+          ],
+          "valueType": "xs:string",
+          "value": "KR"
+        },
+        {
+          "modelType": "File",
+          "idShort": "CompanyLogo",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0112/2///61987#ABP463#001"
+              }
+            ]
+          },
+          "supplementalSemanticIds": [
+            {
+              "type": "ExternalReference",
+              "keys": [
+                {
+                  "type": "GlobalReference",
+                  "value": "0173-1#02-ABI776#002"
+                }
+              ]
+            }
+          ],
+          "contentType": "image/png",
+          "value": "/aasx/files/acme_logo.png"
+        }
+      ]
+    },
+    {
+      "modelType": "Submodel",
+      "idShort": "OperationalData",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://cw1.co.kr/ids/cd/OperationalData/1/0"
+          }
+        ]
+      },
+      "id": "https://bnb.co.kr/ids/sm/operational-data",
+      "kind": "Instance",
+      "submodelElements": [
+        {
+          "modelType": "Property",
+          "idShort": "CurrentTemperature",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-BAA092#002"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "45.2"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "RotationSpeed",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-BAF161#004"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "1450"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "OperatingHours",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-AAH252#003"
+              }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "12874.5"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "MachineState",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "0173-1#02-ABH789#001"
+              }
+            ]
+          },
+          "valueType": "xs:string",
+          "value": "Running"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "Timestamp",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://cw1.co.kr/ids/cd/Timestamp/1/0"
+              }
+            ]
+          },
+          "valueType": "xs:dateTime",
+          "value": "2026-08-26T09:30:00+09:00"
+        },
+        {
+          "modelType": "SubmodelElementCollection",
+          "idShort": "ProcessQuality_collection",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://bnb.co.kr/ids/cd/ProcessQuality_collection/1/0"
+              }
+            ]
+          },
+          "value": [
+            {
+              "modelType": "Property",
+              "idShort": "ToolWearRate",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/ToolWearRate/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "0.34"
+            },
+            {
+              "modelType": "Property",
+              "idShort": "SurfaceRoughnessRa",
+              "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                  {
+                    "type": "GlobalReference",
+                    "value": "https://bnb.co.kr/ids/cd/SurfaceRoughnessRa/1/0"
+                  }
+                ]
+              },
+              "valueType": "xs:double",
+              "value": "0.82"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conceptDescriptions": [
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61360_7#AAS011#001",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "ManufacturerProductRoot"
+              },
+              {
+                "language": "ko",
+                "text": "ManufacturerProductRoot"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "top level of a 3 level manufacturer specific product hierarchy"
+              }
+            ],
+            "dataType": "STRING_TRANSLATABLE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABA300#008",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "ManufacturerProductType"
+              },
+              {
+                "language": "ko",
+                "text": "형식"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "characteristic to differentiate between different products of a product family or special variants"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABA565#009",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "ManufacturerName"
+              },
+              {
+                "language": "ko",
+                "text": "제조사명"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "legally valid designation of the natural or judicial person which is directly responsible for the design, production, packaging and labeling of a product in respect to its being brought into circulation"
+              }
+            ],
+            "dataType": "STRING_TRANSLATABLE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABA567#009",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "ManufacturerProductDesignation"
+              },
+              {
+                "language": "ko",
+                "text": "제품명"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "short description of the product (short text), third or lowest level of a 3 level manufacturer specific product hierarchy"
+              }
+            ],
+            "dataType": "STRING_TRANSLATABLE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABA581#007",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "ProductArticleNumberOfManufacturer"
+              },
+              {
+                "language": "ko",
+                "text": "품번"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "unique product identifier of the manufacturer"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABA950#008",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "OrderCodeOfManufacturer"
+              },
+              {
+                "language": "ko",
+                "text": "주문코드"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "unique combination of numbers and letters issued by the manufacturer that is used to identify the device for ordering"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABA951#009",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "SerialNumber"
+              },
+              {
+                "language": "ko",
+                "text": "시리얼번호"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "unique combination of numbers and letters used to identify the device once it has been manufactured"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABB757#007",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "DateOfManufacture"
+              },
+              {
+                "language": "ko",
+                "text": "제조일자"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "date when an item was manufactured"
+              }
+            ],
+            "dataType": "DATE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABN590#002",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "URIOfTheProduct"
+              },
+              {
+                "language": "ko",
+                "text": "제품URI"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "unique global identification of the product instance using an universal resource identifier (URI)"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABP000#002",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "YearOfConstruction"
+              },
+              {
+                "language": "ko",
+                "text": "제조연도"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "year in which the manufacturing process is completed"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABP462#001",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "CountryOfOrigin"
+              },
+              {
+                "language": "ko",
+                "text": "원산지"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "country where the product was manufactured"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABP463#001",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "CompanyLogo"
+              },
+              {
+                "language": "ko",
+                "text": "회사로고"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "a graphic mark used to represent a company, an organisation or a product"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0112/2///61987#ABP464#002",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "ManufacturerProductFamily"
+              },
+              {
+                "language": "ko",
+                "text": "ManufacturerProductFamily"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "second level of a 3 level manufacturer specific product hierarchy"
+              }
+            ],
+            "dataType": "STRING_TRANSLATABLE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAH252#003",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Operating hours"
+              },
+              {
+                "language": "ko",
+                "text": "가동시간"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Accumulated time the equipment has been in operation since commissioning."
+              }
+            ],
+            "unit": "h",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAO128#002",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Street"
+              },
+              {
+                "language": "ko",
+                "text": "도로명주소"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "street name and house number"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAO129#002",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Zipcode"
+              },
+              {
+                "language": "ko",
+                "text": "우편번호"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "ZIP code of address"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAO132#002",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "CityTown"
+              },
+              {
+                "language": "ko",
+                "text": "도시"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "town or city"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-AAO134#002",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "NationalCode"
+              },
+              {
+                "language": "ko",
+                "text": "국가코드"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "code of a country"
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-ABH789#001",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Machine state"
+              },
+              {
+                "language": "ko",
+                "text": "설비상태"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Current operating state of the machine, for example running, idle, stopped or faulted."
+              }
+            ],
+            "dataType": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-BAA092#002",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Current temperature"
+              },
+              {
+                "language": "ko",
+                "text": "현재온도"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Temperature measured at the reference point at the time of reading."
+              }
+            ],
+            "unit": "°C",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "0173-1#02-BAF161#004",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Rotation speed"
+              },
+              {
+                "language": "ko",
+                "text": "회전속도"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Number of revolutions of the rotating part per unit of time."
+              }
+            ],
+            "unit": "1/min",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "https://admin-shell.io/idta/nameplate/3/0/Nameplate",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Nameplate"
+              },
+              {
+                "language": "ko",
+                "text": "명판"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Submodel carrying the nameplate information of the asset as required for market surveillance."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/AddressInformation",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Address information"
+              },
+              {
+                "language": "ko",
+                "text": "주소 정보"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Collection of address fields of a contact, such as street, zip code, city and national code."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "https://bnb.co.kr/ids/cd/ProcessQuality_collection/1/0",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Process quality collection"
+              },
+              {
+                "language": "ko",
+                "text": "표면마모"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Toolwear rate"
+              }
+            ],
+            "unit": "mm",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "https://bnb.co.kr/ids/cd/SurfaceRoughnessRa/1/0",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Surface roughness ra"
+              },
+              {
+                "language": "ko",
+                "text": "표면강도"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "Surface roughness"
+              }
+            ],
+            "unit": "bar",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "https://bnb.co.kr/ids/cd/ToolWearRate/1/0",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "SurfaceRoughness"
+              },
+              {
+                "language": "ko",
+                "text": "표면강도"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "SurfaceRoughness"
+              }
+            ],
+            "unit": "Pa",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "https://cw1.co.kr/ids/cd/OperationalData/1/0",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Operational data"
+              },
+              {
+                "language": "ko",
+                "text": "기계 운전 온도"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "machine operational data"
+              }
+            ],
+            "unit": "°C",
+            "dataType": "REAL_MEASURE"
+          }
+        }
+      ]
+    },
+    {
+      "modelType": "ConceptDescription",
+      "id": "https://cw1.co.kr/ids/cd/Timestamp/1/0",
+      "embeddedDataSpecifications": [
+        {
+          "dataSpecification": {
+            "type": "ExternalReference",
+            "keys": [
+              {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360"
+              }
+            ]
+          },
+          "dataSpecificationContent": {
+            "modelType": "DataSpecificationIec61360",
+            "preferredName": [
+              {
+                "language": "en",
+                "text": "Timestamp"
+              },
+              {
+                "language": "ko",
+                "text": "시간"
+              }
+            ],
+            "definition": [
+              {
+                "language": "en",
+                "text": "time series time"
+              }
+            ],
+            "unit": "s",
+            "dataType": "TIMESTAMP"
+          }
+        }
+      ]
+    }
+  ]
+}

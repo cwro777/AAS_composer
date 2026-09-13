@@ -1,0 +1,76 @@
+{
+  "assetAdministrationShells": [
+    {
+      "modelType": "AssetAdministrationShell",
+      "idShort": "MX200_Line1_AAS",
+      "id": "https://bnb.co.kr/ids/aas/mx200-line1-001",
+      "description": [
+        { "language": "ko", "text": "1공장 1라인 CNC 가공기 MX-200 — 연습용. 고칠 것이 넷 있다" }
+      ],
+      "assetInformation": {
+        "assetKind": "Instance",
+        "globalAssetId": "https://bnb.co.kr/ids/asset/mx200-line1-001"
+      },
+      "submodels": [
+        {
+          "type": "ModelReference",
+          "keys": [
+            {
+              "type": "Submodel",
+              "value": "https://acme-supplier.com/ids/sm/mx200-line1-001/operationaldata"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "submodels": [
+    {
+      "modelType": "Submodel",
+      "idShort": "OperationalData",
+      "id": "https://acme-supplier.com/ids/sm/mx200-line1-001/operationaldata",
+      "kind": "Instance",
+      "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "https://bnb.co.kr/ids/cd/MachineOperationalData/1/0"
+          }
+        ]
+      },
+      "submodelElements": [
+        {
+          "modelType": "Property",
+          "idShort": "RatedPower",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              { "type": "GlobalReference", "value": "https://bnb.co.kr/ids/cd/RatedPower/1/0" }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "15.0 kW"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "CycleTime",
+          "valueType": "xs:double",
+          "value": "42.5"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "ToolWearRate",
+          "semanticId": {
+            "type": "ExternalReference",
+            "keys": [
+              { "type": "GlobalReference", "value": "https://example.org/cd/ToolWearRate/1/0" }
+            ]
+          },
+          "valueType": "xs:double",
+          "value": "0.34"
+        }
+      ]
+    }
+  ]
+}
