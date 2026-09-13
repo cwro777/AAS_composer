@@ -21,7 +21,7 @@
       "cardinality": "0..1",
       "valueType": "xs:double",
       "semanticId": "0173-1#02-BAA092#002",
-      "source": "사내 정의 — eCl@ss 미대조",
+      "source": "eCl@ss 후보 — 라이선스가 없어 대조하지 못했다. 라이선스를 확보하면 대조해 verified를 올린다",
       "exampleValue": "45.2"
     },
     {
@@ -32,7 +32,7 @@
       "cardinality": "0..1",
       "valueType": "xs:double",
       "semanticId": "0173-1#02-BAF161#004",
-      "source": "사내 정의 — eCl@ss 미대조",
+      "source": "eCl@ss 후보 — 라이선스가 없어 대조하지 못했다. 라이선스를 확보하면 대조해 verified를 올린다",
       "exampleValue": "1450"
     },
     {
@@ -43,7 +43,7 @@
       "cardinality": "0..1",
       "valueType": "xs:double",
       "semanticId": "0173-1#02-AAH252#003",
-      "source": "사내 정의 — eCl@ss 미대조",
+      "source": "eCl@ss 후보 — 라이선스가 없어 대조하지 못했다. 라이선스를 확보하면 대조해 verified를 올린다",
       "exampleValue": "12874.5"
     },
     {
@@ -54,7 +54,7 @@
       "cardinality": "0..1",
       "valueType": "xs:string",
       "semanticId": "0173-1#02-ABH789#001",
-      "source": "사내 정의 — eCl@ss 미대조",
+      "source": "eCl@ss 후보 — 라이선스가 없어 대조하지 못했다. 라이선스를 확보하면 대조해 verified를 올린다",
       "exampleValue": "Running"
     },
     {
@@ -64,8 +64,8 @@
       "required": false,
       "cardinality": "0..1",
       "valueType": "xs:dateTime",
-      "semanticId": "https://admin-shell.io/idta/TimeSeries/UtcTime/1/1",
-      "source": "사내 정의",
+      "semanticId": "{ns}/cd/Timestamp/1/0",
+      "source": "사내 정의 — 우리 이름으로 발행한다. 예전 값 https://admin-shell.io/idta/TimeSeries/UtcTime/1/1은 IDTA 02008 1.1 공식 Template JSON에 없어(시간 IRI는 Segment/StartTime·Segment/EndTime·RelativePointInTime뿐) IDTA 네임스페이스로 쓸 근거가 없었다",
       "exampleValue": "2026-08-26T09:30:00+09:00"
     }
   ]

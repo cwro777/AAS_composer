@@ -50,16 +50,22 @@ export function getTemplate(id: string): TemplateDef | undefined {
   return BY_ID.get(id);
 }
 
-/** 사양서에서 대조하지 못한 항목 — UI가 배지로 드러내고 배포 전 확인이 필요하다. */
+/**
+ * 사양서에서 대조하지 못한 항목 — UI가 배지로 드러내고 배포 전 확인이 필요하다.
+ *
+ * **`{ns}`로 발행한 사내 개념은 넣지 않는다.** 남의 이름을 쓴다는 주장이 아니라 우리 이름이라는
+ * 선언이라 대조할 원본이 없다. 여기 섞이면 "확인이 필요한 남의 IRDI"가 묻힌다.
+ */
 export function unverifiedOf(def: TemplateDef): Array<{ path: string; source?: string }> {
   const out: Array<{ path: string; source?: string }> = [];
-  if (def.submodel.verified === 'none') {
+  const selfIssued = (v: string | undefined): boolean => !!v && v.includes(NS);
+  if (def.submodel.verified === 'none' && !selfIssued(def.submodel.semanticId)) {
     out.push({ path: def.submodel.idShort, source: '(서브모델 semanticId)' });
   }
   const walk = (els: ElementDef[], prefix: string): void => {
     for (const e of els) {
       const path = `${prefix}/${e.idShort}`;
-      if (e.verified === 'none') out.push({ path, ...(e.source ? { source: e.source } : {}) });
+      if (e.verified === 'none' && !selfIssued(e.semanticId)) out.push({ path, ...(e.source ? { source: e.source } : {}) });
       if (e.children?.length) walk(e.children, path);
     }
   };

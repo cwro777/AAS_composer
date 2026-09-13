@@ -446,14 +446,25 @@ docs/mock/MOCK-idta-missing-concepts.json    13건
 ```
 admin-shell.io/idta/nameplate/3/0/Nameplate
 admin-shell.io/zvei/nameplate/1/0/ContactInformations/AddressInformation
-admin-shell.io/idta/TimeSeries/1/1 · …/TimeSeries/UtcTime/1/1
+admin-shell.io/idta/TimeSeries/1/1
 admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0
-admin-shell.io/idta/OperationalData/1/0
 admin-shell.io/idta/HierarchicalStructures/…            (5건)
 opcfoundation.org/UA/WoT-Binding/…                       (2건)
+admin-shell.io/idta/TimeSeries/UtcTime/1/1              ← IDTA가 쓴 적도 없다 (아래)
+admin-shell.io/idta/OperationalData/1/0                 ← IDTA가 쓴 적도 없다 (아래)
 ```
 
-둘 다 심으면 **템플릿 9종의 CD-001이 전부 0이 된다.** 확인은 이것으로 한다.
+**마지막 두 건은 전제가 틀렸다.** "IDTA가 IRI만 쓰고 정의를 안 냈다"가 아니라, IDTA 공식
+Template JSON 어디에도 없고 **우리 Operational Data 템플릿만** 쓰던 값이다(TimeSeries 1.1의
+시간 IRI는 `Segment/StartTime` · `Segment/EndTime` · `RelativePointInTime`뿐이다). 그래서
+템플릿에서 뺐다 — 서브모델은 `{ns}/cd/OperationalData/1/0`, Timestamp는 `{ns}/cd/Timestamp/1/0`.
+mock에는 남아 있다. 이 IRI를 이미 쓰는 옛 모델이 있어서다.
+
+**`/idta/`가 들어 있다고 IDTA 개념이 아니다.** 판단 근거는 IDTA 공식 Template JSON(`docs/idta/*.json`)이나
+사양서 본문에 그 IRI가 실제로 있는가뿐이다. 인스펙터 배지 `사양서 확인`이 그 확인을 거친 값이다.
+
+둘 다 심으면 **템플릿 9종의 CD-001이 전부 0이 된다** — 사내 개념(`{ns}`)을 뺀 나머지가.
+사내 개념은 템플릿을 넣은 뒤 `개념 등록`으로 뜻을 채운다.
 
 ```
 pnpm --filter @aas/api exec tsx scripts/audit-templates.ts --dict

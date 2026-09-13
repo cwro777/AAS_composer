@@ -25,7 +25,8 @@ import {
 
 const OLD = 'https://cw.co.kr/ids';
 const NEW = 'https://cw1.co.kr/ids';
-const STD_TIME = 'https://admin-shell.io/idta/TimeSeries/UtcTime/1/1';
+/* IDTA 02008 1.1 공식 Template JSON에 실재하는 IRI */
+const STD_TIME = 'https://admin-shell.io/idta/TimeSeries/Segment/StartTime/1/1';
 const STD_CDD = '0112/2///61987#ABA951#009';
 
 function build(): AasDoc {

@@ -83,8 +83,11 @@
 - `@aas/templates` — **템플릿 9종** + 적합성 검사(T-001·T-002·T-003) + `verified` 표기
   + **개정 마이그레이션**(`planMigration` — 미리보기와 적용을 분리한다).
   기존 6종 + Hierarchical Structures(02011-1-1) + AID MQTT·OPC UA(02017-1-1).
-  미확인 semanticId는 9건뿐이고 전부 이유가 분명하다 — 사내 정의 6건,
-  공식 템플릿에 없는 예시 속성 3건(eCl@ss 라이선스 없음).
+  미확인 semanticId는 **7건, 전부 eCl@ss 후보**다 — Operational Data 4건, Technical Data의
+  공식 템플릿에 없는 예시 속성 3건. 라이선스가 없어 대조하지 못했고 P0 결정대로 IRDI는 유지한다.
+  사내 개념(`{ns}` — OperationalData·Timestamp)은 우리 이름이라는 선언이라 미확인에 세지 않는다.
+  **`/idta/`가 들어 있다고 IDTA 개념이 아니다** — 예전 Timestamp의 `…/idta/TimeSeries/UtcTime/1/1`은
+  IDTA 공식 JSON 어디에도 없었다. 근거는 공식 Template JSON·사양서 본문뿐이다.
 - `apps/web` — **P9 운전 모니터링 진행 중.** `/dashboard/operations`가 서버를 본다 —
   수집 상태·신호별 지연·시계열. **지연은 서버가 준 `now`로 잰다**(브라우저 시계는 어긋난다).
   값이 온 적 없는 신호도 목록에 남고, 조회 실패를 "신호 없음"으로 보이지 않는다.
@@ -256,4 +259,4 @@ Nameplate 2.0 → 3.0 마이그레이션 미리보기도 이 단계다.
   다음 설비는 같은 방식으로 build-*.ts를 하나 더 쓰면 된다.
 - **Package Explorer 샘플 AASX 3종** — 같은 폴더에 넣으면 손실 없이 열고 저장되는지 검사된다.
   현재는 15종 노드를 모두 쓰는 합성 픽스처(`test/coverage.test.ts`)로 대신하고 있다.
-- 미확인 semanticId 8건 — `unverifiedOf()`가 목록으로 내주고 골든 스냅샷에 고정돼 있다.
+- 미확인 semanticId 7건(eCl@ss 후보) — `unverifiedOf()`가 목록으로 내주고 골든 스냅샷에 고정돼 있다.
