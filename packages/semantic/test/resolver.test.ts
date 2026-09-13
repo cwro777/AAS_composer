@@ -5,7 +5,7 @@
  * **사출성형기 픽스처**로 확인한다. 합성 문서가 아니라 우리가 모델링한 그 설비다.
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
@@ -45,15 +45,37 @@ describe('사출성형기 모델에 단위를 실어 보낸다', () => {
     expect(content['dataType']).toBe('REAL_MEASURE');
   });
 
-  it('표준 개념은 아직 해석되지 않는다 — 정의를 우리가 갖고 있지 않다', () => {
-    /* IEC CDD IRDI는 사전 프록시(P7)가 채운다. 그때까지 목록으로 남는 것이 맞다. */
-    const cddUnresolved = result.unresolved.filter((i) => i.path.startsWith('0112/'));
-    expect(cddUnresolved.length).toBeGreaterThan(0);
-    expect(cddUnresolved[0]!.message.ko).toMatch(/정의|모릅니다/);
+  /**
+   * 표준 개념의 정의는 **IDTA가 발행한 문장 그대로**여야 한다.
+   *
+   * 샘플 용어집의 IEC CDD·eCl@ss 항목에는 원래 정의가 없었다(그래서 이 자리의 옛 테스트는
+   * "해석되지 않는다"를 확인했다). 이제 IDTA 공식 Template JSON의 conceptDescriptions에서
+   * 옮겨 적었다. 한 글자라도 다르면 원본과 다른 설명이 표준 식별자를 달고 나간다.
+   */
+  it('표준 개념은 IDTA 공식 JSON의 정의로만 해석된다 — 지어내지 않는다', () => {
+    const official = new Map<string, string>();
+    const dir = fileURLToPath(new URL('../../../docs/idta/', import.meta.url));
+    for (const f of readdirSync(dir).filter((n) => n.endsWith('.json'))) {
+      const e = JSON.parse(readFileSync(`${dir}${f}`, 'utf8')) as {
+        conceptDescriptions?: Array<{ id: string; embeddedDataSpecifications?: Array<{ dataSpecificationContent?: { definition?: Array<{ language: string; text: string }> } }> }>;
+      };
+      for (const cd of e.conceptDescriptions ?? []) {
+        const def = cd.embeddedDataSpecifications?.[0]?.dataSpecificationContent?.definition?.find((t) =>
+          t.language.toLowerCase().startsWith('en'),
+        )?.text;
+        if (def && !official.has(cd.id)) official.set(cd.id, def.trim());
+      }
+    }
+
+    const standard = SAMPLE_TERMS.terms.filter((t) => /^(0112\/|0173-)/.test(t.semanticId) && t.definition);
+    expect(standard.length).toBeGreaterThan(0);
+    for (const t of standard) {
+      expect(official.get(t.semanticId), t.semanticId).toBe(t.definition);
+    }
   });
 
   it('해석하지 못한 것이 조용히 사라지지 않는다', () => {
-    expect(result.unresolved.every((i) => i.code === 'CD-001')).toBe(true);
+    expect(result.unresolved.every((i) => i.code === 'CD-001' || i.code === 'CD-002')).toBe(true);
     expect(result.unresolved.every((i) => i.path !== '')).toBe(true);
   });
 

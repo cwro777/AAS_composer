@@ -12,7 +12,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "legally valid designation of the natural or judicial person which is directly responsible for the design, production, packaging and labeling of a product in respect to its being brought into circulation"
     },
     {
       "term": "제품명",
@@ -24,7 +25,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "short description of the product (short text), third or lowest level of a 3 level manufacturer specific product hierarchy"
     },
     {
       "term": "형식",
@@ -37,7 +39,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "characteristic to differentiate between different products of a product family or special variants"
     },
     {
       "term": "시리얼번호",
@@ -50,7 +53,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "unique combination of numbers and letters used to identify the device once it has been manufactured"
     },
     {
       "term": "주문코드",
@@ -59,7 +63,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "unique combination of numbers and letters issued by the manufacturer that is used to identify the device for ordering"
     },
     {
       "term": "품번",
@@ -71,7 +76,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "unique product identifier of the manufacturer"
     },
     {
       "term": "제조연도",
@@ -80,7 +86,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "year in which the manufacturing process is completed"
     },
     {
       "term": "제조일자",
@@ -89,7 +96,8 @@
       "dataType": "DATE",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "date when an item was manufactured"
     },
     {
       "term": "원산지",
@@ -98,7 +106,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "country where the product was manufactured"
     },
     {
       "term": "하드웨어버전",
@@ -107,7 +116,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "version of the hardware supplied with the device"
     },
     {
       "term": "펌웨어버전",
@@ -116,7 +126,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "version of the firmware supplied with the device"
     },
     {
       "term": "소프트웨어버전",
@@ -125,7 +136,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "version of the software used by the device"
     },
     {
       "term": "제품URI",
@@ -134,7 +146,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "unique global identification of the product instance using an universal resource identifier (URI)"
     },
     {
       "term": "회사로고",
@@ -143,7 +156,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02006-3-0 Template JSON"
+      "provenance": "IDTA 02006-3-0 Template JSON",
+      "definition": "a graphic mark used to represent a company, an organisation or a product"
     },
     {
       "term": "도로명주소",
@@ -156,7 +170,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)"
+      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)",
+      "definition": "street name and house number"
     },
     {
       "term": "우편번호",
@@ -165,7 +180,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)"
+      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)",
+      "definition": "ZIP code of address"
     },
     {
       "term": "도시",
@@ -177,7 +193,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)"
+      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)",
+      "definition": "town or city"
     },
     {
       "term": "국가코드",
@@ -186,7 +203,8 @@
       "dataType": "STRING",
       "origin": "idta",
       "verified": "spec",
-      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)"
+      "provenance": "IDTA 02002-1-0 Template JSON (ContactInformation)",
+      "definition": "code of a country"
     },
     {
       "term": "형체력",
