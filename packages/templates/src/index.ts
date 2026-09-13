@@ -86,8 +86,46 @@ export interface InstantiateOptions {
   withExamples?: boolean;
 }
 
+/* ── 사내 네임스페이스 자리표시 `{ns}` ─────────────────────────────
+   사내 정의 템플릿의 개념은 우리 이름으로 발행한다. 도메인을 JSON에 박으면 네임스페이스를
+   바꾸는 순간 그 템플릿만 남의(옛) 도메인으로 개념을 발행한다 — 실제로 bnb.co.kr이 남았다. */
+
+const NS = '{ns}';
+const DEFAULT_NS = 'https://example.com/ids';
+
+/** `{ns}`를 치환한다. 네임스페이스를 모르면 null — 자리표시를 그대로 문서에 넣지 않는다 */
+export function resolveTemplateValue(value: string, ns: string | null | undefined): string | null {
+  if (!value.includes(NS)) return value;
+  if (!ns) return null;
+  return value.split(NS).join(ns.replace(/\/+$/, ''));
+}
+
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * 문서의 값이 템플릿 값을 따르는가. `{ns}` 자리는 **어느 IRI 네임스페이스든** 받는다 —
+ * 네임스페이스를 바꾸기 전에 만든 모델이 적합성 경고로 뒤덮이면 안 된다.
+ */
+export function conformsToTemplateValue(actual: string | undefined, expected: string): boolean {
+  if (actual === undefined) return false;
+  if (!expected.includes(NS)) return actual === expected;
+  const re = new RegExp(`^${expected.split(NS).map(escapeRe).join('https?://\\S+?')}$`);
+  return re.test(actual);
+}
+
+/** 인스턴스의 식별자를 idPattern에 맞춰 네임스페이스를 되읽는다. 못 읽으면 null */
+function namespaceOf(def: TemplateDef, identifier: string | undefined): string | null {
+  if (!identifier || !def.submodel.idPattern.includes(NS)) return null;
+  const re = new RegExp(
+    `^${escapeRe(def.submodel.idPattern).replace(escapeRe(NS), '(https?://.+?)').replace(escapeRe('{asset}'), '[^/]+')}(?:-\\d+)?$`,
+  );
+  return re.exec(identifier)?.[1] ?? null;
+}
+
 function identifierFor(def: TemplateDef, o: InstantiateOptions): string {
-  const ns = o.namespace ?? 'https://example.com/ids';
+  const ns = o.namespace ?? DEFAULT_NS;
   const asset = o.assetSlug ?? 'asset';
   const id = def.submodel.idPattern.replace('{ns}', ns).replace('{asset}', asset);
   /* 문서를 알 때만 유일성을 보장할 수 있다. 모르면 패턴 그대로 — 조용히 바꾸지 않는다. */
@@ -103,7 +141,12 @@ export function instantiate(def: TemplateDef, opts: InstantiateOptions): Cmd {
   const origin = { templateId: def.id, version: def.version };
   const withExamples = opts.withExamples !== false;
 
+  const ns = opts.namespace ?? DEFAULT_NS;
   const smId = opts.newId();
+  const smSemanticId = resolveTemplateValue(def.submodel.semanticId, ns);
+  const smSupplemental = def.submodel.supplementalSemanticIds
+    ?.map((v) => resolveTemplateValue(v, ns))
+    .filter((v): v is string => !!v);
   cmds.push({
     t: 'insert',
     parent: opts.shell ?? null,
@@ -112,10 +155,8 @@ export function instantiate(def: TemplateDef, opts: InstantiateOptions): Cmd {
       idShort: def.submodel.idShort,
       identifier: identifierFor(def, opts),
       kind: 'Instance',
-      semanticId: def.submodel.semanticId,
-      ...(def.submodel.supplementalSemanticIds
-        ? { supplementalSemanticIds: def.submodel.supplementalSemanticIds }
-        : {}),
+      ...(smSemanticId ? { semanticId: smSemanticId } : {}),
+      ...(smSupplemental?.length ? { supplementalSemanticIds: smSupplemental } : {}),
       origin,
     }),
   });
@@ -124,7 +165,7 @@ export function instantiate(def: TemplateDef, opts: InstantiateOptions): Cmd {
     if (opts.requiredOnly && !e.required) return;
     /* 인스턴스 데이터 없이는 규격을 만족할 수 없는 요소는 정의만 남기고 넣지 않는다. */
     if (e.autoInsert === false) return;
-    cmds.push(...elementCmds(e, parent, opts.newId, origin, withExamples, Number.MAX_SAFE_INTEGER));
+    cmds.push(...elementCmds(e, parent, opts.newId, origin, withExamples, Number.MAX_SAFE_INTEGER, ns));
   };
 
   for (const e of def.elements) put(e, smId);
@@ -144,18 +185,25 @@ export function elementCmds(
   origin: { templateId: string; version: string },
   withExamples: boolean,
   index: number,
+  /** `{ns}` 치환용. 모르면 `{ns}`가 든 값은 넣지 않는다 — 자리표시를 문서에 남기지 않는다 */
+  ns: string | null = null,
 ): Cmd[] {
   const cmds: Cmd[] = [];
   const put = (d: ElementDef, at: NodeId, idx: number): void => {
     const id = newId();
+    const semanticId = d.semanticId ? resolveTemplateValue(d.semanticId, ns) : null;
+    const supplemental = d.supplementalSemanticIds
+      ?.map((v) => resolveTemplateValue(v, ns))
+      .filter((v): v is string => !!v);
+    const listElement = d.semanticIdListElement ? resolveTemplateValue(d.semanticIdListElement, ns) : null;
     cmds.push({
       t: 'insert',
       parent: at,
       index: idx,
       node: newNode(id, d.t, {
         idShort: d.idShort,
-        ...(d.semanticId ? { semanticId: d.semanticId } : {}),
-        ...(d.supplementalSemanticIds ? { supplementalSemanticIds: d.supplementalSemanticIds } : {}),
+        ...(semanticId ? { semanticId } : {}),
+        ...(supplemental?.length ? { supplementalSemanticIds: supplemental } : {}),
         ...(d.valueType ? { valueType: d.valueType } : {}),
         ...(withExamples && d.exampleValue !== undefined ? { value: d.exampleValue } : {}),
         ...(withExamples && d.langs ? { langs: d.langs } : {}),
@@ -164,7 +212,7 @@ export function elementCmds(
         ...(d.contentType ? { contentType: d.contentType } : {}),
         ...(d.entityType ? { entityType: d.entityType } : {}),
         ...(d.typeValueListElement ? { typeValueListElement: d.typeValueListElement } : {}),
-        ...(d.semanticIdListElement ? { semanticIdListElement: d.semanticIdListElement } : {}),
+        ...(listElement ? { semanticIdListElement: listElement } : {}),
         ...(d.valueTypeListElement ? { valueTypeListElement: d.valueTypeListElement } : {}),
         origin,
       }),
@@ -203,7 +251,10 @@ export function checkConformance(doc: AasDoc, submodelId: NodeId): Conformance[]
 
   /* idShort를 바꿔 쓰는 요소는 semanticId로 대조한다 (템플릿의 editableIdShort). */
   const bySemantic = (parent: NodeId, semanticId: string): NodeId | undefined =>
-    (doc.order[parent] ?? []).find((c) => doc.nodes[c]?.semanticId === semanticId);
+    (doc.order[parent] ?? []).find((c) => conformsToTemplateValue(doc.nodes[c]?.semanticId, semanticId));
+  /* 메시지에 보일 기대값 — 네임스페이스를 되읽을 수 있으면 실제 값으로, 아니면 자리표시로 */
+  const ns = namespaceOf(def, sm.t === 'submodel' ? sm.identifier : undefined);
+  const shown = (v: string): string => resolveTemplateValue(v, ns) ?? v.split(NS).join('<사내 네임스페이스>');
 
   const walk = (els: ElementDef[], parent: NodeId, prefix: string): void => {
     /* List 직속 자식은 idShort가 없다(AASd-120). 이름 대신 위치로 대조한다. */
@@ -232,14 +283,14 @@ export function checkConformance(doc: AasDoc, submodelId: NodeId): Conformance[]
         continue;
       }
       const node = doc.nodes[id]!;
-      if (e.semanticId && node.semanticId && node.semanticId !== e.semanticId) {
+      if (e.semanticId && node.semanticId && !conformsToTemplateValue(node.semanticId, e.semanticId)) {
         out.push({
           code: 'T-002',
           node: id,
           path,
           message: {
-            ko: `semanticId가 템플릿과 다릅니다. 템플릿: ${e.semanticId}`,
-            en: `semanticId deviates from the template. Expected ${e.semanticId}`,
+            ko: `semanticId가 템플릿과 다릅니다. 템플릿: ${shown(e.semanticId)}`,
+            en: `semanticId deviates from the template. Expected ${shown(e.semanticId)}`,
           },
         });
       }
@@ -247,14 +298,14 @@ export function checkConformance(doc: AasDoc, submodelId: NodeId): Conformance[]
     }
   };
 
-  if (sm.semanticId && sm.semanticId !== def.submodel.semanticId) {
+  if (sm.semanticId && !conformsToTemplateValue(sm.semanticId, def.submodel.semanticId)) {
     out.push({
       code: 'T-003',
       node: submodelId,
       path: sm.idShort,
       message: {
-        ko: `서브모델 semanticId가 템플릿 ${def.idtaNumber}과 다릅니다. 템플릿: ${def.submodel.semanticId}`,
-        en: `Submodel semanticId deviates from template ${def.idtaNumber}. Expected ${def.submodel.semanticId}`,
+        ko: `서브모델 semanticId가 템플릿 ${def.idtaNumber}과 다릅니다. 템플릿: ${shown(def.submodel.semanticId)}`,
+        en: `Submodel semanticId deviates from template ${def.idtaNumber}. Expected ${shown(def.submodel.semanticId)}`,
       },
     });
   }
@@ -426,11 +477,16 @@ function submodelSemanticIdFix(
   const sm = doc.nodes[node];
   if (sm?.t !== 'submodel' || !sm.origin) return null;
   const def = BY_ID.get(sm.origin.templateId);
-  if (!def || sm.semanticId === def.submodel.semanticId) return null;
+  if (!def || conformsToTemplateValue(sm.semanticId, def.submodel.semanticId)) return null;
+
+  /* `{ns}`면 이 서브모델의 식별자에서 네임스페이스를 되읽는다. 못 읽으면 고치지 않는다 —
+     남의 네임스페이스로 되돌리는 것은 되돌리기가 아니다 */
+  const value = resolveTemplateValue(def.submodel.semanticId, namespaceOf(def, sm.identifier));
+  if (!value) return null;
 
   return {
     label: { ko: '템플릿 값으로 되돌리기', en: 'Restore the template semanticId' },
-    cmds: [{ t: 'set', node, path: 'semanticId', value: def.submodel.semanticId }],
+    cmds: [{ t: 'set', node, path: 'semanticId', value }],
   };
 }
 
@@ -492,7 +548,7 @@ export function conformanceFix(
       ko: `템플릿에서 ${target.idShort} 생성`,
       en: `Create ${target.idShort} from the template`,
     },
-    cmds: elementCmds(target, parent, newId, sm.origin, true, at),
+    cmds: elementCmds(target, parent, newId, sm.origin, true, at, namespaceOf(def, sm.t === 'submodel' ? sm.identifier : undefined)),
   };
 }
 

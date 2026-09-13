@@ -7,9 +7,9 @@
   "sourceUrl": "(사내 문서)",
   "submodel": {
     "idShort": "OperationalData",
-    "semanticId": "https://bnb.co.kr/ids/cd/OperationalData/1/0",
+    "semanticId": "{ns}/cd/OperationalData/1/0",
     "verified": "none",
-    "source": "사내 정의. IDTA에 대응 서브모델이 없어 우리 이름으로 발행한다 — 예전에는 admin-shell.io 아래 IRI를 썼는데, 남이 정의하지 않은 개념을 남의 네임스페이스로 발행한 것이라 고쳤다",
+    "source": "사내 정의. IDTA에 대응 서브모델이 없어 우리 이름으로 발행한다 — 예전에는 admin-shell.io 아래 IRI를 썼는데, 남이 정의하지 않은 개념을 남의 네임스페이스로 발행한 것이라 고쳤다. {ns}는 삽입할 때 사내 네임스페이스로 바뀐다(도메인을 박아 두었더니 네임스페이스를 바꾼 뒤에도 옛 도메인으로 발행됐다)",
     "idPattern": "{ns}/sm/{asset}/operational"
   },
   "elements": [

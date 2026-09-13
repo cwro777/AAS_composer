@@ -134,6 +134,15 @@ https://id.acme.co.kr                 전용 서브도메인
 | Asset | `…/asset/imm150-aas` | `{ns}/asset/{슬러그}` |
 | Submodel `TechnicalData` | `…/sm/asset/technicaldata` | 템플릿의 `idPattern` |
 | 자체 발행 개념 `BarrelTemperature` | `…/cd/BarrelTemperature/1/0` | `{ns}/cd/{이름}/1/0` |
+| 사내 정의 템플릿의 개념 (Operational Data) | `…/cd/OperationalData/1/0` | 템플릿 JSON의 `{ns}` |
+
+**사내 정의 템플릿도 네임스페이스를 따라간다.** 템플릿 JSON의 semanticId에 `{ns}`를 쓰면
+넣을 때 사내 네임스페이스로 바뀐다. 도메인을 박아 두었을 때는 네임스페이스를 바꾼 뒤에도
+그 서브모델만 옛 도메인으로 개념을 발행했다. 적합성 검사(T-002·T-003)는 `{ns}` 자리에
+**어느 네임스페이스든** 받는다 — 바꾸기 전에 만든 모델이 경고로 뒤덮이지 않게.
+`템플릿 값으로 되돌리기`는 서브모델 식별자에서 네임스페이스를 되읽어 그 값으로 되돌리고,
+읽지 못하면 버튼을 만들지 않는다. **표준 템플릿(IDTA)의 식별자에는 `{ns}`를 쓰지 않는다.**
+새로 넣은 사내 개념은 용어집이 아직 모르므로 `CD-001` → `개념 등록`으로 뜻을 채운다.
 
 **식별자는 소문자 슬러그, 개념 IRI는 원래 대소문자를 유지한다.**
 `RatedPower` → 식별자 `rated-power`, 개념 `…/cd/RatedPower/1/0`.

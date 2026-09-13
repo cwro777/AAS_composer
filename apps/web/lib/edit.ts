@@ -20,7 +20,7 @@ import {
   slugify,
   uniqueIdentifier,
 } from '@aas/kernel';
-import { type TemplateDef, instantiate } from '@aas/templates';
+import { type TemplateDef, conformsToTemplateValue, instantiate } from '@aas/templates';
 
 import { DEFAULT_IRI_PREFIX, useSettings } from './settings';
 import { useEditor } from './store';
@@ -136,10 +136,11 @@ export function insertTemplate(def: TemplateDef, shell: NodeId | null): void {
    * 대개 사고이고, 넣고 나서 합치는 것보다 넣기 전에 멈추는 편이 싸다.
    * 일부러 둘을 두려는 경우(설비마다 다른 접점 등)도 있으므로 막지는 않는다.
    */
+  /* `{ns}` 템플릿은 네임스페이스와 무관하게 같은 뜻이다 — 적합성 검사와 같은 비교를 쓴다 */
   const already = Object.keys(s.doc.nodes).find(
     (id) =>
       s.doc.nodes[id]!.t === 'submodel' &&
-      s.doc.nodes[id]!.semanticId === def.submodel.semanticId &&
+      conformsToTemplateValue(s.doc.nodes[id]!.semanticId, def.submodel.semanticId) &&
       parentOf(s.doc, id) === shell,
   );
   if (

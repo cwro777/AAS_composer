@@ -156,6 +156,11 @@ P3에서 확정된 것:
   `test/empty-collection.test.ts`가 지킨다.
 - **골든 스냅샷 키는 템플릿 id로 고정한다.** name·idtaNumber·version을 키에 넣으면
   메타데이터를 고치는 순간 골든이 고아가 되고 새 키로 조용히 다시 쓰인다 — 안전망이 사라진다.
+- **사내 정의 템플릿의 semanticId는 `{ns}`로 쓴다**(예: `{ns}/cd/OperationalData/1/0`).
+  `instantiate()`가 사내 네임스페이스로 치환하고, 적합성 검사는 `conformsToTemplateValue`로
+  어느 IRI 네임스페이스든 받는다. 되돌리기 값은 서브모델 식별자(idPattern)에서 되읽는다.
+  도메인을 JSON에 박지 말 것 — 네임스페이스를 바꾼 뒤에도 그 템플릿만 옛 도메인으로 발행된다.
+  표준(IDTA·IEC CDD·eCl@ss) 식별자에는 쓰지 않는다.
 - **마이그레이션은 계획과 적용을 분리한다.** `planMigration()`은 문서를 바꾸지 않고
   steps(미리보기)와 manual(사람이 판단할 것)을 돌려준다. 구조가 바뀌는 항목을
   자동 변환하지 않는 것이 핵심이다 — 조용히 옮기면 데이터가 사라진다.

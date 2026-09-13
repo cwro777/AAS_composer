@@ -97,6 +97,11 @@ export interface TemplateDef {
   sourceUrl: string;
   submodel: {
     idShort: string;
+    /**
+     * `{ns}`를 넣을 수 있다 — 사내 정의 템플릿이 **우리 이름으로 발행하는** 개념이다.
+     * 삽입할 때 사내 네임스페이스로 치환하고, 적합성 검사는 어느 네임스페이스든 받는다.
+     * 표준(IDTA·IEC CDD·eCl@ss) 식별자에는 쓰지 않는다 — 그것은 네임스페이스를 따라가면 안 된다.
+     */
     semanticId: string;
     supplementalSemanticIds?: string[];
     verified: Verified;

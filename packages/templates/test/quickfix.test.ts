@@ -177,3 +177,58 @@ describe('T-003 퀵픽스', () => {
     expect(conformanceFix(doc, issue, ids('f'))).toBeNull();
   });
 });
+
+/**
+ * 사내 정의 템플릿의 개념은 사내 네임스페이스를 따라간다.
+ * Operational Data가 bnb.co.kr을 박아 두어, 네임스페이스를 cw1.co.kr로 바꾼 뒤에도
+ * 그 서브모델만 옛 도메인으로 개념을 발행했다.
+ */
+describe('{ns} — 템플릿 개념이 사내 네임스페이스를 따른다', () => {
+  const def = getTemplate('local-operational')!;
+  const make = (ns: string): { doc: ReturnType<typeof emptyDoc>; sm: NodeId } => {
+    const doc = apply(emptyDoc(), instantiate(def, { newId: ids('o'), namespace: ns, assetSlug: 'mx200', shell: null })).doc;
+    return { doc, sm: Object.keys(doc.nodes).find((id) => doc.nodes[id]!.t === 'submodel')! };
+  };
+
+  it('삽입하면 네임스페이스로 치환된다 — 자리표시가 문서에 남지 않는다', () => {
+    const cw1 = make('https://cw1.co.kr/ids');
+    expect(cw1.doc.nodes[cw1.sm]!.semanticId).toBe('https://cw1.co.kr/ids/cd/OperationalData/1/0');
+    const other = make('https://acme.example/ids/');
+    expect(other.doc.nodes[other.sm]!.semanticId).toBe('https://acme.example/ids/cd/OperationalData/1/0');
+    expect(JSON.stringify(serialize(cw1.doc))).not.toContain('{ns}');
+  });
+
+  it('어느 네임스페이스로 만든 모델이든 적합하다 — 네임스페이스를 바꿔도 경고로 뒤덮이지 않는다', () => {
+    for (const ns of ['https://cw1.co.kr/ids', 'https://bnb.co.kr/ids']) {
+      const { doc, sm } = make(ns);
+      expect(checkConformance(doc, sm)).toEqual([]);
+    }
+  });
+
+  it('남의 네임스페이스로 발행한 옛 값은 여전히 T-003이다', () => {
+    const { doc, sm } = make('https://cw1.co.kr/ids');
+    const old = apply(doc, { t: 'set', node: sm, path: 'semanticId', value: 'https://admin-shell.io/idta/OperationalData/1/0' }).doc;
+    const issues = checkConformance(old, sm);
+    expect(issues.map((i) => i.code)).toEqual(['T-003']);
+    /* 메시지는 자리표시가 아니라 이 모델의 네임스페이스로 보인다 */
+    expect(issues[0]!.message.ko).toContain('https://cw1.co.kr/ids/cd/OperationalData/1/0');
+  });
+
+  it('되돌리기는 서브모델 식별자에서 네임스페이스를 읽어 그 값으로 되돌린다', () => {
+    const { doc, sm } = make('https://cw1.co.kr/ids');
+    const old = apply(doc, { t: 'set', node: sm, path: 'semanticId', value: 'https://admin-shell.io/idta/OperationalData/1/0' }).doc;
+    const fix = conformanceFix(old, checkConformance(old, sm)[0]!, ids('f'))!;
+    const fixed = apply(old, { t: 'batch', label: fix.label.ko, cmds: fix.cmds }).doc;
+    expect(fixed.nodes[sm]!.semanticId).toBe('https://cw1.co.kr/ids/cd/OperationalData/1/0');
+    expect(checkConformance(fixed, sm)).toEqual([]);
+  });
+
+  it('식별자에서 네임스페이스를 못 읽으면 되돌리지 않는다 — 추측해서 발행하지 않는다', () => {
+    const { doc, sm } = make('https://cw1.co.kr/ids');
+    let old = apply(doc, { t: 'set', node: sm, path: 'semanticId', value: 'urn:x:operational' }).doc;
+    old = apply(old, { t: 'set', node: sm, path: 'identifier', value: 'urn:uuid:1234' }).doc;
+    const issue = checkConformance(old, sm)[0]!;
+    expect(issue.message.ko).toContain('<사내 네임스페이스>');
+    expect(conformanceFix(old, issue, ids('f'))).toBeNull();
+  });
+});
