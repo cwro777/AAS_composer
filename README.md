@@ -69,36 +69,32 @@ pnpm --filter @aas/api exec tsx scripts/opcua-sim.ts
 `opc.tcp://<호스트>:4841`에 띄웁니다. **Ctrl+C로 내리면 운전 화면에 "붙지 못했습니다"가
 뜹니다** — 그것이 정상 동작입니다.
 
-### dev 서버가 UNKNOWN 오류로 죽을 때
+### `.next`는 Dropbox 밖에 있다
 
-이 저장소는 Dropbox 안(`work262/aas/aas-composer`)에 있습니다. 그래서 가끔 이렇게 죽습니다:
+이 저장소는 Dropbox 안(`work262/aas/aas-composer`)에 있습니다. 예전에는 코드를 고칠 때마다
+dev 서버가 이렇게 죽었습니다:
 
 ```
-UNKNOWN: unknown error, open ... .next\static\chunks\app\editor\page.js
+UNKNOWN: unknown error, open ... .next\static\chunks\app\editor\page.js   (errno -4094)
 ```
 
-**고치는 법 — 이것은 항상 통합니다.** 서버를 멈추고 `.next`를 지운 뒤 다시 띄웁니다.
+**원인:** Dropbox 폴더는 Windows 클라우드 파일 필터(재분석 태그 `0x9000f01a`)가 관리합니다.
+Next dev가 청크를 다시 쓸 때 필터가 파일을 붙잡습니다. **Dropbox 앱이 꺼져 있어도 필터는
+남아 있어서** `com.dropbox.ignored` 표시만으로는 막지 못했습니다.
 
-```powershell
-Remove-Item -Recurse -Force apps\web\.next
-```
+**해결:** `apps/web/scripts/dropbox-ignore.mjs`가 `pnpm dev`·`pnpm build` 앞에서
+`apps\web\.next`를 **`%LOCALAPPDATA%\aas-composer\web-next`로 가는 junction**으로 만듭니다.
+빌드 산출물이 동기화 루트 밖에 쓰이므로 필터를 거치지 않습니다. `next.config`의 `distDir`은
+프로젝트 밖을 가리키지 못해서 링크로 풀었습니다. 무엇이 `.next`를 진짜 폴더로 되돌려도
+다음 기동 때 다시 junction으로 바뀝니다.
 
-관찰한 사실만 적습니다. **정확한 기전은 확인하지 못했습니다.**
+확인: 소스를 8번 연달아 고쳐 재컴파일시켰을 때 실패 0건 (예전에는 한두 번 만에 죽었습니다).
 
-- Dropbox 안에 있을 때만 났습니다. 잠시 밖으로 옮겨 본 동안에는 나지 않았지만,
-  **한 번 띄워 본 것뿐이라 해결됐다고 말할 근거는 못 됩니다.**
-- `com.dropbox.ignored` 표시가 **정상적으로 걸린 상태에서도** 계속 났습니다.
-  동기화 제외만으로는 부족합니다.
-- Next dev가 매초 수십 개의 청크를 지우고 다시 쓰는 것과 관련이 있어 보입니다.
-  `pnpm build` 직후와 서버를 죽였다 다시 띄운 직후에 잦았습니다.
+그래도 죽으면 `scripts\aas clean restart`를 씁니다 — junction은 두고 산출물만 비웁니다.
+**`Remove-Item -Recurse apps\web\.next`는 쓰지 마십시오.** junction에 대고 하면
+PowerShell 5.1이 링크 대상을 헤집을 수 있습니다. 링크만 지우려면 `cmd /c rmdir apps\web\.next`.
 
-`apps/web/scripts/dropbox-ignore.mjs`가 `pnpm dev`·`pnpm build` 앞에서 `.next`에
-동기화 제외 표시를 겁니다. 빈도는 줄지만 **없애지는 못합니다.**
-
-확실히 없애려면 빌드 산출물을 동기화 폴더 밖으로 빼야 합니다(`next.config.ts`의
-`distDir`). 아직 하지 않았습니다.
-
-OneDrive·iCloud·Google Drive도 같은 방식이라 마찬가지입니다.
+OneDrive·iCloud·Google Drive도 같은 필터를 쓰므로 같은 방식이 필요합니다.
 
 ## 명령어
 

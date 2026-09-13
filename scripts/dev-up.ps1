@@ -110,6 +110,21 @@ function Start-Detached([string]$Filter, [string]$LogName) {
   Write-Host "  ..   $Filter 기동 중 ($log)" -ForegroundColor DarkYellow
 }
 
+# .next 는 Dropbox 밖에 있다 — apps/web/scripts/dropbox-ignore.mjs 가 pnpm dev 앞에서
+# LOCALAPPDATA\aas-composer\web-next 로 가는 junction 을 만든다(이유는 그 파일에).
+# 여기서는 비우기만 한다. junction 자체를 Remove-Item -Recurse 하면 PowerShell 5.1이
+# 대상 안까지 헤집는 경우가 있어, 대상 폴더의 내용을 직접 지운다.
+$nextTarget = Join-Path $env:LOCALAPPDATA 'aas-composer\web-next'
+
+function Clear-NextOutput {
+  if (Test-Path $nextTarget) {
+    Get-ChildItem $nextTarget -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+  }
+  if ((Test-Path $nextDir) -and ((Get-Item $nextDir -Force).LinkType -ne 'Junction')) {
+    Remove-Item -Recurse -Force $nextDir -ErrorAction SilentlyContinue
+  }
+}
+
 # ── 1. WSL ─────────────────────────────────────────────────────────
 Write-Step 'WSL · Docker'
 
@@ -155,8 +170,8 @@ if ($Restart) {
   Write-Warn2 '기존 web·api를 종료했습니다.'
 }
 
-if ($Clean -and (Test-Path $nextDir)) {
-  Remove-Item -Recurse -Force $nextDir -ErrorAction SilentlyContinue
+if ($Clean) {
+  Clear-NextOutput
   Write-Warn2 '.next 를 지웠습니다.'
 }
 
@@ -208,12 +223,12 @@ if (-not $webOk) {
   $webLog = Join-Path $logDir 'web.log'
   $einval = $false
   if (Test-Path $webLog) {
-    $einval = [bool](Select-String -Path $webLog -Pattern 'EINVAL.*readlink' -Quiet -ErrorAction SilentlyContinue)
+    $einval = [bool](Select-String -Path $webLog -Pattern 'EINVAL.*readlink|errno: -4094' -Quiet -ErrorAction SilentlyContinue)
   }
   if ($einval) {
     Write-Warn2 '.next 가 깨졌습니다(readlink EINVAL). 지우고 한 번 더 띄웁니다.'
     Stop-Port 3000
-    Remove-Item -Recurse -Force $nextDir -ErrorAction SilentlyContinue
+    Clear-NextOutput
     Start-Detached '@aas/web' 'web.log'
     $webOk = Wait-Url $editorUrl $TimeoutSec
   }
