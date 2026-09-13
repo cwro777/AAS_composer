@@ -18,6 +18,7 @@ import { DEFAULT_IRI_PREFIX, useSettings } from '../lib/settings';
 import { useEditor } from '../lib/store';
 import { entryFromDict, useTerms } from '../lib/terms';
 import { ConceptForm } from './ConceptForm';
+import { NamespaceMove } from './NamespaceMove';
 import { TermsPane } from './TermsPane';
 
 const LAYER_LABEL: Record<UiIssue['layer'], string> = {
@@ -70,6 +71,7 @@ export function Drawer(): React.JSX.Element {
   const restoreTerms = useTerms((s) => s.restore);
   const [tab, setTab] = useState<'json' | 'issues' | 'terms'>('json');
   const [busy, setBusy] = useState(false);
+  const [moving, setMoving] = useState(false);
   const json = useJson(doc);
   const issues = useIssues(doc);
   const fixable = issues.filter((i) => i.fix);
@@ -198,6 +200,14 @@ export function Drawer(): React.JSX.Element {
                 onChange={(e) => setIriPrefix(e.target.value)}
               />
             </label>
+            <button
+              type="button"
+              className="mini"
+              title="옛 접두어 아래의 식별자·개념·용어집 항목을 새 접두어로 함께 옮깁니다. 먼저 무엇이 바뀌는지 보여 줍니다."
+              onClick={() => setMoving(true)}
+            >
+              옮기기…
+            </button>
             {iriPrefix !== DEFAULT_IRI_PREFIX ? (
               <button type="button" className="mini" onClick={() => setIriPrefix(DEFAULT_IRI_PREFIX)}>
                 기본값
@@ -229,6 +239,7 @@ export function Drawer(): React.JSX.Element {
       </div>
 
       <div className="panes">
+        {tab === 'issues' && moving ? <NamespaceMove onClose={() => setMoving(false)} /> : null}
         {tab === 'issues' || tab === 'terms' ? <ConceptForm /> : null}
         {tab === 'json' ? (
           <pre className="json">{json}</pre>

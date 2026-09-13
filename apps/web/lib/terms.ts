@@ -15,7 +15,7 @@
 
 import { create } from 'zustand';
 
-import { type AasDoc, type NodeId, subtreeOf } from '@aas/kernel';
+import { type AasDoc, type NodeId, isUnderNamespace, subtreeOf } from '@aas/kernel';
 import { SAMPLE_TERMS, type TermBook, type TermEntry, mergeBooks } from '@aas/semantic';
 
 import { lookupConcepts } from './api';
@@ -297,6 +297,85 @@ export function planModelImport(
   return plan;
 }
 
+export interface GlossaryMovePlan {
+  /** 사내 용어집 항목의 IRI를 새 접두어로 */
+  moved: Array<{ before: string; after: string; term: string }>;
+  /** 모델이 쓰는데 샘플·파일에만 뜻이 있던 개념 — 새 IRI로 용어집에 담는다(샘플·파일은 못 고친다) */
+  copied: Array<{ after: string; term: string; source: 'sample' | 'file' }>;
+  /** 새 IRI에 이미 항목이 있다 — 사람이 쓴 것을 덮지 않고 옛 항목도 그대로 둔다 */
+  conflicts: string[];
+  /** 적용 후의 사내 용어집 */
+  next: TermEntry[];
+}
+
+/**
+ * 네임스페이스 옮기기의 용어집 쪽 계획. 모델 쪽은 커널의 `planNamespaceMove`다.
+ *
+ * 둘은 반드시 함께 간다 — 모델의 semanticId만 옮기면 용어집이 옛 IRI로 뜻을 들고 있어
+ * 새 IRI마다 CD-001이 뜨고, 개념 설명이 내보내기에서 빠진다.
+ */
+export function planGlossaryMove(entries: TermEntry[], doc: AasDoc, fromRaw: string, toRaw: string): GlossaryMovePlan {
+  const from = fromRaw.trim().replace(/\/+$/, '');
+  const to = toRaw.trim().replace(/\/+$/, '');
+  const move = (v: string): string => `${to}${v.slice(from.length)}`;
+  const plan: GlossaryMovePlan = { moved: [], copied: [], conflicts: [], next: [] };
+  if (!from || !to || from === to) return { ...plan, next: entries };
+
+  const have = new Set(entries.map((e) => e.semanticId));
+  const kept: TermEntry[] = [];
+  const added: TermEntry[] = [];
+
+  for (const e of entries) {
+    if (!isUnderNamespace(e.semanticId, from)) {
+      kept.push(e);
+      continue;
+    }
+    const after = move(e.semanticId);
+    if (have.has(after)) {
+      plan.conflicts.push(after);
+      kept.push(e);
+      continue;
+    }
+    plan.moved.push({ before: e.semanticId, after, term: e.term });
+    added.push({ ...e, semanticId: after, provenance: `${e.provenance ? `${e.provenance} · ` : ''}네임스페이스 옮김 (옛 ${e.semanticId})` });
+  }
+
+  /* 모델이 쓰는 옛 IRI 중 사내 용어집에 없는 것 — 샘플이나 파일이 뜻을 갖고 있으면 새 IRI로 담는다 */
+  const used = new Set<string>();
+  for (const id of Object.keys(doc.nodes)) {
+    const n = doc.nodes[id] as { semanticId?: string; semanticIdListElement?: string; supplementalSemanticIds?: string[] };
+    for (const v of [n.semanticId, n.semanticIdListElement, ...(n.supplementalSemanticIds ?? [])]) {
+      if (v && isUnderNamespace(v, from)) used.add(v);
+    }
+  }
+  const sample = new Map(SAMPLE_TERMS.terms.map((t) => [t.semanticId, t]));
+  const rawList = Array.isArray(doc.raw?.['conceptDescriptions']) ? (doc.raw!['conceptDescriptions'] as unknown[]) : [];
+  const carried = new Map(rawList.map((cd) => [text((cd as { id?: unknown } | null)?.id), cd]));
+
+  for (const before of used) {
+    if (have.has(before)) continue; /* 위에서 옮겼거나 충돌로 남겼다 */
+    const after = move(before);
+    if (have.has(after) || added.some((e) => e.semanticId === after)) continue;
+    const s = sample.get(before);
+    if (s?.nameEn && s.definition) {
+      added.push({ ...s, semanticId: after, origin: 'local', provenance: `샘플 용어집에서 옮김 (옛 ${before})` });
+      plan.copied.push({ after, term: s.term, source: 'sample' });
+      continue;
+    }
+    const e = carried.has(before) ? entryFromConceptDescription(carried.get(before), from) : null;
+    if (e) {
+      added.push({ ...e, semanticId: after, origin: 'local', provenance: `모델 파일의 개념에서 옮김 (옛 ${before})` });
+      plan.copied.push({ after, term: e.term, source: 'file' });
+    }
+  }
+
+  plan.next = [...kept, ...added];
+  return plan;
+}
+
+const BACKUP_KEY = 'aas-composer/terms/backup-before-namespace-move';
+let backup: TermEntry[] | null = null;
+
 /** 이 목록에 있는 id는 이번 세션에 이미 물어봤다 — 답이 없던 것도 다시 묻지 않는다 */
 const asked = new Set<string>();
 /** 서버에 닿지 못했으면 잠시 쉰다. 검증은 타이핑마다 돌므로 그대로 두면 요청이 쏟아진다 */
@@ -331,6 +410,14 @@ interface TermsState {
   remove: (semanticId: string) => void;
   /** 여러 항목을 한 번에. 이미 있는 것은 덮어쓰지 않는다 — 사람이 쓴 것이 이긴다 */
   addMany: (list: TermEntry[]) => number;
+  /**
+   * 사내 용어집을 통째로 바꾼다 — 네임스페이스 옮기기 전용. 바꾸기 전 것을 남긴다.
+   * 용어집은 문서가 아니라 Ctrl+Z가 닿지 않으므로, 되돌릴 길을 따로 둔다.
+   */
+  replaceEntries: (next: TermEntry[]) => void;
+  /** 직전 replaceEntries 이전으로. 되돌린 뒤에는 백업을 지운다 */
+  undoReplace: () => boolean;
+  hasBackup: boolean;
   restore: () => void;
 }
 
@@ -425,6 +512,42 @@ export const useTerms = create<TermsState>()((set, get) => ({
     return fresh.length;
   },
 
+  hasBackup: false,
+
+  replaceEntries: (next) => {
+    try {
+      window.localStorage.setItem(BACKUP_KEY, JSON.stringify({ schema: 1, terms: get().entries }));
+    } catch {
+      /* 백업을 못 남겨도 이번 세션의 되돌리기는 메모리로 된다 */
+    }
+    backup = get().entries;
+    set({ entries: next, hasBackup: true });
+    persist(next);
+  },
+
+  undoReplace: () => {
+    let prev = backup;
+    if (!prev) {
+      try {
+        const raw = window.localStorage.getItem(BACKUP_KEY);
+        const saved = raw ? (JSON.parse(raw) as { terms?: unknown }) : null;
+        if (Array.isArray(saved?.terms)) prev = saved.terms as TermEntry[];
+      } catch {
+        /* 읽지 못하면 되돌릴 것이 없다 */
+      }
+    }
+    if (!prev) return false;
+    set({ entries: prev, hasBackup: false });
+    persist(prev);
+    backup = null;
+    try {
+      window.localStorage.removeItem(BACKUP_KEY);
+    } catch {
+      /* 지우지 못해도 된다 */
+    }
+    return true;
+  },
+
   remove: (semanticId) => {
     const entries = get().entries.filter((e) => e.semanticId !== semanticId);
     set({ entries });
@@ -436,6 +559,8 @@ export const useTerms = create<TermsState>()((set, get) => ({
       const raw = window.localStorage.getItem(KEY);
       const saved = raw ? (JSON.parse(raw) as { terms?: unknown }) : null;
       if (Array.isArray(saved?.terms)) set({ entries: saved.terms as TermEntry[] });
+      /* 새로고침해도 옮기기 전 용어집으로 되돌릴 수 있게 */
+      set({ hasBackup: window.localStorage.getItem(BACKUP_KEY) !== null });
     } catch {
       /* 읽지 못하면 샘플만 쓴다 */
     }

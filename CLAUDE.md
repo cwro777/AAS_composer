@@ -200,6 +200,11 @@ P3에서 확정된 것:
   중복을 피하면, 다른 셸 아래의 서브모델과 그대로 부딪힌다(화면에는 이름이 달라 보여
   원인을 찾기 어렵다). 발급은 `mintIdentifier()` / `uniqueIdentifier()` 한 곳만 쓴다 —
   `edit.ts`의 새 노드도, `instantiate()`의 템플릿도, 퀵픽스도 같은 함수다.
+- **네임스페이스를 옮길 때는 모델과 용어집을 함께 옮긴다.** 커널 `planNamespaceMove`가
+  식별자(참조까지)·자산·개념 semanticId(보조·목록·Qualifier·Extension·SpecificAssetId)를
+  batch 하나로, 웹 `planGlossaryMove`가 용어집 항목을 옮긴다. 계획과 적용을 분리하고,
+  표준 네임스페이스(admin-shell.io)와 서로 품는 접두어는 거절한다. 용어집은 문서가 아니라
+  Ctrl+Z가 닿지 않으므로 옮기기 전 사본을 남기고 되돌리기를 따로 둔다.
 - **식별자를 바꿀 때는 참조를 함께 고친다.** `renameIdentifier()`가 문서 전체의
   Reference 키를 훑어 하나의 batch로 만든다. 식별자만 바꾸면 그것을 가리키던
   Relationship·ReferenceElement·derivedFrom이 조용히 끊긴다. `raw`는 건드리지 않고
