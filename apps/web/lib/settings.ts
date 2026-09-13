@@ -17,8 +17,9 @@ import { create } from 'zustand';
 
 const KEY = 'aas-composer/settings/v1';
 
+/* 기본값은 루트 `.env`의 NEXT_PUBLIC_IRI_PREFIX다(next.config.ts가 읽는다). 뒤의 값은 .env가 없을 때만 */
 export const DEFAULT_IRI_PREFIX =
-  process.env['NEXT_PUBLIC_IRI_PREFIX'] ?? 'https://bnb.co.kr/ids';
+  process.env['NEXT_PUBLIC_IRI_PREFIX'] ?? 'https://cw1.co.kr/ids';
 
 interface SettingsState {
   /** 비우면 네임스페이스 검사를 하지 않는다 */

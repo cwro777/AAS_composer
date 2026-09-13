@@ -29,8 +29,13 @@ import { type Dictionary, createDictionary } from './dict/service.js';
 import { type DictEntry, createMemoryDictStore } from './dict/store.js';
 import type { ModelStore } from './store.js';
 
-const IRI_PREFIX = process.env['IRI_PREFIX'] ?? 'https://bnb.co.kr/ids';
-const BASYX_URL = process.env['BASYX_URL'] ?? 'http://localhost:8081';
+/**
+ * 환경값은 **쓸 때 읽는다.** 모듈 최상위에서 읽으면 `.env`보다 먼저 읽힌다 —
+ * ESM은 import를 본문보다 먼저 평가하므로 index.ts의 `loadEnvFile`이 돌기 전에 이 파일이
+ * 이미 값을 붙잡는다. 그래서 한동안 `.env`의 IRI_PREFIX·BASYX_URL이 무시되고 기본값만 쓰였다.
+ */
+const iriPrefix = (): string => process.env['IRI_PREFIX'] ?? 'https://cw1.co.kr/ids';
+const basyxUrl = (): string => process.env['BASYX_URL'] ?? 'http://localhost:8081';
 
 /* 문서 구조는 커널이 지킨다. 여기서는 형태만 본다 — 두 곳에서 규칙을 쓰지 않기 위해서다. */
 const docSchema = z.object({
@@ -60,7 +65,7 @@ const commandsSchema = z.object({
 
 /** 저장할 때마다 서버도 같은 커널로 검증한다 */
 function issuesOf(doc: AasDoc): ReturnType<typeof validate> {
-  const policy = validate(doc, { iriPrefix: IRI_PREFIX });
+  const policy = validate(doc, { iriPrefix: iriPrefix() });
   const template = checkAllConformance(doc).map((c) => ({
     code: c.code,
     layer: 'template' as const,
@@ -283,7 +288,7 @@ export function createApp(
     const rec = await store.get(c.req.param('id'));
     if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
 
-    const baseUrl = c.req.query('target') ?? BASYX_URL;
+    const baseUrl = c.req.query('target') ?? basyxUrl();
     const errors = issuesOf(rec.doc).filter((i) => i.severity === 'error');
     if (errors.length && c.req.query('force') !== '1') {
       /* 깨진 모델을 저장소에 올리면 받는 쪽이 먼저 곤란해진다 */

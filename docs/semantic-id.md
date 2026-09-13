@@ -143,13 +143,19 @@ https://id.acme.co.kr                 전용 서브도메인
 
 | 위치 | 키 |
 |---|---|
-| `.env` — 서버 | `IRI_PREFIX=https://bnb.co.kr/ids` |
-| `.env` — 웹 | `NEXT_PUBLIC_IRI_PREFIX=https://bnb.co.kr/ids` |
+| 저장소 루트 `.env` — 서버 | `IRI_PREFIX=https://cw1.co.kr/ids` |
+| 저장소 루트 `.env` — 웹 | `NEXT_PUBLIC_IRI_PREFIX=https://cw1.co.kr/ids` |
 | 검증 탭 입력칸 | 브라우저에 저장 — **`.env`를 덮어쓴다** |
+
+**두 앱이 같은 루트 `.env`를 읽는다** — API는 `src/index.ts`, 웹은 `next.config.ts`에서.
+예전에는 웹이 자기 폴더의 `.env`만 읽어 루트의 `NEXT_PUBLIC_IRI_PREFIX`가 무시됐고,
+API도 값을 모듈 로드 때 붙잡아 `.env`보다 먼저 읽는 바람에 코드 기본값만 썼다.
+둘 다 기본값과 `.env`가 같아서 드러나지 않았다. 값을 바꾸면 **web·api를 다시 띄워야**
+반영된다(`scripts\aas restart`). API 시작 로그에 `사내 네임스페이스:`가 찍힌다.
 
 앞의 둘이 다르면 **에디터가 통과시킨 것이 서버에서 경고로 뜬다.** 같은 커널을 쓰는
 의미가 사라진다. 검증 탭에서 바꾼 값은 그 브라우저에만 남아 `.env`와 조용히
-어긋날 수 있으므로, 팀에 배포할 값은 `.env`에 넣는다.
+어긋날 수 있으므로, 팀에 배포할 값은 `.env`에 넣는다. 입력칸 옆 `기본값`이 `.env` 값으로 되돌린다.
 
 ### 비우면 검사하지 않는다
 

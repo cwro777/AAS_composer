@@ -88,6 +88,7 @@ if (process.env['NODE_ENV'] !== 'test') {
   console.log(`[api] http://localhost:${port}`);
   console.log(`[api] 저장소: ${kind}`);
   console.log(`[api] BaSyx: ${process.env['BASYX_URL'] ?? 'http://localhost:8081'}`);
+  console.log(`[api] 사내 네임스페이스: ${process.env['IRI_PREFIX'] ?? 'https://cw1.co.kr/ids (기본값 — .env에 IRI_PREFIX 없음)'}`);
   void dictionary.status().then((s) => {
     console.log(`[api] 사전: 캐시 ${s.cached}건 · 상류 ${s.upstream ?? '없음 (IEC CDD 미연결)'}`);
   });
