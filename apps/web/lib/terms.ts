@@ -17,6 +17,8 @@ import { create } from 'zustand';
 
 import { SAMPLE_TERMS, type TermBook, type TermEntry, mergeBooks } from '@aas/semantic';
 
+import { lookupConcepts } from './api';
+
 const KEY = 'aas-composer/terms/v1';
 
 /** 등록 창에 채워 넣을 초안 */
@@ -170,12 +172,32 @@ export function entryFromDict(d: {
   };
 }
 
+/** 이 목록에 있는 id는 이번 세션에 이미 물어봤다 — 답이 없던 것도 다시 묻지 않는다 */
+const asked = new Set<string>();
+/** 서버에 닿지 못했으면 잠시 쉰다. 검증은 타이핑마다 돌므로 그대로 두면 요청이 쏟아진다 */
+let retryAt = 0;
+
 interface TermsState {
   entries: TermEntry[];
+  /**
+   * 서버 사전이 답한 개념 — **이 세션의 메모리에만** 둔다.
+   *
+   * 사내 용어집(`entries`)에 넣지 않는 이유: 그것은 사람이 쓰는 장부다. 자동으로 쌓으면
+   * 지운 항목이 되살아나고, 사전이 고쳐져도 옛 값이 브라우저에 남는다.
+   * 붙잡아 두고 싶으면 검증 탭의 `사전에서 채우기`가 여전히 용어집으로 옮긴다.
+   */
+  dict: TermEntry[];
   draft: ConceptDraft | null;
   restored: boolean;
-  /** 샘플 + 사내. 해석기에 넘길 책 */
+  /** 샘플 → 사전 → 사내. 뒤가 이긴다. 해석기에 넘길 책 */
   book: () => TermBook;
+  /**
+   * 책이 모르는 개념을 서버 사전에 묻는다.
+   *
+   * 누르지 않아도 된다. 검증이 CD-001을 낼 때마다 부르고, 물어본 적 없는 것만 보낸다.
+   * 경고 수십 건이 "버튼 하나 안 눌러서"라면 경고가 할 일을 못 한다.
+   */
+  lookupMissing: (ids: string[]) => void;
   openDraft: (d: ConceptDraft) => void;
   patchDraft: (p: Partial<ConceptDraft>) => void;
   closeDraft: () => void;
@@ -197,10 +219,37 @@ function persist(entries: TermEntry[]): void {
 
 export const useTerms = create<TermsState>()((set, get) => ({
   entries: [],
+  dict: [],
   draft: null,
   restored: false,
 
-  book: () => mergeBooks(SAMPLE_TERMS, { terms: get().entries }),
+  book: () => mergeBooks(SAMPLE_TERMS, { terms: get().dict }, { terms: get().entries }),
+
+  lookupMissing: (ids) => {
+    if (Date.now() < retryAt) return;
+    const fresh = [...new Set(ids)].filter((id) => !asked.has(id));
+    if (fresh.length === 0) return;
+    for (const id of fresh) asked.add(id);
+
+    lookupConcepts(fresh)
+      .then((r) => {
+        const sample = new Map(SAMPLE_TERMS.terms.map((t) => [t.semanticId, t]));
+        const got = r.entries
+          .map(entryFromDict)
+          .filter((e): e is TermEntry => !!e)
+          /* 샘플이 한글 용어·별칭을 갖고 있으면 살린다 — 사전에는 한글이 없어 검색이 끊긴다 */
+          .map((e) => {
+            const s = sample.get(e.semanticId);
+            return s ? { ...e, term: s.term, ...(s.aliases ? { aliases: s.aliases } : {}) } : e;
+          });
+        if (got.length) set((s) => ({ dict: [...s.dict, ...got] }));
+      })
+      .catch(() => {
+        /* 못 물어본 것은 물어본 것이 아니다 — 서버가 돌아오면 다시 묻는다 */
+        for (const id of fresh) asked.delete(id);
+        retryAt = Date.now() + 30_000;
+      });
+  },
 
   openDraft: (draft) => set({ draft }),
   patchDraft: (p) => set((s) => (s.draft ? { draft: { ...s.draft, ...p } } : s)),

@@ -88,7 +88,8 @@ export function SemanticField({ value, onCommit }: Props): React.JSX.Element {
    * 화면과 파일이 다른 책을 보면 무엇이 빠졌는지 알아챌 방법이 없다.
    */
   const entries = useTerms((s) => s.entries);
-  const book = useMemo(() => useTerms.getState().book(), [entries]);
+  const dict = useTerms((s) => s.dict);
+  const book = useMemo(() => useTerms.getState().book(), [entries, dict]);
 
   const hits = useMemo(() => (open ? searchTerms(query, book) : []), [open, query, book]);
 

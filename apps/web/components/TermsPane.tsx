@@ -43,16 +43,32 @@ function haystack(t: TermEntry): string {
 
 export function TermsPane(): React.JSX.Element {
   const entries = useTerms((s) => s.entries);
+  const dict = useTerms((s) => s.dict);
   const remove = useTerms((s) => s.remove);
   const notify = useEditor((s) => s.notify);
   const [q, setQ] = useState('');
   const [onlyBad, setOnlyBad] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  /** 샘플 + 사내. 뒤가 이긴다 — 화면이 내보내기와 같은 책을 봐야 한다 */
-  const book = useMemo(() => useTerms.getState().book(), [entries]);
+  /** 샘플 → 사전 → 사내. 뒤가 이긴다 — 화면이 내보내기와 같은 책을 봐야 한다 */
+  const book = useMemo(() => useTerms.getState().book(), [entries, dict]);
   /** 이 브라우저에 있는 것만 지울 수 있다. 샘플은 파일이라 여기서 못 지운다 */
   const mine = useMemo(() => new Set(entries.map((e) => e.semanticId)), [entries]);
+  const fromDict = useMemo(() => new Set(dict.map((e) => e.semanticId)), [dict]);
+
+  /**
+   * 어디서 온 개념인가. **mock은 따로 표시한다** — 개발용 가정 자료가 사전 답으로
+   * 들어와 파일에 실린다. 표시가 없으면 진짜 정의와 구별할 수 없다.
+   */
+  const originOf = (t: TermEntry): { cls: string; label: string } => {
+    if (mine.has(t.semanticId)) return { cls: 'local', label: '사내' };
+    if (fromDict.has(t.semanticId)) {
+      return /mock/i.test(t.provenance ?? '')
+        ? { cls: 'mock', label: 'mock' }
+        : { cls: 'dict', label: '사전' };
+    }
+    return { cls: 'sample', label: '샘플' };
+  };
 
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -151,8 +167,8 @@ export function TermsPane(): React.JSX.Element {
               <span className="en">{t.nameEn ?? '—'}</span>
               <span className="un">{t.unit ?? ''}</span>
               <span className="dt">{t.dataType ?? ''}</span>
-              <span className={`org ${mine.has(t.semanticId) ? 'local' : 'sample'}`}>
-                {mine.has(t.semanticId) ? '사내' : '샘플'}
+              <span className={`org ${originOf(t).cls}`} title={t.provenance}>
+                {originOf(t).label}
               </span>
               <span className="sem" title={t.semanticId}>
                 {formatSemanticId(parseSemanticId(t.semanticId))}

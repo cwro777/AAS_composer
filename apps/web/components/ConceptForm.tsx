@@ -47,7 +47,7 @@ export function ConceptForm(): React.JSX.Element | null {
         <label>
           <span>사내 용어 (한글)</span>
           <input
-            autoFocus
+            autoFocus={!draft.term}
             value={draft.term}
             placeholder="배럴온도"
             onChange={(e) => patch({ term: e.target.value })}
@@ -77,6 +77,8 @@ export function ConceptForm(): React.JSX.Element | null {
         <label>
           <span>단위</span>
           <input
+            /* 파일에서 이름·정의를 옮겨 온 경우 남은 것은 단위뿐이다 */
+            autoFocus={!!draft.term && !!draft.definition && !draft.unit}
             value={draft.unit}
             placeholder="°C · kN · mm"
             onChange={(e) => patch({ unit: e.target.value })}

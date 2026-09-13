@@ -92,8 +92,38 @@ export interface ConceptResult {
   unresolved: Issue[];
 }
 
+/**
+ * 불러온 파일에 이미 실려 있는 개념 — `doc.raw`에 보존된 conceptDescriptions.
+ *
+ * 이것들은 내보낼 때 그대로 나간다(`attachConceptDescriptions`). 그러니 용어집이
+ * 모른다고 "아는 곳이 없다"고 하면 거짓말이다 — 파일이 알고 있다. 실제로 파일 하나에서
+ * CD-001 64건 중 38건이 이것이었고, 경고가 많으면 진짜 경고가 묻힌다.
+ * 내용이 규격에 맞는지는 L1(aas-core)이 따로 본다.
+ */
+function carriedConcepts(doc: AasDoc): Map<string, Json> {
+  const out = new Map<string, Json>();
+  const list = doc.raw?.['conceptDescriptions'];
+  if (!Array.isArray(list)) return out;
+  for (const cd of list) {
+    const id = (cd as { id?: unknown } | null)?.id;
+    if (typeof id === 'string') out.set(id, cd);
+  }
+  return out;
+}
+
+function carriedUnit(cd: Json | undefined): boolean {
+  const specs = (cd as { embeddedDataSpecifications?: unknown } | undefined)?.embeddedDataSpecifications;
+  if (!Array.isArray(specs)) return false;
+  return specs.some((s) => {
+    const c = (s as { dataSpecificationContent?: { unit?: unknown; unitId?: unknown } } | null)
+      ?.dataSpecificationContent;
+    return (typeof c?.unit === 'string' && c.unit.trim() !== '') || !!c?.unitId;
+  });
+}
+
 export function buildConceptDescriptions(doc: AasDoc, resolver: ConceptResolver): ConceptResult {
   const used = usedSemanticIds(doc);
+  const carried = carriedConcepts(doc);
   const cds: Array<{ id: string; json: Json }> = [];
   const unresolved: Issue[] = [];
 
@@ -121,6 +151,13 @@ export function buildConceptDescriptions(doc: AasDoc, resolver: ConceptResolver)
     });
 
     const info = resolver.resolve(semanticId);
+    const inFile = carried.has(semanticId);
+
+    /* 용어집이 모르거나 규격 최소치를 못 채우면 파일의 개념이 그대로 나간다 — 경고할 것이 없다 */
+    if (inFile && (!info || !hasEnglish(info.preferredName) || !hasEnglish(info.definition))) {
+      continue;
+    }
+
     if (!info) {
       report(
         node,
@@ -174,6 +211,8 @@ export function buildConceptDescriptions(doc: AasDoc, resolver: ConceptResolver)
      * 조용히 빼면 왜 자료형이 없는지 알 방법이 없다.
      */
     if (info.dataType && UNIT_REQUIRED.has(info.dataType) && !info.unit) {
+      /* 파일의 개념이 단위를 갖고 있으면 그쪽이 낫다 — 갈아끼우면 단위를 잃는다 */
+      if (inFile && carriedUnit(carried.get(semanticId))) continue;
       unresolved.push({
         code: 'CD-002',
         layer: 'dictionary',

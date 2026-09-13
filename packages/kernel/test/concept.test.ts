@@ -213,6 +213,32 @@ describe('Environment에 붙이기', () => {
       expect(r.issues.map((i) => `${i.code} ${i.path}`)).toEqual([]);
     });
 
+    it('파일이 싣고 온 개념에는 CD-001을 내지 않는다 — 파일이 알고 있다', () => {
+      const doc = { ...docWith([UNKNOWN, STATE]), raw: { conceptDescriptions: [cd(UNKNOWN, { dataType: 'STRING' })] } };
+      const r = buildConceptDescriptions(doc, { resolve: () => undefined });
+      expect(r.unresolved.map((i) => i.path)).toEqual([STATE]);
+
+      /* 그리고 그 개념은 내보내기에 그대로 나간다 */
+      const env = attachConceptDescriptions(serialize(doc), r.conceptDescriptions);
+      expect((env['conceptDescriptions'] as Array<{ id: string }>).map((c) => c.id)).toEqual([UNKNOWN]);
+    });
+
+    it('용어집에 단위가 없고 파일 개념에 단위가 있으면 파일 쪽을 지킨다', () => {
+      const NOUNIT: ConceptResolver = {
+        resolve: () => ({
+          preferredName: [{ language: 'en', text: 'Barrel temperature' }],
+          definition: [{ language: 'en', text: 'Temperature.' }],
+          dataType: 'REAL_MEASURE',
+        }),
+      };
+      const kept = cd(TEMP, { dataType: 'REAL_MEASURE', unit: '°C' });
+      const doc = { ...docWith([TEMP]), raw: { conceptDescriptions: [kept] } };
+      const r = buildConceptDescriptions(doc, NOUNIT);
+      expect(r.unresolved).toEqual([]);
+      const env = attachConceptDescriptions(serialize(doc), r.conceptDescriptions);
+      expect(env['conceptDescriptions']).toEqual([kept]);
+    });
+
     it('만든 것이 없어도 불러온 개념은 남는다', () => {
       const foreign = cd(OTHER, { dataType: 'STRING' });
       const env = { ...serialize(docWith([UNKNOWN])), conceptDescriptions: [foreign] };

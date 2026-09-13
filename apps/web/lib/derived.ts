@@ -60,6 +60,7 @@ function useDebounced<T>(value: T, ms: number): T {
 export function useJson(doc: AasDoc, ms = 100): string {
   const settled = useDebounced(doc, ms);
   const entries = useTerms((s) => s.entries);
+  const dict = useTerms((s) => s.dict);
   const [text, setText] = useState('{}');
   useEffect(() => {
     try {
@@ -68,7 +69,7 @@ export function useJson(doc: AasDoc, ms = 100): string {
     } catch (e) {
       setText(`// 직렬화 실패: ${(e as Error).message}`);
     }
-  }, [settled, entries]);
+  }, [settled, entries, dict]);
   return text;
 }
 
@@ -76,6 +77,7 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
   const settled = useDebounced(doc, ms);
   const iriPrefix = useSettings((s) => s.iriPrefix);
   const entries = useTerms((s) => s.entries);
+  const dict = useTerms((s) => s.dict);
   const [issues, setIssues] = useState<UiIssue[]>([]);
 
   useEffect(() => {
@@ -313,7 +315,10 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
     }
 
     /* L4 — 사전. 단위·자료형을 모르는 개념은 내보내도 수신 측이 해석하지 못한다 */
-    for (const i of buildConceptDescriptions(settled, termsResolver(book)).unresolved) {
+    const dictIssues = buildConceptDescriptions(settled, termsResolver(book)).unresolved;
+    /* 모르는 것은 서버 사전에 묻는다. 답이 오면 dict가 바뀌어 이 검증이 다시 돈다 */
+    useTerms.getState().lookupMissing(dictIssues.filter((i) => i.code === 'CD-001').map((i) => i.path));
+    for (const i of dictIssues) {
       const issue: UiIssue = {
         code: i.code,
         layer: 'dictionary',
@@ -387,9 +392,41 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
           path: cdId ? `${i.path} (${cdId})` : i.path,
           text:
             cdId && i.message.en.includes('AASc-3a-009')
-              ? `${i.message.ko} — 불러온 파일에 실려 온 개념입니다. 용어집에 이 개념을 단위와 함께 등록하면 내보낼 때 그것으로 바뀝니다.`
+              ? `${i.message.ko} — 불러온 파일에 실려 온 개념입니다. '단위 넣기'로 용어집에 등록하면 내보낼 때 그것으로 바뀝니다.`
               : i.message.ko,
         };
+
+        /**
+         * AASc-3a-009 — 파일에 실려 온 측정형 개념에 단위가 없다.
+         *
+         * 파일의 개념은 에디터에서 고칠 수 없고 용어집이 유일한 자리다. 등록 창을 열되
+         * **파일에 적힌 이름·정의·자료형을 옮겨 채운다** — 사람이 넣을 것은 단위 하나다.
+         * 단위는 채우지 않는다. 우리가 모르는 값이다.
+         */
+        if (cdId && i.message.en.includes('AASc-3a-009')) {
+          const content = (
+            env.conceptDescriptions?.[Number(cdAt![1])] as
+              | { embeddedDataSpecifications?: Array<{ dataSpecificationContent?: Record<string, unknown> }> }
+              | undefined
+          )?.embeddedDataSpecifications?.[0]?.dataSpecificationContent;
+          const pick = (key: string, lang: string): string =>
+            ((content?.[key] as Array<{ language: string; text: string }> | undefined) ?? [])
+              .find((t) => t.language.toLowerCase().startsWith(lang))
+              ?.text.trim() ?? '';
+          const nameEn = pick('preferredName', 'en') || humanize(nameFromIri(cdId));
+          issue.fix = {
+            label: '단위 넣기',
+            run: () =>
+              useTerms.getState().openDraft({
+                semanticId: cdId,
+                term: pick('preferredName', 'ko') || nameEn,
+                nameEn,
+                definition: pick('definition', 'en'),
+                unit: '',
+                dataType: typeof content?.['dataType'] === 'string' ? content['dataType'] : '',
+              }),
+          };
+        }
 
         /**
          * AASd-109 — Property·Range 목록에는 valueTypeListElement가 있어야 한다.
@@ -438,7 +475,7 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
     const rank = { error: 0, warn: 1, info: 2 } as const;
     out.sort((a, b) => rank[a.severity] - rank[b.severity]);
     setIssues(out);
-  }, [settled, iriPrefix, entries]);
+  }, [settled, iriPrefix, entries, dict]);
 
   return issues;
 }

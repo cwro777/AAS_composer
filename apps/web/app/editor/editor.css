@@ -780,6 +780,14 @@ table.grid td.ops button:disabled {
   background: var(--surface-3);
   color: var(--ink-3);
 }
+.tlist .org.dict {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.tlist .org.mock {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
 .tlist .sem {
   font-family: var(--mono);
   font-size: 10px;
