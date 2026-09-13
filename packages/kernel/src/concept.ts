@@ -208,8 +208,49 @@ export function buildConceptDescriptions(doc: AasDoc, resolver: ConceptResolver)
 /**
  * Environment에 붙인다. 비어 있으면 키 자체를 넣지 않는다 —
  * 규격이 "설정하지 않거나 최소 1개"를 요구한다.
+ *
+ * **불러온 파일에 이미 있던 개념과 합친다.** 그것들은 `doc.raw`에 보존돼 `serialize()`가
+ * 그대로 내놓는다. 예전에는 새로 만든 목록으로 통째로 갈아끼웠는데, 그러면
+ *  - 용어집이 모르는 남의 개념이 내보낼 때 조용히 사라지고
+ *  - 만든 것이 하나도 없으면 반대로 옛 개념이 전부 나가서
+ * 화면의 검증과 파일이 서로 다른 것을 보게 된다.
+ *
+ * 같은 id면 **새로 만든 쪽이 이긴다.** `raw`의 개념은 에디터에서 고칠 방법이 없고,
+ * 용어집이 그것을 고치는 유일한 자리다 — 옛 파일에 단위 없는 측정형이 실려 있어도
+ * 용어집에서 고치면 내보낼 때 바로잡힌다. 모르는 id는 손대지 않고 원래 자리에 둔다.
  */
 export function attachConceptDescriptions(env: Environment, cds: Json[]): Environment {
-  if (cds.length === 0) return env;
-  return { ...env, conceptDescriptions: cds };
+  const existing = Array.isArray(env['conceptDescriptions'])
+    ? (env['conceptDescriptions'] as Json[])
+    : [];
+  const idOf = (cd: Json): string | undefined => {
+    const id = (cd as { id?: unknown } | null)?.id;
+    return typeof id === 'string' ? id : undefined;
+  };
+
+  const fresh = new Map<string, Json>();
+  for (const cd of cds) {
+    const id = idOf(cd);
+    if (id !== undefined) fresh.set(id, cd);
+  }
+
+  const used = new Set<string>();
+  const merged = existing.map((cd) => {
+    const id = idOf(cd);
+    const next = id !== undefined ? fresh.get(id) : undefined;
+    if (next === undefined) return cd;
+    used.add(id!);
+    return next;
+  });
+  for (const cd of cds) {
+    const id = idOf(cd);
+    if (id === undefined || !used.has(id)) merged.push(cd);
+  }
+
+  if (merged.length === 0) {
+    const rest = { ...env };
+    delete rest['conceptDescriptions'];
+    return rest;
+  }
+  return { ...env, conceptDescriptions: merged };
 }

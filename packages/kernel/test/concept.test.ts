@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   type ConceptResolver,
+  type Json,
   apply,
   attachConceptDescriptions,
   buildConceptDescriptions,
@@ -159,6 +160,64 @@ describe('Environment에 붙이기', () => {
   it('빈 배열은 붙이지 않는다 — 규격 위반이다', () => {
     const env = serialize(docWith([UNKNOWN]));
     expect(attachConceptDescriptions(env, [])).not.toHaveProperty('conceptDescriptions');
+  });
+
+  /**
+   * 불러온 파일의 개념은 `raw`로 보존돼 serialize()가 그대로 내놓는다.
+   * 통째로 갈아끼우면 남의 개념이 사라지고, 합치지 않으면 옛 결함이 계속 나간다.
+   */
+  describe('불러온 파일의 개념과 합친다', () => {
+    const cd = (id: string, content: Record<string, Json>): Json => ({
+      modelType: 'ConceptDescription',
+      id,
+      embeddedDataSpecifications: [
+        {
+          dataSpecification: {
+            type: 'ExternalReference',
+            keys: [{ type: 'GlobalReference', value: 'https://admin-shell.io/aas/3/0/DataSpecificationIec61360' }],
+          },
+          dataSpecificationContent: {
+            modelType: 'DataSpecificationIec61360',
+            preferredName: [{ language: 'en', text: 'x' }],
+            definition: [{ language: 'en', text: 'x' }],
+            ...content,
+          },
+        },
+      ],
+    });
+    const OTHER = 'https://example.com/cd/Foreign/1/0';
+
+    it('같은 id는 새로 만든 쪽이 이기고, 모르는 id는 자리를 지킨다', () => {
+      const doc = docWith([TEMP]);
+      const stale = cd(TEMP, { dataType: 'REAL_MEASURE' }); /* 옛 내보내기 — 단위 없음 */
+      const foreign = cd(OTHER, { dataType: 'STRING' });
+      const env = { ...serialize(doc), conceptDescriptions: [stale, foreign] };
+
+      const { conceptDescriptions } = buildConceptDescriptions(doc, resolver);
+      const out = attachConceptDescriptions(env, conceptDescriptions)['conceptDescriptions'] as Array<
+        Record<string, unknown>
+      >;
+
+      expect(out.map((c) => c['id'])).toEqual([TEMP, OTHER]);
+      expect(out[0]).toEqual(conceptDescriptions[0]);
+      expect(out[1]).toBe(foreign);
+    });
+
+    it('옛 파일의 단위 없는 측정형이 용어집으로 바로잡혀 규격을 통과한다 (AASc-3a-009)', () => {
+      const doc = docWith([TEMP]);
+      const env = { ...serialize(doc), conceptDescriptions: [cd(TEMP, { dataType: 'REAL_MEASURE' })] };
+      expect(verifyEnvironment(env).issues.length).toBeGreaterThan(0);
+
+      const { conceptDescriptions } = buildConceptDescriptions(doc, resolver);
+      const r = verifyEnvironment(attachConceptDescriptions(env, conceptDescriptions));
+      expect(r.issues.map((i) => `${i.code} ${i.path}`)).toEqual([]);
+    });
+
+    it('만든 것이 없어도 불러온 개념은 남는다', () => {
+      const foreign = cd(OTHER, { dataType: 'STRING' });
+      const env = { ...serialize(docWith([UNKNOWN])), conceptDescriptions: [foreign] };
+      expect(attachConceptDescriptions(env, [])['conceptDescriptions']).toEqual([foreign]);
+    });
   });
 
   /**

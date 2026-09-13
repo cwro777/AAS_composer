@@ -22,6 +22,7 @@ import {
   renameIdentifier,
   serialize,
   suggestIdentifier,
+  usedSemanticIds,
   validate,
   verifyEnvironment,
 } from '@aas/kernel';
@@ -351,10 +352,18 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
       out.push(issue);
     }
 
-    /* L1 — 규격. aas-core3.0의 경로를 색인으로 우리 노드에 잇는다 */
+    /**
+     * L1 — 규격. aas-core3.0의 경로를 색인으로 우리 노드에 잇는다.
+     *
+     * **내보낼 것을 검사한다.** `serialize()`만 검사하면 불러온 파일의 옛 개념(`raw`)을
+     * 보고, 용어집으로 만든 개념은 보지 못한다 — 화면은 오류라는데 파일은 멀쩡하거나
+     * 그 반대가 된다.
+     */
     try {
       const index = pathIndex(settled);
-      const r = verifyEnvironment(serialize(settled));
+      const env = buildExport(settled, book).env as { conceptDescriptions?: Array<{ id?: string }> };
+      const usedBy = usedSemanticIds(settled);
+      const r = verifyEnvironment(env as ReturnType<typeof serialize>);
       if (r.deserializationError) {
         out.push({
           code: 'AAS-CORE',
@@ -366,14 +375,20 @@ export function useIssues(doc: AasDoc, ms = 300): UiIssue[] {
         });
       }
       for (const i of r.issues) {
-        const node = nodeForPath(index, i.path);
+        /* 개념 쪽 오류는 그 개념을 쓰는 첫 요소로 간다. 경로만으로는 무엇인지 알 수 없다 */
+        const cdAt = /^conceptDescriptions\/\[(\d+)\]/.exec(i.path);
+        const cdId = cdAt ? env.conceptDescriptions?.[Number(cdAt[1])]?.id : undefined;
+        const node = cdId ? (usedBy.get(cdId)?.[0] ?? null) : nodeForPath(index, i.path);
         const issue: UiIssue = {
           code: i.code,
           layer: 'core',
           severity: 'error',
           node,
-          path: i.path,
-          text: i.message.ko,
+          path: cdId ? `${i.path} (${cdId})` : i.path,
+          text:
+            cdId && i.message.en.includes('AASc-3a-009')
+              ? `${i.message.ko} — 불러온 파일에 실려 온 개념입니다. 용어집에 이 개념을 단위와 함께 등록하면 내보낼 때 그것으로 바뀝니다.`
+              : i.message.ko,
         };
 
         /**
