@@ -79,6 +79,8 @@ export interface PublishResult {
   concepts: number;
   /** 서버 사전도 샘플도 몰라 올리지 못한 개념 */
   unresolved: string[];
+  /** 사전은 알지만 mock(가정·창작 자료)이라 일부러 빼고 올린 개념 */
+  mock: string[];
 }
 
 /**

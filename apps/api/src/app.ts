@@ -261,13 +261,14 @@ export function createApp(
   app.get('/models/:id/aasx', async (c) => {
     const rec = await store.get(c.req.param('id'));
     if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
-    const { env, concepts, unresolved } = await buildServerExport(rec.doc, dict);
+    const { env, concepts, unresolved, mock } = await buildServerExport(rec.doc, dict);
     const bytes = writeAasx({ environment: env });
     const name = `${rec.name.replace(/[^A-Za-z0-9_-]/g, '_')}.aasx`;
     c.header('Content-Type', 'application/asset-administration-shell-package');
     c.header('Content-Disposition', `attachment; filename="${name}"`);
     c.header('X-Concept-Descriptions', String(concepts));
     c.header('X-Unresolved-Concepts', String(unresolved.length));
+    c.header('X-Mock-Concepts-Skipped', String(mock.length));
     return c.body(bytes as unknown as ArrayBuffer);
   });
 
@@ -302,14 +303,17 @@ export function createApp(
 
     try {
       /* 개념 설명도 함께 올린다 — 서버가 아는 만큼. 모르는 것은 unresolved로 돌려준다 */
-      const { env, concepts, unresolved } = await buildServerExport(rec.doc, dict);
+      const { env, concepts, unresolved, mock } = await buildServerExport(rec.doc, dict);
       const result = await publish(env, { baseUrl, fetchLike: fetchImpl });
+      const missing = unresolved.filter((i) => i.code === 'CD-001').map((i) => i.path);
       return c.json(
         {
           ...result,
           concepts,
           /* 사전도 샘플도 모르는 개념 — 게시된 모델에는 단위·정의가 없다 */
-          unresolved: unresolved.filter((i) => i.code === 'CD-001').map((i) => i.path),
+          unresolved: missing.filter((id) => !mock.includes(id)),
+          /* 사전은 알지만 mock이라 싣지 않은 것 — 지어낸 정의를 남의 서버에 남기지 않는다 */
+          mock,
         },
         result.failed ? 207 : 200,
       );
@@ -350,6 +354,23 @@ export function createApp(
     }
     if (body.data.entries) entries.push(...(body.data.entries as unknown as DictEntry[]));
     if (body.data.terms) terms.push(...body.data.terms);
+
+    /**
+     * **mock 표시를 지우지 않는다.**
+     *
+     * 에디터가 모델을 보낼 때 개념을 함께 밀어 넣는데, 그 개념 중에는 사전이 mock으로 답해
+     * 브라우저 용어집에 들어간 것이 섞일 수 있다. 그대로 upsert하면 origin이
+     * `idta:MOCK-…` → `editor:…`로 바뀌어 **지어낸 정의가 보통 항목처럼 보인다**(실제로 그랬다).
+     * 그러면 게시에서 걸러낼 근거가 사라진다. 이미 mock인 것은 mock으로 남긴다.
+     */
+    const kept: DictEntry[] = [];
+    for (const e of entries) {
+      const before = await dict.lookup(e.irdi);
+      const wasMock = /mock/i.test(before.entry?.origin ?? '');
+      kept.push(wasMock && !/mock/i.test(e.origin ?? '') ? { ...e, origin: before.entry!.origin! } : e);
+    }
+    entries.length = 0;
+    entries.push(...kept);
 
     if (entries.length === 0 && terms.length === 0) {
       return c.json({ error: 'NOTHING_TO_IMPORT', hint: 'environment · entries · terms 중 하나가 필요합니다.' }, 400);

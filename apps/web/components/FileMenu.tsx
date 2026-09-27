@@ -52,7 +52,13 @@ export function FileMenu(): React.JSX.Element {
       const { id } = await createModel(shell?.idShort || 'AAS 모델', doc, layout);
       setServerId(id);
 
-      const { env, concepts } = buildExport(doc, useTerms.getState().book());
+      /**
+       * **mock에서 온 뜻은 서버에 보내지 않는다.** 개발용으로 지어내거나 라이선스를 가정한
+       * 자료라, 사전에 들어가면 게시에서 걸러낼 근거가 사라진다(한 번 그렇게 섞였다).
+       */
+      const all = useTerms.getState().book();
+      const clean = { terms: all.terms.filter((t) => !/mock/i.test(t.provenance ?? '')) };
+      const { env, concepts } = buildExport(doc, clean);
       let sent = 0;
       if (concepts) {
         try {
@@ -97,6 +103,7 @@ export function FileMenu(): React.JSX.Element {
       notify(
         `BaSyx에 ${r.ok}건 올렸습니다 (개념 ${r.concepts}건 포함).` +
           (failed.length ? ` 실패 ${failed.length}건 — ${failed[0]!.idShort} ${failed[0]!.status}.` : '') +
+          (r.mock.length ? ` mock 정의 ${r.mock.length}건은 빼고 올렸습니다 — 지어낸 값입니다.` : '') +
           (r.unresolved.length
             ? ` 사전이 모르는 개념 ${r.unresolved.length}건은 단위·정의 없이 나갔습니다.`
             : ''),

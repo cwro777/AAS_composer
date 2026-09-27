@@ -411,6 +411,80 @@ describe('BaSyx 게시', () => {
     expect(fake.calls[0]!.url).toContain('/concept-descriptions');
   });
 
+  /**
+   * mock은 우리가 지어내거나 라이선스를 가정한 자료다(파일이 스스로 "Do not ship"이라고 적는다).
+   * 개발 중에는 사전이 답하게 두되, 남의 서버에 남기지 않는다.
+   */
+  it('mock 시드에서 온 개념은 빼고 올린다 — 무엇을 뺐는지 말한다', async () => {
+    const fake = fakeBasyx(() => 201);
+    const app = withStore(fake.fetchLike);
+    const id = await seeded(app);
+
+    await app.request('/dictionary/import', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        origin: 'idta:MOCK-idta-missing-concepts.json',
+        entries: [
+          {
+            irdi: 'https://admin-shell.io/idta/nameplate/3/0/Nameplate',
+            scheme: 'iri',
+            status: 'unknown',
+            nameEn: 'Digital nameplate',
+            definition: '지어낸 정의 — 내보내면 안 된다',
+            origin: 'idta:MOCK-idta-missing-concepts.json',
+          },
+        ],
+      }),
+    });
+
+    const res = await app.request(`/publish/${id}`, { method: 'POST' });
+    const body = (await res.json()) as {
+      concepts: number;
+      mock: string[];
+      unresolved: string[];
+      items: Array<{ kind: string }>;
+    };
+    expect(body.concepts).toBe(0);
+    expect(body.mock).toEqual(['https://admin-shell.io/idta/nameplate/3/0/Nameplate']);
+    /* 뺀 것을 모르는 것으로 두 번 세지 않는다 */
+    expect(body.unresolved).toEqual([]);
+    expect(body.items.map((i) => i.kind)).toEqual(['submodel', 'shell']);
+    expect(fake.calls.some((c) => c.url.includes('/concept-descriptions'))).toBe(false);
+  });
+
+  /**
+   * 실제로 당한 경로다: 에디터가 모델을 보내며 개념을 함께 넣었고, 그 안에 사전이 mock으로
+   * 답했던 개념이 섞여 origin이 `editor:…`로 덮였다. 그 뒤로는 게시에서 걸러낼 근거가 없었다.
+   */
+  it('나중에 들어온 import가 mock 표시를 지우지 못한다', async () => {
+    const fake = fakeBasyx(() => 201);
+    const app = withStore(fake.fetchLike);
+    const id = await seeded(app);
+    const entry = {
+      irdi: 'https://admin-shell.io/idta/nameplate/3/0/Nameplate',
+      scheme: 'iri',
+      status: 'unknown',
+      nameEn: 'Digital nameplate',
+      definition: '지어낸 정의',
+    };
+
+    const push = (origin: string): Promise<Response> =>
+      app.request('/dictionary/import', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ origin, entries: [{ ...entry, origin }] }),
+      });
+
+    await push('idta:MOCK-idta-missing-concepts.json');
+    await push('editor:abc'); /* 에디터가 같은 개념을 다시 밀어 넣는다 */
+
+    const res = await app.request(`/publish/${id}`, { method: 'POST' });
+    const body = (await res.json()) as { concepts: number; mock: string[] };
+    expect(body.concepts).toBe(0);
+    expect(body.mock).toEqual([entry.irdi]);
+  });
+
   it('사전도 샘플도 모르는 개념은 올리지 않고 무엇인지 돌려준다', async () => {
     const fake = fakeBasyx(() => 201);
     const app = withStore(fake.fetchLike);

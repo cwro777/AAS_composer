@@ -47,34 +47,56 @@ function bookFromDictionary(entries: Array<{ irdi: string; nameEn?: string | nul
   return { terms };
 }
 
+/**
+ * mock 시드에서 온 답인가.
+ *
+ * `docs/mock/*`은 **우리가 지어내거나 라이선스를 가정한 자료**다. 그 파일이 스스로
+ * "Do not ship"이라고 적고 있다. 개발·시연 중에는 사전이 답하게 두되, **내보내는 것에는
+ * 싣지 않는다** — 한 번 나가면 남의 네임스페이스를 단 우리 창작이 남의 시스템에 남는다.
+ */
+function isMock(origin: string | null | undefined): boolean {
+  return /mock/i.test(origin ?? '');
+}
+
 export interface ServerExport {
   env: Environment;
   /** 함께 실린 개념 수 */
   concepts: number;
   /** 해석하지 못한 것 — 조용히 빠지지 않는다 */
   unresolved: Issue[];
+  /** 사전이 알지만 mock이라 싣지 않은 개념 */
+  mock: string[];
 }
 
 /**
  * 문서에 쓰인 semanticId를 사전에 묻고, 답한 것으로 개념을 만들어 Environment에 붙인다.
  * 샘플보다 사전이 뒤에 온다 — 사전이 이긴다(에디터의 책 순서와 같다).
+ *
+ * mock에서 온 답은 빼고, 무엇을 뺐는지 돌려준다. 빠진 개념은 `unresolved`에도 남는다 —
+ * 조용히 사라지면 단위·정의가 왜 없는지 알 방법이 없다.
  */
 export async function buildServerExport(doc: AasDoc, dict: Dictionary): Promise<ServerExport> {
   const ids = [...usedSemanticIds(doc).keys()];
   const answered: Array<Parameters<typeof bookFromDictionary>[0][number]> = [];
+  const mock: string[] = [];
   for (const id of ids) {
     const r = await dict.lookup(id);
-    if (r.entry) answered.push(r.entry);
+    if (!r.entry) continue;
+    if (isMock(r.entry.origin)) mock.push(id);
+    else answered.push(r.entry);
   }
 
   const book = mergeBooks(SAMPLE_TERMS, bookFromDictionary(answered));
-  const cd = buildConceptDescriptions(doc, termsResolver(book));
+  const resolver = termsResolver(book);
+  const cd = buildConceptDescriptions(doc, resolver);
   const env = attachConceptDescriptions(serialize(doc), cd.conceptDescriptions);
   const list = env['conceptDescriptions'];
   return {
     env,
     concepts: Array.isArray(list) ? (list as Json[]).length : 0,
     unresolved: cd.unresolved,
+    /* 샘플이 같은 개념을 제대로 알고 있으면 빠진 것이 아니다 — 그것으로 나간다 */
+    mock: mock.filter((id) => !resolver.resolve(id)),
   };
 }
 
