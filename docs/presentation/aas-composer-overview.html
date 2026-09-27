@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AAS Composer 총람</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #e9ecf1; --paper: #ffffff; --panel: #f3f6f9; --panel-2: #e7ecf2;
+  --line: #c6d0dc; --line-soft: #dee4ec;
+  --ink: #111823; --ink-2: #4c596a; --ink-3: #6f7c8d;
+  --accent: #a85400; --accent-soft: #f5e5d2;
+  --wire: #3b7abe;
+  --cdd: #1c6aac; --eclass: #9a3a70; --idta: #0c7370;
+  --ok: #1b7350; --ok-bg: #dcf0e6; --warn: #7f5900; --warn-bg: #f7ebcf; --err: #a82920; --err-bg: #f7dedb;
+  --n-shell: #5e4a9e; --n-submodel: #1c6aac; --n-smc: #0c7370; --n-sml: #3a712b; --n-prop: #a85400;
+  --n-mlp: #9a3a70; --n-range: #71621b; --n-file: #556577; --n-blob: #46586b; --n-ref: #814527;
+  --n-entity: #2f6b8f; --n-rel: #7a5230; --n-annrel: #8a6a4a; --n-op: #6b4a86; --n-cap: #3f6d5a;
+  --sans: 'IBM Plex Sans KR', 'IBM Plex Sans', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', 'IBM Plex Sans KR', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f131a; --paper: #161c24; --panel: #1c232d; --panel-2: #232b36; --line: #2f3a48; --line-soft: #242d38;
+    --ink: #dbe3ec; --ink-2: #a2aebd; --ink-3: #7c8a9b; --accent: #e59a3e; --accent-soft: #33250f; --wire: #5ca1df;
+    --cdd: #6aaae3; --eclass: #df86b8; --idta: #4cc0ba;
+    --ok: #4fc08d; --ok-bg: #12291f; --warn: #deb24c; --warn-bg: #2c2410; --err: #ee857c; --err-bg: #2e1614;
+    --n-shell: #a08ee0; --n-submodel: #5ca1df; --n-smc: #3cb5b0; --n-sml: #77bc62; --n-prop: #e59a3e;
+    --n-mlp: #db7cb2; --n-range: #c0ac4e; --n-file: #93a3b5; --n-blob: #8496a8; --n-ref: #c68259;
+    --n-entity: #6fa8cc; --n-rel: #c39a72; --n-annrel: #c7a686; --n-op: #b096d4; --n-cap: #74b39a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f131a; --paper: #161c24; --panel: #1c232d; --panel-2: #232b36; --line: #2f3a48; --line-soft: #242d38;
+  --ink: #dbe3ec; --ink-2: #a2aebd; --ink-3: #7c8a9b; --accent: #e59a3e; --accent-soft: #33250f; --wire: #5ca1df;
+  --cdd: #6aaae3; --eclass: #df86b8; --idta: #4cc0ba;
+  --ok: #4fc08d; --ok-bg: #12291f; --warn: #deb24c; --warn-bg: #2c2410; --err: #ee857c; --err-bg: #2e1614;
+  --n-shell: #a08ee0; --n-submodel: #5ca1df; --n-smc: #3cb5b0; --n-sml: #77bc62; --n-prop: #e59a3e;
+  --n-mlp: #db7cb2; --n-range: #c0ac4e; --n-file: #93a3b5; --n-blob: #8496a8; --n-ref: #c68259;
+  --n-entity: #6fa8cc; --n-rel: #c39a72; --n-annrel: #c7a686; --n-op: #b096d4; --n-cap: #74b39a;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 20px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
+  font-size: 15.5px; line-height: 1.65; word-break: keep-all; overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+code, .mono { font-family: var(--mono); font-size: 0.9em; word-break: normal; overflow-wrap: anywhere; }
+h1, h2, h3 { text-wrap: balance; margin: 0; line-height: 1.3; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+.page { max-width: 1240px; margin: 0 auto; padding: 32px 22px 80px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 36px; }
+.rail { position: sticky; top: 20px; align-self: start; display: grid; gap: 14px; }
+.rail .brand { font-weight: 700; font-size: 15px; }
+.rail .brand small { display: block; font-family: var(--mono); font-weight: 400; font-size: 11.5px; color: var(--ink-3); }
+.rail nav { display: grid; gap: 1px; border-left: 1px solid var(--line); }
+.rail nav a { color: var(--ink-2); text-decoration: none; font-size: 13.5px; padding: 4px 0 4px 12px; margin-left: -1px; border-left: 2px solid transparent; }
+.rail nav a:hover { color: var(--ink); border-left-color: var(--accent); }
+
+.doc { display: grid; gap: 22px; min-width: 0; }
+.sheet { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 34px 40px 38px; display: grid; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: 0.02em; }
+.eyebrow b { color: var(--accent); font-weight: 500; }
+.sheet h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+.sheet h3 { font-size: 16.5px; font-weight: 600; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 70ch; }
+.muted { color: var(--ink-2); font-size: 14px; }
+
+/* 머리 */
+.head h1 { font-size: clamp(34px, 4.6vw, 50px); font-weight: 700; letter-spacing: -0.02em; }
+.head .lede { font-size: 17.5px; }
+.facts { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.facts div { padding: 12px 12px 0 0; display: grid; gap: 2px; }
+.facts .v { font-family: var(--mono); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.facts .v small { font-size: 13px; font-weight: 500; color: var(--ink-3); }
+.facts span:last-child { font-size: 12.5px; color: var(--ink-3); }
+
+/* 시스템 지도 */
+.map { display: grid; gap: 10px; }
+.tier { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 14px; align-items: stretch; }
+.tier > .lbl { font-size: 12px; color: var(--ink-3); padding-top: 10px; font-weight: 600; }
+.row { display: grid; gap: 10px; }
+.row.r2 { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.row.r4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.row.r5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.box { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 12px 14px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.box .t { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.box .t b { font-size: 14.5px; }
+.box .t code { font-size: 12px; color: var(--ink-3); }
+.box ul { margin: 0; padding-left: 1.05em; font-size: 13px; color: var(--ink-2); display: grid; gap: 1px; }
+.box.lead { background: var(--paper); border-color: var(--accent); }
+.box.kernel { background: var(--accent-soft); border-color: var(--accent); }
+.wire { font-family: var(--mono); font-size: 11.5px; color: var(--wire); padding-left: calc(7.5em + 14px); display: flex; gap: 18px; flex-wrap: wrap; }
+.wire span::before { content: "↕ "; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); }
+table { border-collapse: collapse; width: 100%; font-size: 13.8px; }
+th, td { text-align: left; padding: 8px 12px; border-top: 1px solid var(--line-soft); vertical-align: top; }
+thead th { border-top: 0; background: var(--panel); font-size: 12px; color: var(--ink-3); font-weight: 600; white-space: nowrap; }
+td code { font-size: 12.3px; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.cols2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 30px; }
+.cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; }
+.item { display: grid; gap: 5px; align-content: start; }
+.item b { font-size: 14.5px; }
+.item p { font-size: 13.8px; color: var(--ink-2); }
+
+.chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 999px; line-height: 1.6; white-space: nowrap; }
+.chip.ok { color: var(--ok); background: var(--ok-bg); }
+.chip.warn { color: var(--warn); background: var(--warn-bg); }
+.chip.err { color: var(--err); background: var(--err-bg); }
+.chip.plain { color: var(--ink-2); background: var(--panel-2); }
+
+/* 노드 */
+.nodes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.node { border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 4px; padding: 7px 10px; background: var(--paper); display: grid; gap: 1px; min-width: 0; }
+.node b { font-size: 13.5px; }
+.node code { font-size: 11px; color: var(--ink-3); }
+
+/* 계층 */
+.layers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+.layer { border: 1px solid var(--line); padding: 14px 16px; display: grid; gap: 6px; align-content: start; background: var(--paper); }
+.layer + .layer { border-left: 0; }
+.layer:first-child { border-radius: var(--r) 0 0 var(--r); }
+.layer:last-child { border-radius: 0 var(--r) var(--r) 0; }
+.layer .k { font-family: var(--mono); font-size: 12px; color: var(--accent); font-weight: 600; }
+.layer b { font-size: 15px; }
+.layer p { font-size: 13.2px; color: var(--ink-2); }
+.layer code.c { font-size: 12px; color: var(--ink); background: var(--panel); padding: 1px 6px; border-radius: 3px; }
+
+.rules { display: grid; gap: 8px; }
+.rules li { font-size: 14px; color: var(--ink-2); }
+.rules li b { color: var(--ink); }
+ul.rules { margin: 0; padding-left: 1.1em; }
+
+.fam { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.fam > div { border-top: 3px solid var(--c); padding-top: 8px; display: grid; gap: 4px; }
+.fam b { font-size: 14px; }
+.fam code { font-size: 11.8px; }
+.fam p { font-size: 13px; color: var(--ink-2); }
+
+.cmd { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 14px; font-family: var(--mono); font-size: 13px; overflow-x: auto; white-space: pre; margin: 0; }
+
+.callout { border: 1px solid var(--warn); background: var(--warn-bg); border-radius: var(--r); padding: 12px 16px; font-size: 14px; display: grid; gap: 4px; }
+.callout b { color: var(--warn); }
+
+.backlog { display: grid; gap: 0; border: 1px solid var(--line); border-radius: var(--r); }
+.backlog > div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 14px; padding: 10px 14px; border-top: 1px solid var(--line-soft); font-size: 14px; }
+.backlog > div:first-child { border-top: 0; }
+.backlog .why { color: var(--ink-2); font-size: 13.5px; }
+
+footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 4px 4px 0; }
+
+@media (max-width: 1080px) {
+  .page { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: static; }
+  .rail nav { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); border-left: 0; }
+  .rail nav a { border-left: 0; padding-left: 0; }
+}
+@media (max-width: 820px) {
+  .sheet { padding: 24px 18px 28px; }
+  .facts, .row.r2, .row.r4, .row.r5, .cols2, .cols3, .layers, .fam { grid-template-columns: minmax(0, 1fr); }
+  .nodes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tier { grid-template-columns: minmax(0, 1fr); }
+  .tier > .lbl { padding-top: 0; }
+  .wire { padding-left: 0; }
+  .layer + .layer { border-left: 1px solid var(--line); border-top: 0; }
+  .layer:first-child, .layer:last-child { border-radius: var(--r); }
+}
+@media print {
+  body { background: #fff; }
+  .page { grid-template-columns: minmax(0, 1fr); padding: 0; }
+  .rail { display: none; }
+  .sheet { break-inside: avoid-page; border: 0; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+<aside class="rail" aria-label="목차">
+  <div class="brand">AAS Composer 총람<small>2026-09-13 기준</small></div>
+  <nav>
+    <a href="#what">무엇을 하나</a>
+    <a href="#map">시스템 지도</a>
+    <a href="#editor">에디터</a>
+    <a href="#model">문서 모델</a>
+    <a href="#validate">검증 네 계층</a>
+    <a href="#templates">IDTA 템플릿</a>
+    <a href="#semantic">semanticId · 용어집</a>
+    <a href="#api">서버 API</a>
+    <a href="#collect">값 수집 · 운전</a>
+    <a href="#run">실행 · 개발</a>
+    <a href="#rules">확정된 원칙</a>
+    <a href="#next">남은 것</a>
+  </nav>
+</aside>
+
+<main class="doc">
+
+<section class="sheet head" id="top">
+  <div class="eyebrow">IEC 63278 Asset Administration Shell <b>V3.0</b> · 저작 · 검증 · 게시 · 수집</div>
+  <h1>AAS Composer 총람</h1>
+  <p class="lede">산업 설비를 AAS 모델로 만들고, 네 계층으로 검증하고, BaSyx V2에 게시하고, 설비 값을 받아 운전 화면에 보이는 웹 플랫폼입니다. 이 문서는 지금까지 만든 것 전체를 한자리에 정리합니다 — 무엇이 있고, 어떻게 연결되며, 어떤 원칙으로 판단하는지.</p>
+  <div class="facts">
+    <div><span class="v">9</span><span>IDTA·사내 템플릿</span></div>
+    <div><span class="v">15</span><span>노드 종류</span></div>
+    <div><span class="v">4</span><span>검증 계층</span></div>
+    <div><span class="v">23</span><span>API 경로</span></div>
+    <div><span class="v">332</span><span>단위 테스트</span></div>
+    <div><span class="v">76<small> 커밋</small></span><span>2026-08-29 시작</span></div>
+  </div>
+</section>
+
+<section class="sheet" id="what">
+  <div class="eyebrow">범위</div>
+  <h2>무엇을 하나</h2>
+  <div class="cols3">
+    <div class="item"><b>저작</b><p>트리·캔버스·표 세 화면에서 Shell·Submodel·요소를 만들고, IDTA 템플릿으로 서브모델을 한 번에 넣습니다. 모든 변경은 명령이라 실행취소됩니다.</p></div>
+    <div class="item"><b>검증</b><p>규격(aas-core3.0) · 사내 정책 · 템플릿 적합성 · 사전(개념) 네 계층. 고칠 수 있는 이슈에는 버튼이 붙습니다.</p></div>
+    <div class="item"><b>뜻 붙이기</b><p>semanticId와 용어집, 개념 등록(Concept definition)으로 단위·정의를 ConceptDescription에 실어 내보냅니다.</p></div>
+    <div class="item"><b>저장 · 버전</b><p>서버에 모델과 명령 로그를 남기고, 버전 비교(diff)와 서버 검증을 합니다. 에디터는 브라우저에 자동 저장합니다.</p></div>
+    <div class="item"><b>내보내기 · 게시</b><p>AAS Environment JSON과 AASX(OPC 패키지)로 내보내고, BaSyx V2(AAS V3 API)에 게시합니다.</p></div>
+    <div class="item"><b>값 수집 · 운전</b><p>AID 서브모델을 설정으로 읽어 MQTT·OPC UA에서 값을 받고, 운전 화면에 수집 상태·신호 지연·시계열을 보입니다.</p></div>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>확정된 전제</th><th>뜻</th></tr></thead>
+      <tbody>
+        <tr><td>사전은 IEC CDD 단독</td><td>eCl@ss는 라이선스가 없어 파싱·보존·출력만 하고 조회·검증하지 않습니다</td></tr>
+        <tr><td>단일 사용자</td><td>실시간 공동 편집 없음 — 충돌은 ETag 409와 재적재 안내. 명령 로그와 버전은 유지</td></tr>
+        <tr><td>게시 대상 BaSyx V2</td><td>AAS V3 API 하나만 — 버전 어댑터를 만들지 않습니다</td></tr>
+        <tr><td>설비 10~50대</td><td>일괄 생성보다 템플릿 정확도와 표 편집 속도가 우선</td></tr>
+        <tr><td>값 수집은 apps/api가 직접</td><td>접점 설정은 AID 서브모델이 곧 설정 파일 — 별도 커넥터 화면·n8n 없음</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="sheet" id="map">
+  <div class="eyebrow">pnpm + turbo 모노레포</div>
+  <h2>시스템 지도</h2>
+  <div class="map">
+    <div class="tier"><div class="lbl">브라우저</div>
+      <div class="row r2">
+        <div class="box lead"><div class="t"><b>apps/web · /editor</b><code>Next.js 15 · :3000</code></div>
+          <ul><li>트리 · 캔버스 · 표 — 한 스토어(Zustand)</li><li>인스펙터 · 팔레트 · 서랍(출력 JSON · 검증 · 용어집)</li><li>로컬 자동 저장 · JSON/AASX 내보내기 · 서버에 보내기</li></ul></div>
+        <div class="box"><div class="t"><b>/dashboard/operations</b><code>TanStack Query</code></div>
+          <ul><li>수집 상태 · 신호별 지연 · 시계열</li><li>지연은 서버가 준 now로</li></ul></div>
+      </div>
+    </div>
+    <div class="wire"><span>HTTP · CORS localhost</span><span>WEB_ORIGIN</span></div>
+    <div class="tier"><div class="lbl">서버</div>
+      <div class="row">
+        <div class="box lead"><div class="t"><b>apps/api</b><code>Hono · :8787</code></div>
+          <ul><li>모델 저장소 · 명령 로그 · 버전 · diff · 서버 검증 · AASX</li><li>BaSyx 게시(부분 실패는 항목별 결과) · 사전 프록시(캐시) · 값 수집(MQTT · OPC UA)</li></ul></div>
+      </div>
+    </div>
+    <div class="wire"><span>DATABASE_URL</span><span>BASYX_URL</span><span>MQTT · opc.tcp</span></div>
+    <div class="tier"><div class="lbl">인프라<br>(WSL Docker)</div>
+      <div class="row r4">
+        <div class="box"><div class="t"><b>PostgreSQL</b><code>:5433</code></div><ul><li>모델 · 버전 · 사전 캐시 · samples</li></ul></div>
+        <div class="box"><div class="t"><b>BaSyx V2</b><code>:8081</code></div><ul><li>aas-environment 2.0.0-M15</li></ul></div>
+        <div class="box"><div class="t"><b>Mosquitto</b><code>:1883</code></div><ul><li>MQTT 브로커</li></ul></div>
+        <div class="box"><div class="t"><b>설비 OPC UA</b><code>외부</code></div><ul><li>보안 None · 익명만</li></ul></div>
+      </div>
+    </div>
+    <div class="wire"><span>웹과 API가 같은 패키지를 소스로 씁니다</span></div>
+    <div class="tier"><div class="lbl">공유 패키지</div>
+      <div class="row r5">
+        <div class="box kernel"><div class="t"><b>kernel</b></div><ul><li>문서 모델 · 명령 · 직렬화 · 파싱 · 검증</li><li>순수 TS — DOM·fetch 없음</li></ul></div>
+        <div class="box"><div class="t"><b>templates</b></div><ul><li>템플릿 9종 · 적합성 · 마이그레이션</li></ul></div>
+        <div class="box"><div class="t"><b>semantic</b></div><ul><li>IRDI/IRI 파서 · 샘플 용어집 · 해석기</li></ul></div>
+        <div class="box"><div class="t"><b>aasx</b></div><ul><li>OPC 패키지 쓰기·읽기 (fflate)</li></ul></div>
+        <div class="box"><div class="t"><b>ui</b></div><ul><li>디자인 토큰 (슬레이트 · 앰버)</li></ul></div>
+      </div>
+    </div>
+  </div>
+  <p class="muted"><code>packages/kernel</code>이 유일한 진실입니다. AAS JSON을 손으로 조립하지 않고 <code>serialize()</code>만 쓰며, 규격 제약(AASd-*)은 직접 구현하지 않고 aas-core3.0에 맡깁니다. 경계는 <code>pnpm check:kernel</code>이 CI에서 다시 막습니다.</p>
+</section>
+
+<section class="sheet" id="editor">
+  <div class="eyebrow"><b>apps/web</b>/components · /editor</div>
+  <h2>에디터</h2>
+  <div class="cols2">
+    <div class="item"><b>세 화면, 한 문서</b><p>트리 · 캔버스 · 표가 같은 문서와 선택을 봅니다. 좌표는 문서가 아니라 Layout이라 실행취소·diff 대상이 아닙니다. 표의 붙여넣기는 batch 명령 하나입니다.</p></div>
+    <div class="item"><b>실행취소</b><p>커널의 역명령으로 만듭니다(zundo 없음). 모든 변경은 <code>Cmd</code>를 거칩니다 — 템플릿 삽입, 퀵픽스, 네임스페이스 옮기기도 한 번의 Ctrl+Z로 돌아갑니다.</p></div>
+    <div class="item"><b>파일 메뉴</b><p>새로 만들기 · 가져오기(JSON) · 내보내기(JSON) · AASX · 서버에 보내기(새 모델로만 — 덮어쓰기는 아직) · 복사.</p></div>
+    <div class="item"><b>인스펙터</b><p>선택한 요소의 필드와 semanticId. <code>한글 용어로 찾기</code>는 용어집(샘플 → 사전 답 → 사내)에서 찾고, 배지로 근거의 세기를 보입니다.</p></div>
+    <div class="item"><b>서랍 — 출력 JSON</b><p>내보내기와 같은 결과(conceptDescriptions 포함)를 그대로 보입니다.</p></div>
+    <div class="item"><b>서랍 — 검증 · 용어집</b><p>이슈를 누르면 그 노드로 갑니다. 모두 고치기 · 사전에서 채우기 · 전체 복사 · 사내 네임스페이스 · 옮기기…. 용어집 탭은 고칠 것만 · 고치기 · 모델에서 가져오기 · 가져오기 · 내보내기.</p></div>
+  </div>
+</section>
+
+<section class="sheet" id="model">
+  <div class="eyebrow"><b>packages/kernel</b>/src/model.ts</div>
+  <h2>문서 모델 — 노드 15종</h2>
+  <div class="nodes">
+    <div class="node" style="--c:var(--n-shell)"><b>Shell</b><code>AssetAdministrationShell</code></div>
+    <div class="node" style="--c:var(--n-submodel)"><b>Submodel</b><code>Submodel</code></div>
+    <div class="node" style="--c:var(--n-smc)"><b>Collection</b><code>SubmodelElementCollection</code></div>
+    <div class="node" style="--c:var(--n-sml)"><b>List</b><code>SubmodelElementList</code></div>
+    <div class="node" style="--c:var(--n-prop)"><b>Property</b><code>Property</code></div>
+    <div class="node" style="--c:var(--n-mlp)"><b>MLP</b><code>MultiLanguageProperty</code></div>
+    <div class="node" style="--c:var(--n-range)"><b>Range</b><code>Range</code></div>
+    <div class="node" style="--c:var(--n-file)"><b>File</b><code>File</code></div>
+    <div class="node" style="--c:var(--n-blob)"><b>Blob</b><code>Blob</code></div>
+    <div class="node" style="--c:var(--n-ref)"><b>Reference</b><code>ReferenceElement</code></div>
+    <div class="node" style="--c:var(--n-entity)"><b>Entity</b><code>Entity</code></div>
+    <div class="node" style="--c:var(--n-rel)"><b>Relationship</b><code>RelationshipElement</code></div>
+    <div class="node" style="--c:var(--n-annrel)"><b>AnnotatedRel.</b><code>AnnotatedRelationshipElement</code></div>
+    <div class="node" style="--c:var(--n-op)"><b>Operation</b><code>Operation</code></div>
+    <div class="node" style="--c:var(--n-cap)"><b>Capability</b><code>Capability</code></div>
+  </div>
+  <ul class="rules">
+    <li><b>자식 순서는 <code>AasDoc.order</code> 배열뿐</b> — 객체 키·간선 삽입 순서에 기대지 않습니다.</li>
+    <li><b>List 직속 자식은 문서에서도 idShort가 빈 문자열</b>(AASd-120). 표시 이름은 Layout.label, 의미는 목록의 <code>semanticIdListElement</code>.</li>
+    <li><b>Operation 자식은 in → out → inout 슬롯으로 정규화</b> — JSON이 세 배열로 담기 때문입니다.</li>
+    <li><b>qualifiers · extensions · administration · specificAssetIds · derivedFrom · assetType · defaultThumbnail은 1급 필드</b>로 편집합니다.</li>
+    <li><b>모르는 필드는 <code>raw</code>로 보존해 그대로 재출력</b> — 남의 AASX를 손상시키지 않습니다. 왕복 <code>parse(serialize(doc)) ≡ doc</code>를 테스트가 지킵니다.</li>
+    <li><b>빈 컬렉션·빈 conceptDescriptions는 내보내지 않습니다</b> — 규격이 "없거나 최소 1개"를 요구합니다.</li>
+  </ul>
+</section>
+
+<section class="sheet" id="validate">
+  <div class="eyebrow">apps/web/lib/derived.ts · <b>커널이 판정</b></div>
+  <h2>검증 네 계층</h2>
+  <div class="layers">
+    <div class="layer"><span class="k">L1 규격</span><b>aas-core3.0</b><p>AASd-* · AASc-* 제약을 위임합니다. <b>내보낼 것</b>(개념 설명 포함)을 검사합니다.</p><code class="c">AAS-CORE</code></div>
+    <div class="layer"><span class="k">L2 정책</span><b>사내 규칙</b><p>식별자 네임스페이스 · 중복 · semanticId 누락 · 값 형식 · 구조.</p><code class="c">POL-IRI · POL-ID · POL-SEM · POL-VAL · POL-STRUCT</code></div>
+    <div class="layer"><span class="k">L3 템플릿</span><b>적합성</b><p>필수 요소 누락 · 자식/서브모델 semanticId 이탈. <code>{ns}</code> 자리는 어느 네임스페이스든 받습니다.</p><code class="c">T-001 · T-002 · T-003</code></div>
+    <div class="layer"><span class="k">L4 사전</span><b>개념</b><p>아무도 모르는 semanticId, 단위 없는 측정형. 파일이 싣고 온 개념·사전이 아는 개념에는 내지 않습니다.</p><code class="c">CD-001 · CD-002</code></div>
+  </div>
+  <div class="cols2">
+    <div class="item"><b>지적만 하지 않는다</b><p>커널이 만든 <code>quickFix</code>를 UI가 그대로 씁니다 — 식별자 고치기(참조까지 함께), 사내 개념 발행, 템플릿에서 요소 생성, 템플릿 값으로 되돌리기, 중복 서브모델 합치기(사라지는 요소 수를 먼저 보임), 단위 넣기, 개념 등록.</p></div>
+    <div class="item"><b>경고는 사실일 때만</b><p>MX200 모델의 CD-001 64건은 사실인 경고가 0건이었습니다(파일이 싣고 온 개념 38 · 사전이 아는 개념 26). 고친 뒤 0건. 이슈는 복사 버튼으로 표 형태로 옮길 수 있습니다.</p></div>
+  </div>
+</section>
+
+<section class="sheet" id="templates">
+  <div class="eyebrow"><b>packages/templates</b>/src/idta · 공식 Template JSON에서 기계 추출</div>
+  <h2>IDTA 템플릿</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>템플릿</th><th>번호</th><th>버전</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td>Digital Nameplate</td><td class="num">02006-3-0</td><td class="num">3.0</td><td>IEC CDD IRDI 14건 · 2.0 → 3.0 마이그레이션(미리보기와 적용 분리)</td></tr>
+        <tr><td>Technical Data</td><td class="num">02003-1-2</td><td class="num">1.2</td><td>예시 속성 3건은 eCl@ss 후보(미확인)</td></tr>
+        <tr><td>Handover Documentation</td><td class="num">02004-2-0</td><td class="num">2.0</td><td></td></tr>
+        <tr><td>Time Series Data</td><td class="num">02008-1-1</td><td class="num">1.1</td><td>시간 IRI는 Segment/StartTime · EndTime · RelativePointInTime</td></tr>
+        <tr><td>Carbon Footprint</td><td class="num">02023-1-0</td><td class="num">1.0</td><td></td></tr>
+        <tr><td>Hierarchical Structures enabling BoM</td><td class="num">02011-1-1</td><td class="num">1.1</td><td>Entity 기반 설비 구성</td></tr>
+        <tr><td>Asset Interfaces Description (MQTT)</td><td class="num">02017-1-1</td><td class="num">1.1</td><td>값 수집 설정 그 자체</td></tr>
+        <tr><td>Asset Interfaces Description (OPC UA)</td><td class="num">02017-1-1</td><td class="num">1.1</td><td>browsePath로 신호 지정</td></tr>
+        <tr><td>Operational Data</td><td class="num">사내 정의</td><td class="num">1.0</td><td><code>{ns}/cd/OperationalData/1/0</code> · Timestamp도 사내 개념 · eCl@ss 후보 4건</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul class="rules">
+    <li><b>PDF를 옮겨 적지 않습니다</b> — admin-shell-io/submodel-templates의 published Template JSON이 규범입니다.</li>
+    <li><b>인스턴스 데이터 없이 규격을 못 채우는 요소는 자동 삽입하지 않습니다</b>(RelationshipElement의 first·second). 가짜 참조를 심지 않습니다.</li>
+    <li><b>미확인 semanticId 7건은 전부 eCl@ss 후보</b> — <code>unverifiedOf()</code>가 목록으로 내고 골든이 고정합니다. 사내 개념(<code>{ns}</code>)은 세지 않습니다.</li>
+    <li><b>템플릿 감사</b> <code>scripts/audit-templates.ts --dict</code> — 9종 결함 0.</li>
+  </ul>
+</section>
+
+<section class="sheet" id="semantic">
+  <div class="eyebrow"><b>packages/semantic</b> · apps/web/lib/terms.ts · docs/semantic-id.md</div>
+  <h2>semanticId · 용어집 · 개념 등록</h2>
+  <div class="fam">
+    <div style="--c:var(--cdd)"><b>IEC CDD</b><code>0112/2///61987#ABA951#009</code><p>열람 가능 · 자동 접근 403 · 회사가 등록할 수 없음</p></div>
+    <div style="--c:var(--eclass)"><b>eCl@ss · 라이선스 필요</b><code>0173-1#02-BAA120#008</code><p>파싱·보존·출력만 · mock은 가정 자료</p></div>
+    <div style="--c:var(--idta)"><b>IDTA IRI</b><code>https://admin-shell.io/idta/…</code><p>근거는 공식 JSON · <code>/idta/</code>는 증거가 아님</p></div>
+    <div style="--c:var(--accent)"><b>사내 IRI</b><code>https://cw1.co.kr/ids/cd/…/1/0</code><p>자체 발급 — 뜻은 개념 등록으로</p></div>
+  </div>
+  <div class="cols2">
+    <div class="item"><b>용어집 — 세 층, 뒤가 이긴다</b><p>샘플(<code>terms.sample.json</code>, IDTA 공식 정의를 글자 그대로) → 서버 사전의 답(CD-001 때 자동 조회, 세션 메모리) → 사내(브라우저). 미리보기 · 내보내기 · AASX · 검증 · 인스펙터가 같은 책을 봅니다. mock에서 온 답은 <span class="chip warn">mock</span>으로 표시합니다.</p></div>
+    <div class="item"><b>개념 등록 · Concept definition</b><p>한글 용어 → preferredName[ko], 영문 이름(AASc-3a-002) · 영문 정의(AASc-3a-008) 필수, 단위(측정·통화형 AASc-3a-009 — 종류 22가지에서 고르고 이름에서 추천), 자료형. 사내 개념에만 열립니다. 고치기는 같은 IRI를 덮어써 지우고 다시 만들 필요가 없습니다.</p></div>
+    <div class="item"><b>사전 프록시</b><p>상류(IEC CDD)는 꽂혀 있지 않고 캐시가 답합니다. <code>dict-seed.ts</code>가 IDTA Template JSON과 <code>{"terms":[…]}</code> 파일(사람이 CDD에서 옮겨 적은 개념)을 받습니다. 받지 못한 항목은 이유와 함께 찍습니다.</p></div>
+    <div class="item"><b>사내 네임스페이스</b><p>루트 <code>.env</code>의 <code>IRI_PREFIX</code> 하나를 웹·API가 함께 읽습니다(기본 <code>https://cw1.co.kr/ids</code>). <code>옮기기…</code>가 식별자(참조까지) · 자산 · 개념 · 용어집을 미리 보고 한 번에 옮깁니다. 표준 식별자는 건드리지 않습니다.</p></div>
+  </div>
+  <p class="muted">자세한 흐름은 발표 덱 <code>docs/presentation/semantic-map.html</code>(12장)과 <code>/semantic-check</code> 스킬에 있습니다.</p>
+</section>
+
+<section class="sheet" id="api">
+  <div class="eyebrow"><b>apps/api</b>/src/app.ts · createApp(store, { fetchLike })</div>
+  <h2>서버 API</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>묶음</th><th>경로</th><th>하는 일</th></tr></thead>
+      <tbody>
+        <tr><td>상태</td><td><code>GET /health</code></td><td>살아 있는지</td></tr>
+        <tr><td>모델</td><td><code>GET · POST /models</code> · <code>GET · PUT · DELETE /models/:id</code></td><td>저장소 — PostgreSQL(Drizzle), <code>DATABASE_URL</code>이 없으면 메모리(시작 로그가 말함)</td></tr>
+        <tr><td>명령 · 버전</td><td><code>POST /models/:id/commands</code> · <code>GET …/versions</code> · <code>GET …/diff</code></td><td>명령 로그로 버전을 만들고 비교</td></tr>
+        <tr><td>검증 · 파일</td><td><code>POST …/validate</code> · <code>GET …/aasx</code></td><td>같은 커널로 서버 검증 · AASX 내려받기</td></tr>
+        <tr><td>게시</td><td><code>POST /publish/:id</code></td><td>BaSyx V2 — 부분 실패를 롤백하지 않고 항목별 결과, 실패한 것만 다시</td></tr>
+        <tr><td>사전</td><td><code>GET /dictionary/status · search · :irdi</code> · <code>POST /dictionary/import · lookup</code></td><td>캐시가 답함 · 한글 용어·별칭 검색 · 모르면 없다고 말함</td></tr>
+        <tr><td>수집</td><td><code>GET /collect/:id/plan</code> · <code>POST …/start · stop</code> · <code>GET /collect/status</code></td><td>AID에서 계획 · 어댑터 없는 접점은 207과 건너뛴 이유</td></tr>
+        <tr><td>시계열</td><td><code>GET /models/:id/timeseries</code> · <code>GET /models/:id/signals</code></td><td>신호별 마지막 한 건은 SQL <code>DISTINCT ON</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted">네트워크는 주입받아 테스트가 실제 BaSyx 없이 돕니다. 환경값은 <b>쓸 때 읽습니다</b> — 모듈 최상위에서 읽으면 ESM import 순서 때문에 <code>.env</code>보다 먼저 굳습니다(실제로 그랬습니다). 일괄 생성 <code>POST /batch</code>는 501입니다.</p>
+</section>
+
+<section class="sheet" id="collect">
+  <div class="eyebrow"><b>apps/api</b>/src/collect · /dashboard/operations</div>
+  <h2>값 수집 · 운전 모니터링</h2>
+  <div class="cols2">
+    <div class="item"><b>AID가 곧 설정</b><p><code>planFor(doc)</code>가 AID 서브모델에서 프로토콜·주소·신호를 읽고, 읽지 못한 것은 <code>problems</code>에 남깁니다. 조용히 넘기지 않습니다.</p></div>
+    <div class="item"><b>MQTT</b><p>숫자로 읽히지 않는 페이로드는 <code>textValue</code>로 — 0으로 바꾸지 않습니다. 연결 대기 타이머를 반드시 지우고, 붙은 뒤의 <code>'error'</code>도 듣습니다(안 들으면 API가 죽고, 안 지우면 8초마다 값이 조용히 멎었습니다).</p></div>
+    <div class="item"><b>OPC UA</b><p>폴링이 아니라 구독. AID의 browsePath를 TranslateBrowsePathsToNodeIds로 한 번 옮긴 뒤 감시합니다. Bad 상태는 값이 아니라 problems로. 보안은 None · 익명만.</p></div>
+    <div class="item"><b>되쓰지 않는다</b><p>수집한 값을 저작 문서에 쓰지 않습니다 — 버전 비교가 무의미해집니다. 신호 → 요소 연결은 IDTA 02027(AIMC)의 몫이라 짐작하지 않습니다.</p></div>
+    <div class="item"><b>운전 화면</b><p>수집 상태 · 신호별 지연 · 시계열. 지연은 서버가 준 <code>now</code>로 잽니다. 값이 온 적 없는 신호도 목록에 남고, 서버 없음 · 모델 없음 · 수집 꺼짐을 다른 화면으로 안내합니다.</p></div>
+    <div class="item"><b>차트</b><p>라이브러리 없이 SVG. 축약은 구간 min·max를 남겨 스파이크가 사라지지 않게 합니다. 팬·줌은 아직 없습니다.</p></div>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>점검 스크립트</th><th>하는 일</th></tr></thead>
+      <tbody>
+        <tr><td><code>collect-check.ts</code></td><td>실제 MQTT 브로커로 수집 경로 확인</td></tr>
+        <tr><td><code>opcua-check.ts</code> · <code>opcua-sim.ts</code></td><td>실측 픽스처의 browsePath와 같은 주소공간을 띄워 붙음(:4841)</td></tr>
+        <tr><td><code>feed-demo.ts</code></td><td>운전 화면을 움직일 값 흘리기</td></tr>
+        <tr><td><code>live-check.ts</code></td><td>살아 있는 스택 전체 점검</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="sheet" id="run">
+  <div class="eyebrow">scripts · .claude · turbo</div>
+  <h2>실행 · 개발</h2>
+  <div class="cols2">
+    <div class="stack item" style="gap:10px">
+      <b>스택 띄우기</b>
+<pre class="cmd">scripts\aas                 # postgres · web · api
+scripts\aas full            # + BaSyx 8081 · Mosquitto 1883
+scripts\aas clean restart   # .next 비우고 다시</pre>
+      <p>WSL을 깨우면 systemd가 Docker를 띄우고 <code>restart: unless-stopped</code> 컨테이너가 돌아옵니다. 포트가 아니라 실제 응답(<code>/editor</code> 200 · <code>/dictionary/status</code>)을 확인합니다. 로그는 <code>%TEMP%\aas-dev</code>.</p>
+    </div>
+    <div class="stack item" style="gap:10px">
+      <b>커밋 전</b>
+<pre class="cmd">pnpm verify   # check:kernel · typecheck · test · lint (22 태스크)</pre>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>패키지</th><th>테스트</th></tr></thead>
+          <tbody>
+            <tr><td>@aas/kernel</td><td class="num">115</td></tr>
+            <tr><td>@aas/templates</td><td class="num">98</td></tr>
+            <tr><td>@aas/api</td><td class="num">62</td></tr>
+            <tr><td>@aas/semantic</td><td class="num">47</td></tr>
+            <tr><td>@aas/aasx</td><td class="num">10</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Claude 도구</th><th>종류</th><th>하는 일</th></tr></thead>
+      <tbody>
+        <tr><td><code>/dev-up</code></td><td>스킬</td><td>개발 스택을 한 번에 살리고 응답을 확인</td></tr>
+        <tr><td><code>/verify</code></td><td>스킬</td><td>커밋 전 전체 검증</td></tr>
+        <tr><td><code>/semantic-check</code></td><td>스킬</td><td>식별자의 주인을 근거로 판정하고 할 일 안내</td></tr>
+        <tr><td><code>/new-element</code></td><td>스킬</td><td>새 SubmodelElement 종류를 커널에 추가(여섯 지점 전부)</td></tr>
+        <tr><td><code>/new-template</code></td><td>스킬</td><td>IDTA 서브모델 템플릿을 레지스트리에 추가</td></tr>
+        <tr><td><code>aas-spec</code> · <code>template-harvester</code> · <code>ui-reviewer</code></td><td>에이전트</td><td>규격 리뷰 · 템플릿 추출 · 렌더 결과 검토</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout"><b>알려진 문제 — 개발 서버 500</b><span>코드를 고칠 때 가끔 <code>UNKNOWN: unknown error, open … .next\static\chunks\app\editor\page.js</code>(errno -4094)로 멈춥니다. <code>.next</code>는 Dropbox 밖(junction)으로 옮겼지만 해결되지 않았고 원인은 확인하지 못했습니다. <code>scripts\aas clean restart</code>로 복구합니다.</span></div>
+</section>
+
+<section class="sheet" id="rules">
+  <div class="eyebrow">CLAUDE.md · docs/prototype-delta.md</div>
+  <h2>확정된 원칙</h2>
+  <ul class="rules">
+    <li><b>문서 변경은 반드시 <code>Cmd</code>를 거친다</b> — 실행취소 · 버전 · 감사 추적이 여기서 나옵니다.</li>
+    <li><b>semanticId를 추측하지 않는다</b> — 레지스트리에서 가져오거나, 확인 못 한 값은 <code>verified: none</code>으로 남겨 보고합니다.</li>
+    <li><b>표준 식별자는 한 글자도 바꾸지 않고, 우리 개념은 우리 이름으로</b> — <code>{ns}/cd/…</code>로 발행하고 뜻을 채웁니다.</li>
+    <li><b>식별자를 바꿀 때는 참조를 함께</b> — <code>renameIdentifier()</code>가 문서 전체의 Reference 키를 하나의 batch로 고칩니다. raw는 문자열 치환하지 않고 알립니다.</li>
+    <li><b>계획과 적용을 분리한다</b> — 마이그레이션 · 서브모델 합치기 · 네임스페이스 옮기기는 무엇이 바뀌는지 먼저 보입니다.</li>
+    <li><b>있는 척하지 않는다</b> — 어댑터가 없는 프로토콜, 상류가 없는 사전, 대조 못 한 eCl@ss는 없다고 말합니다.</li>
+    <li><b>오류는 판별 가능한 코드로</b>, 메시지는 <code>{ ko, en }</code> 두 벌. 색은 CSS 변수로만.</li>
+    <li><b>파생값은 저장하지 않는다</b> — JSON 미리보기와 검증 이슈는 selector로 계산합니다. 서버 상태는 TanStack Query, 에디터는 Zustand, 섞지 않습니다.</li>
+  </ul>
+</section>
+
+<section class="sheet" id="next">
+  <div class="eyebrow">README · 이번 정리에서 남긴 것</div>
+  <h2>남은 것</h2>
+  <div class="backlog">
+    <div><span class="chip plain">화면</span><span><b>/dashboard/models</b> 모델 자산 관리 — P9의 나머지 한 화면 <span class="why">· 시계열 팬·줌도 아직 (지금은 최근 500건 창)</span></span></div>
+    <div><span class="chip plain">서버</span><span><b>서버에 보내기의 덮어쓰기·버전 잠금</b> <span class="why">· 지금은 새 모델로 만들기만</span></span></div>
+    <div><span class="chip plain">서버</span><span><b>CSV 일괄 생성</b> <code>POST /batch</code> <span class="why">· 501</span></span></div>
+    <div><span class="chip plain">수집</span><span><b>HTTP · Modbus 어댑터</b>, 신호 → AAS 요소 되쓰기(IDTA 02027 AIMC) <span class="why">· 짐작으로 잇지 않음</span></span></div>
+    <div><span class="chip warn">사전</span><span><b>IEC CDD 상류</b> — 공개 창구 없음, 사람이 옮겨 적은 파일로 시드 <span class="why">· eCl@ss 7건은 라이선스 확보 후 대조</span></span></div>
+    <div><span class="chip warn">내용</span><span><b>MX200 개념의 뜻 확정</b> — ToolWearRate(무엇을 재는가 → 단위), Timestamp 개념 등록, 용어집의 옛 네임스페이스(cw.co.kr · bnb.co.kr) 옮기기</span></div>
+    <div><span class="chip warn">파일</span><span><b>AASX에 File 첨부</b> — 에디터에 첨부를 넣는 자리가 아직 없어 몇 건 빠졌는지 알려 주기만</span></div>
+    <div><span class="chip err">개발</span><span><b>개발 서버 500(errno -4094)</b> — 원인 미확인, Turbopack 전환을 시험해 볼 후보</span></div>
+    <div><span class="chip plain">실측</span><span><b>설비 2대 추가 실측</b>과 Package Explorer 샘플 AASX 3종 왕복 확인</span></div>
+  </div>
+</section>
+
+<footer><span>AAS Composer · 2026-09-13 · main</span><span>근거: CLAUDE.md · README.md · docs/semantic-id.md · 코드</span></footer>
+</main>
+</div>
+</body>
+</html>
