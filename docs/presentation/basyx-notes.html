@@ -135,7 +135,7 @@ footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content:
     <span class="no">개발 대상 아님</span>
     <div>
       <p><b>BaSyx 자체는 만들지 않습니다.</b> Eclipse 재단의 오픈소스 AAS 서버를 컨테이너 그대로 띄워 씁니다. 우리가 만드는 것은 BaSyx에 모델을 올리는 <b>게시 게이트웨이</b>이고, 그것은 이미 있으며 실제 서버에서 동작을 확인했습니다.</p>
-      <p>남은 것은 BaSyx를 개발하는 일이 아니라 연결을 채우는 일이었습니다. <b>2026-09-27에 둘을 채웠습니다</b> — 에디터의 <code>BaSyx에 게시</code> 버튼과 개념 설명(단위·정의) 게시. 나머지는 아래 "남은 것"에 크기와 필요한 시점을 적었습니다.</p>
+      <p>남은 것은 BaSyx를 개발하는 일이 아니라 연결을 채우는 일이었습니다. <b>2026-09-27에 셋을 채웠습니다</b> — 에디터의 <code>BaSyx에 게시</code> 버튼, 개념 설명(단위·정의) 게시, mock 정의 제외. 나머지는 아래 "남은 것"에 크기와 필요한 시점을 적었습니다.</p>
     </div>
   </div>
 </section>
@@ -210,14 +210,15 @@ footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content:
       <div class="who"><span>apps/api</span><code>:8787</code></div>
       <div class="msg"><code class="req">POST /models</code><span>저장소에 기록 · 명령 로그 시작</span></div>
       <div class="msg"><code class="req">POST /publish/:id</code><span>서버 검증 — 오류가 있으면 멈춤</span><span class="st warn">422 HAS_ERRORS (force=1로 강행)</span></div>
-      <div class="msg"><code class="req">serialize(doc)</code><span>커널이 AAS Environment JSON을 만듦</span></div>
+      <div class="msg"><code class="req">buildServerExport(doc, dict)</code><span>커널이 JSON을 만들고, 사전·샘플로 개념 설명을 붙임 (mock은 뺌)</span></div>
       <div class="msg"><code class="req">응답</code><span>항목별 결과 · 롤백하지 않음</span><span class="st ok">200 전부 성공</span><span class="st warn">207 일부 실패</span><span class="st err">502 UNREACHABLE</span></div>
     </div>
     <div class="lane bx">
       <div class="who"><span>BaSyx</span><code>:8081</code></div>
-      <div class="msg"><code class="req">① POST /submodels</code><span>서브모델 먼저 — 셸이 참조하기 때문</span><span class="st ok">201</span></div>
+      <div class="msg"><code class="req">① POST /concept-descriptions</code><span>개념 먼저 — semanticId가 가리키는 쪽</span><span class="st ok">201</span></div>
+      <div class="msg"><code class="req">② POST /submodels</code><span>셸보다 먼저 — 셸이 참조하기 때문</span><span class="st ok">201</span></div>
       <div class="msg"><code class="req">이미 있으면 409 →<br>PUT /submodels/{Base64URL id}</code><span>두 번 눌러도 409가 쌓이지 않고 갱신</span><span class="st ok">204</span></div>
-      <div class="msg"><code class="req">② POST /shells</code><span>같은 규칙 · 409면 PUT /shells/{id}</span><span class="st ok">201</span></div>
+      <div class="msg"><code class="req">③ POST /shells</code><span>같은 규칙 · 409면 PUT /shells/{id}</span><span class="st ok">201</span></div>
     </div>
   </div>
   <div class="cols2">
@@ -228,8 +229,58 @@ footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content:
 </section>
 
 <section class="sheet">
-  <div class="eyebrow"><b>apps/api/scripts/live-check.ts</b> · 실제 PostgreSQL + BaSyx · 2026-09-17</div>
-  <h2>실제로 올라가는가</h2>
+  <div class="eyebrow">사용법 — 세 단계</div>
+  <h2>띄우고 · 올리고 · 확인한다</h2>
+  <div class="lanes">
+    <div class="lane">
+      <div class="who"><span>① 띄우기</span><code>터미널</code></div>
+      <div class="msg"><code class="req">scripts\aas full</code><span>기본 <code>scripts\aas</code>는 BaSyx를 띄우지 않습니다</span><span class="st ok">OK basyx http://localhost:8081/shells</span></div>
+    </div>
+    <div class="lane">
+      <div class="who"><span>② 올리기</span><code>에디터</code></div>
+      <div class="msg"><code class="req">서버에 보내기</code><span>모델 저장 + 용어집 개념을 서버 사전에</span></div>
+      <div class="msg"><code class="req">BaSyx에 게시</code><span>서버에 없으면 먼저 보낸 뒤 게시</span></div>
+    </div>
+    <div class="lane bx">
+      <div class="who"><span>③ 확인</span><code>브라우저 · 터미널</code></div>
+      <div class="msg"><code class="req">/shells · /submodels<br>/concept-descriptions</code><span>주소창에 넣으면 JSON이 보입니다</span></div>
+      <div class="msg"><code class="req">/submodels/{id}/$value</code><span>값만 — {id}는 Base64URL</span></div>
+    </div>
+  </div>
+  <h3>게시 응답 읽는 법</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>응답</th><th>뜻</th><th>할 일</th></tr></thead>
+      <tbody>
+        <tr><td class="num">200</td><td>전부 올라감</td><td>확인만 — 알림에 개념 수가 함께 나옵니다</td></tr>
+        <tr><td class="num">207</td><td>일부 실패 (롤백하지 않음)</td><td>실패한 항목만 다시 게시</td></tr>
+        <tr><td class="num">422</td><td>검증 오류가 있는 모델</td><td>오류를 고치거나 확인 창에서 강행</td></tr>
+        <tr><td class="num">502</td><td>BaSyx에 닿지 못함</td><td><code>scripts\aas full</code>로 띄우기</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>확인 명령</h3>
+<pre class="cmd"># 요약
+powershell -Command "'shells: ' + (Invoke-RestMethod http://localhost:8081/shells).result.Count; (Invoke-RestMethod http://localhost:8081/submodels).result | ForEach-Object { ' - ' + $_.idShort }; 'concepts: ' + (Invoke-RestMethod http://localhost:8081/concept-descriptions).result.Count"
+
+# 값까지 ({id}는 전역 식별자를 Base64URL로)
+powershell -Command "$id='https://bnb.co.kr/ids/sm/operational-data'; $b=[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($id)).TrimEnd('=').Replace('+','-').Replace('/','_'); Invoke-RestMethod \"http://localhost:8081/submodels/$b/`$value\" | ConvertTo-Json"</pre>
+</section>
+
+<section class="sheet">
+  <div class="eyebrow">mock 정책 — 2026-09-27</div>
+  <h2>지어낸 정의는 올리지 않는다</h2>
+  <p class="lede">개발·시연을 위해 사전에는 mock이 들어 있습니다 — eCl@ss 후보(라이선스를 가정한 것)와 아무도 발행하지 않은 IRI의 정의입니다. mock 파일이 스스로 "Do not ship"이라고 적습니다. 그런데 <b>그것이 BaSyx에 올라가 있었습니다.</b></p>
+  <div class="cols2">
+    <div class="item"><b>게시에서 뺀다</b><p>사전이 mock으로 답한 개념은 싣지 않고, 무엇을 뺐는지 <code>mock</code>으로 돌려줍니다. 에디터 알림도 "mock 정의 N건은 빼고 올렸습니다"라고 말합니다. 샘플이 같은 개념을 제대로 알면 그것으로 나갑니다.</p></div>
+    <div class="item"><b>표시가 덮이지 않게</b><p>에디터가 모델을 보내며 개념을 사전에 넣을 때 mock 항목의 출처가 <code>editor:…</code>로 덮여, 지어낸 정의가 보통 항목처럼 보였습니다. 이제 에디터는 mock을 보내지 않고, 사전도 이미 mock인 항목의 출처를 덮지 않습니다.</p></div>
+  </div>
+  <p class="src">주의: 게시는 올리기만 합니다. 이미 올라간 mock은 따로 지워야 합니다 — 이번에 10건을 지웠습니다.</p>
+</section>
+
+<section class="sheet">
+  <div class="eyebrow">결과물 — 실측 2026-09-17 · 09-27</div>
+  <h2>실제로 올라간 것</h2>
   <p class="lede">사출성형기 IM-150E 2호기 모델을 저장하고, 명령으로 버전을 올리고, 게시했습니다.</p>
   <div class="tablewrap">
     <table>
@@ -263,6 +314,25 @@ pnpm --filter @aas/api exec tsx scripts/live-check.ts      # KEEP=1 이면 점�
       </tbody>
     </table>
   </div>
+
+  <h3>MX200_Line1 — mock을 뺀 뒤 (09-27)</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>BaSyx</th><th>건수</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td><code>/shells</code></td><td class="num">1</td><td>MX200_Line1_AAS</td></tr>
+        <tr><td><code>/submodels</code></td><td class="num">4</td><td>Nameplate · OperationalData · TechnicalData · TimeSeries</td></tr>
+        <tr><td><code>/concept-descriptions</code></td><td class="num">39</td><td>mock 10건을 뺀 수 (전에는 49건이었습니다)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted">게시 응답: <code>ok 44 · failed 0 · concepts 39 · mock 10 · unresolved 0</code>. 뺀 10건은 eCl@ss 후보 6건과 <code>…/idta/nameplate/3/0/Nameplate</code> · <code>…/idta/TimeSeries/1/1</code> 같은 IDTA IRI 4건입니다.</p>
+  <h3>값도 올라갑니다 — <code>OperationalData/$value</code></h3>
+<pre class="cmd">{ "OperatingHours": "12874.5", "CurrentTemperature": "45.2",
+  "ProcessQuality": { "SurfaceRoughnessRa": "0.82", "ToolWearRate": "0.34" },
+  "RotationSpeed": "1450", "MachineState": "Running",
+  "Timestamp": "2026-08-26T09:30:00+09:00" }</pre>
+  <p class="src">게시한 시점의 저작 값입니다. 수집 중인 실시간 값이 아닙니다 — 값 갱신(<code>PATCH …/$value</code>)은 아직 꽂지 않았습니다.</p>
 </section>
 
 <section class="sheet">
@@ -271,6 +341,7 @@ pnpm --filter @aas/api exec tsx scripts/live-check.ts      # KEEP=1 이면 점�
   <div class="backlog">
     <div><span class="chip ok">했음</span><div><b>개념 설명(ConceptDescription) 게시</b><p>게시가 <code>serialize(doc)</code>만 보내 BaSyx에는 0건이었습니다. 이제 서버가 <code>buildServerExport</code>로 개념을 만들어 <code>/concept-descriptions</code>에 먼저 올립니다. 서버는 브라우저 용어집을 모르므로 <b>에디터가 <code>서버에 보내기</code>에서 용어집을 사전에 함께 넣습니다</b>. 사전도 샘플도 모르는 개념은 지어내지 않고 <code>unresolved</code>로 돌려줍니다.</p></div><span class="when">2026-09-27</span></div>
     <div><span class="chip ok">했음</span><div><b>에디터의 게시 버튼</b><p>파일 메뉴의 <code>BaSyx에 게시</code>. 서버에 없는 모델이면 먼저 보내고, 결과를 한 줄로 알립니다 — 올린 건수·개념 수·실패 항목·사전이 모르는 개념. 검증 오류(422)는 확인 창에서 사람이 강행을 결정하고, BaSyx가 없으면(502) 띄우는 방법을 안내합니다.</p></div><span class="when">2026-09-27</span></div>
+    <div><span class="chip ok">했음</span><div><b>mock 정의를 게시에서 제외</b><p>사전이 mock으로 답한 개념은 싣지 않고 <code>mock</code>으로 돌려줍니다. 에디터는 mock을 사전에 보내지 않고, 사전은 이미 mock인 항목의 출처를 덮지 않습니다 — 한 번 <code>editor:…</code>로 덮여 걸러낼 근거가 사라졌습니다. 이미 올라가 있던 10건은 BaSyx에서 지웠습니다.</p></div><span class="when">2026-09-27</span></div>
     <div><span class="chip warn">설정</span><div><b>저장 방식 — InMemory</b><p>컨테이너를 다시 띄우면 게시한 모델이 사라집니다. 운영에서는 영속 백엔드로 바꿔야 합니다. BaSyx 쪽 설정 문제이며 우리 코드는 바뀌지 않습니다(BaSyx 문서 기준 — 이 프로젝트에서 아직 시험하지 않음).</p></div><span class="when">설정 · 운영 전 필수</span></div>
     <div><span class="chip plain">없음</span><div><b>지운 것 동기화</b><p>게시는 올리기(POST/PUT)만 합니다. 에디터에서 서브모델을 지워도 BaSyx에는 남습니다. 무엇을 지울지 미리 보이고 확인받는 방식이어야 합니다(계획과 적용 분리).</p></div><span class="when">중간 · 모델을 자주 고칠 때</span></div>
     <div><span class="chip plain">대기</span><div><b>실행 값 갱신 <code>PATCH …/$value</code></b><p><code>patchValue()</code>는 만들어 두었지만 꽂지 않았습니다. 수집한 신호를 어느 요소에 쓸지는 AID가 말해 주지 않고 IDTA 02027(AIMC)의 몫이라, 짐작으로 잇지 않습니다.</p></div><span class="when">AIMC 결정 후</span></div>
