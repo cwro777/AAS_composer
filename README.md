@@ -32,6 +32,7 @@ PostgreSQL 16 · Mosquitto · BaSyx V2를 띄웁니다.
 | PostgreSQL | `localhost:5433` | `pnpm --filter @aas/api db:migrate` |
 | MQTT (Mosquitto) | `localhost:1883` | `scripts/collect-check.ts` |
 | BaSyx V2 | `http://localhost:8081/shells` | `scripts/live-check.ts` |
+| BaSyx Web UI | `http://localhost:8082` | 게시한 모델을 트리로 열람 (개발자가 아닌 사람에게 보여 줄 때) |
 
 Docker가 WSL 안에 있으면:
 

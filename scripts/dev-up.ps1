@@ -21,7 +21,7 @@
   이미 떠 있는 것은 건드리지 않는다. 두 번 실행해도 안전하다.
 
 .PARAMETER Full
-  BaSyx(8081)와 Mosquitto(1883)까지 올린다. 없으면 postgres만.
+  BaSyx(8081)·BaSyx Web UI(8082)·Mosquitto(1883)까지 올린다. 없으면 postgres만.
 
 .PARAMETER Clean
   시작 전에 apps/web/.next를 지운다. 증상이 없어도 강제로 지우고 싶을 때.
@@ -247,6 +247,12 @@ if ($Full) {
     Write-Warn2 'basyx    아직 응답 없음. 기동에 30초 이상 걸립니다.'
   }
   if (Test-Port 1883) { Write-Ok 'mqtt     1883' } else { Write-Warn2 'mqtt     1883 닫힘' }
+  # BaSyx 열람 화면. 개발자가 아닌 사람에게 보여 줄 때 쓴다.
+  if (Wait-Url 'http://localhost:8082/' 60) {
+    Write-Ok 'basyx-ui http://localhost:8082'
+  } else {
+    Write-Warn2 'basyx-ui 8082 응답 없음 — docker compose logs basyx-ui 를 보십시오.'
+  }
 }
 
 Write-Host ''

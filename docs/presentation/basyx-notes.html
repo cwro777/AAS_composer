@@ -245,6 +245,7 @@ footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content:
       <div class="who"><span>③ 확인</span><code>브라우저 · 터미널</code></div>
       <div class="msg"><code class="req">/shells · /submodels<br>/concept-descriptions</code><span>주소창에 넣으면 JSON이 보입니다</span></div>
       <div class="msg"><code class="req">/submodels/{id}/$value</code><span>값만 — {id}는 Base64URL</span></div>
+      <div class="msg"><code class="req">http://localhost:8082</code><span>열람 화면 — 트리로 보기</span></div>
     </div>
   </div>
   <h3>게시 응답 읽는 법</h3>
@@ -259,6 +260,14 @@ footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content:
       </tbody>
     </table>
   </div>
+  <h3>열람 화면 — <code>http://localhost:8082</code></h3>
+  <p class="lede">BaSyx가 만든 화면(<code>aas-gui</code>)을 compose에 넣었습니다. <b>개발자가 아닌 사람에게 보여 줄 때</b> 씁니다 — 셸을 고르면 서브모델 트리가 열리고, 요소를 누르면 값·semanticId·JSON을 봅니다.</p>
+  <div class="cols2">
+    <div class="item"><b>레지스트리 없이 붙는다</b><p>저장소 주소를 직접 줍니다(<code>AAS_REPO_PATH</code> · <code>SUBMODEL_REPO_PATH</code> · <code>CD_REPO_PATH</code>). 이 주소는 <b>브라우저가</b> 부르므로 컨테이너 이름이 아니라 호스트에서 보이는 주소여야 합니다 — 다른 PC에서 열려면 <code>localhost</code>를 이 PC의 IP로 바꿔 띄웁니다.</p></div>
+    <div class="item"><b>CORS를 함께 켰다</b><p>화면이 브라우저에서 BaSyx를 직접 부르므로 <code>BASYX_CORS_ALLOWED-ORIGINS</code>가 없으면 목록이 빈 채로만 보입니다(원인은 콘솔에만 남습니다). 개발용으로 열어 두었으니 사내망 밖으로 열 때는 좁히십시오.</p></div>
+  </div>
+  <p class="src">주의: 이 화면은 <b>편집·업로드도 허용</b>되어 있고 인증이 없습니다. 보여 주기 전용으로만 쓰십시오. 컨테이너 안 nginx는 3000으로 듣습니다 — 이미지의 EXPOSE(80)와 어긋나므로 그 값을 믿고 매핑하면 연결이 끊깁니다.</p>
+
   <h3>확인 명령</h3>
 <pre class="cmd"># 요약
 powershell -Command "'shells: ' + (Invoke-RestMethod http://localhost:8081/shells).result.Count; (Invoke-RestMethod http://localhost:8081/submodels).result | ForEach-Object { ' - ' + $_.idShort }; 'concepts: ' + (Invoke-RestMethod http://localhost:8081/concept-descriptions).result.Count"

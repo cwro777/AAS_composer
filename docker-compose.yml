@@ -31,11 +31,37 @@ services:
       SERVER_PORT: 8081
       BASYX_ENVIRONMENT: ''
       BASYX_BACKEND: InMemory
+      # Web UI는 **브라우저에서** 이 서버를 직접 부른다. 헤더가 없으면 화면이 비어 보이고
+      # 원인은 콘솔에만 남는다. 개발용이라 열어 두지만, 사내망 밖으로 열 때는 좁혀야 한다.
+      BASYX_CORS_ALLOWED-ORIGINS: '*'
+      BASYX_CORS_ALLOWED-METHODS: 'GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD'
     healthcheck:
       test: ['CMD-SHELL', 'wget -q -O- http://localhost:8081/shells || exit 1']
       interval: 10s
       timeout: 5s
       retries: 12
+
+  # BaSyx가 만든 열람 화면. 개발자가 아닌 사람에게 보여 줄 때 쓴다 —
+  # 셸·서브모델·개념 설명을 트리로 보여 주고 값도 읽는다.
+  #
+  # 레지스트리를 두지 않았으므로 **저장소 주소를 직접** 준다(Discovery·Registry 경로는 비운다).
+  # 이 주소는 브라우저가 부르는 것이라 컨테이너 이름이 아니라 호스트에서 보이는 주소여야 한다.
+  # 다른 PC에서 열 때는 localhost를 이 PC의 IP로 바꾼 값으로 띄운다.
+  basyx-ui:
+    # 태그를 고정한다 — `SNAPSHOT`·`latest`는 같은 이름으로 내용이 바뀌어 재현이 안 된다.
+    image: eclipsebasyx/aas-gui:v2-260924
+    restart: unless-stopped
+    ports:
+      # 컨테이너 안 nginx는 3000으로 듣는다. 이미지 메타데이터의 EXPOSE는 80이라 어긋나 있으니
+      # 그 값을 믿지 말 것(80으로 매핑하면 연결이 그냥 끊긴다). 바깥은 8082 —
+      # 3000은 Next.js(web)가, 8081은 BaSyx가 쓰고 있다.
+      - '8082:3000'
+    environment:
+      AAS_REPO_PATH: 'http://localhost:8081/shells'
+      SUBMODEL_REPO_PATH: 'http://localhost:8081/submodels'
+      CD_REPO_PATH: 'http://localhost:8081/concept-descriptions'
+    depends_on:
+      - basyx
 
   # 값 수집 시험용 MQTT 브로커.
   # 운영 브로커는 현장에 따로 있다 — 이것은 우리가 붙는 쪽을 확인하기 위한 것이다.
