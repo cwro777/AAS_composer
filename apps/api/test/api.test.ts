@@ -369,6 +369,60 @@ describe('BaSyx 게시', () => {
     expect(fake.calls.length).toBeGreaterThan(0);
   });
 
+  /**
+   * 개념 설명도 함께 올린다.
+   *
+   * 올리지 않으면 내보내기 파일에는 단위·정의가 있는데 게시된 것에는 없다 — 받는 쪽이
+   * `0.34`를 해석하지 못한다(실측: 게시 뒤 BaSyx의 /concept-descriptions가 0건이었다).
+   * 서버는 브라우저 용어집을 모르므로 **사전이 답한 것만** 올린다. 지어내지 않는다.
+   */
+  it('사전이 아는 개념을 개념 설명으로 함께 올린다 — 서브모델보다 먼저', async () => {
+    const fake = fakeBasyx(() => 201);
+    const app = withStore(fake.fetchLike);
+    const id = await seeded(app);
+
+    /* 에디터가 모델을 보낼 때 함께 넣는 것과 같은 경로 */
+    await app.request('/dictionary/import', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        entries: [
+          {
+            irdi: 'https://admin-shell.io/idta/nameplate/3/0/Nameplate',
+            scheme: 'iri',
+            status: 'unknown',
+            nameEn: 'Digital nameplate',
+            definition: 'Digital nameplate of the asset.',
+          },
+        ],
+      }),
+    });
+
+    const res = await app.request(`/publish/${id}`, { method: 'POST' });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      concepts: number;
+      unresolved: string[];
+      items: Array<{ kind: string; id: string }>;
+    };
+    expect(body.concepts).toBe(1);
+    expect(body.unresolved).toEqual([]);
+    expect(body.items.map((i) => i.kind)).toEqual(['concept', 'submodel', 'shell']);
+    expect(fake.calls[0]!.url).toContain('/concept-descriptions');
+  });
+
+  it('사전도 샘플도 모르는 개념은 올리지 않고 무엇인지 돌려준다', async () => {
+    const fake = fakeBasyx(() => 201);
+    const app = withStore(fake.fetchLike);
+    const id = await seeded(app);
+
+    const res = await app.request(`/publish/${id}`, { method: 'POST' });
+    const body = (await res.json()) as { concepts: number; unresolved: string[]; items: Array<{ kind: string }> };
+    expect(body.concepts).toBe(0);
+    expect(body.unresolved).toEqual(['https://admin-shell.io/idta/nameplate/3/0/Nameplate']);
+    expect(body.items.map((i) => i.kind)).toEqual(['submodel', 'shell']);
+  });
+
   it('BaSyx가 죽어 있으면 502로 알린다', async () => {
     const app = withStore(async () => {
       throw new Error('ECONNREFUSED');

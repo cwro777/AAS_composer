@@ -17,10 +17,10 @@ import { z } from 'zod';
 import { type AasDoc, type Cmd, type Environment, apply, validate } from '@aas/kernel';
 import { checkAllConformance } from '@aas/templates';
 import { writeAasx } from '@aas/aasx';
-import { buildConceptDescriptions, attachConceptDescriptions, serialize } from '@aas/kernel';
-import { termsResolver } from '@aas/semantic';
+import { serialize } from '@aas/kernel';
 
 import { type FetchLike, publish } from './basyx.js';
+import { buildServerExport } from './concepts.js';
 import type { Collector, SampleStore } from './collect/collector.js';
 import { planFor } from './collect/plan.js';
 import { diffLines } from './diff.js';
@@ -261,14 +261,13 @@ export function createApp(
   app.get('/models/:id/aasx', async (c) => {
     const rec = await store.get(c.req.param('id'));
     if (!rec) return c.json({ error: 'NOT_FOUND' }, 404);
-    const cd = buildConceptDescriptions(rec.doc, termsResolver());
-    const env = attachConceptDescriptions(serialize(rec.doc), cd.conceptDescriptions);
+    const { env, concepts, unresolved } = await buildServerExport(rec.doc, dict);
     const bytes = writeAasx({ environment: env });
     const name = `${rec.name.replace(/[^A-Za-z0-9_-]/g, '_')}.aasx`;
     c.header('Content-Type', 'application/asset-administration-shell-package');
     c.header('Content-Disposition', `attachment; filename="${name}"`);
-    c.header('X-Concept-Descriptions', String(cd.conceptDescriptions.length));
-    c.header('X-Unresolved-Concepts', String(cd.unresolved.length));
+    c.header('X-Concept-Descriptions', String(concepts));
+    c.header('X-Unresolved-Concepts', String(unresolved.length));
     return c.body(bytes as unknown as ArrayBuffer);
   });
 
@@ -281,8 +280,11 @@ export function createApp(
    * BaSyx V2 게시.
    *
    * 부분 실패를 롤백하지 않는다 — 항목별 결과를 돌려주고 실패한 것만 다시 시도한다.
-   * conceptDescriptions는 올리지 않는다. BaSyx의 개념 저장소는 별도 서비스라
-   * 지금 여기서 다루면 절반만 맞는 구현이 된다.
+   *
+   * **개념 설명도 함께 올린다.** 한동안 올리지 않았고(주석은 "개념 저장소는 별도 서비스"라고
+   * 적고 있었다) 그래서 게시된 모델에는 단위·정의가 없었다 — 실측으로 BaSyx의
+   * `/concept-descriptions`가 0건이었다. 지금 쓰는 aas-environment 이미지는 그 저장소를
+   * 함께 제공한다. 서버가 아는 것만 올리고, 모르는 것은 `unresolved`로 돌려준다.
    */
   app.post('/publish/:id', async (c) => {
     const rec = await store.get(c.req.param('id'));
@@ -299,8 +301,18 @@ export function createApp(
     }
 
     try {
-      const result = await publish(serialize(rec.doc), { baseUrl, fetchLike: fetchImpl });
-      return c.json(result, result.failed ? 207 : 200);
+      /* 개념 설명도 함께 올린다 — 서버가 아는 만큼. 모르는 것은 unresolved로 돌려준다 */
+      const { env, concepts, unresolved } = await buildServerExport(rec.doc, dict);
+      const result = await publish(env, { baseUrl, fetchLike: fetchImpl });
+      return c.json(
+        {
+          ...result,
+          concepts,
+          /* 사전도 샘플도 모르는 개념 — 게시된 모델에는 단위·정의가 없다 */
+          unresolved: unresolved.filter((i) => i.code === 'CD-001').map((i) => i.path),
+        },
+        result.failed ? 207 : 200,
+      );
     } catch (e) {
       return c.json({ error: 'UNREACHABLE', target: baseUrl, detail: (e as Error).message }, 502);
     }

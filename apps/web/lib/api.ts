@@ -60,6 +60,46 @@ export const listModels = (): Promise<{ models: ModelSummary[] }> => call('/mode
 export const createModel = (name: string, doc: unknown, layout?: unknown): Promise<{ id: string }> =>
   call('/models', { method: 'POST', body: JSON.stringify({ name, doc, layout }) });
 
+export interface PublishItem {
+  kind: 'shell' | 'submodel' | 'concept';
+  id: string;
+  idShort: string;
+  status: number;
+  ok: boolean;
+  updated: boolean;
+  error?: string;
+}
+
+export interface PublishResult {
+  target: string;
+  items: PublishItem[];
+  ok: number;
+  failed: number;
+  /** 함께 올린 개념 설명 수 */
+  concepts: number;
+  /** 서버 사전도 샘플도 몰라 올리지 못한 개념 */
+  unresolved: string[];
+}
+
+/**
+ * BaSyx V2에 게시한다. 오류가 있는 모델은 서버가 422로 막는다 — `force`는 사람이 보고 누를 때만.
+ * 일부만 실패하면 207과 함께 항목별 결과가 온다(롤백하지 않는다).
+ */
+export const publishModel = (id: string, opts?: { force?: boolean }): Promise<PublishResult> =>
+  call(`/publish/${id}${opts?.force ? '?force=1' : ''}`, { method: 'POST' });
+
+/**
+ * 사내 용어집의 개념을 서버 사전에 넣는다.
+ *
+ * 브라우저 용어집은 서버에 없다. 이것을 보내지 않으면 게시된 모델에 단위·정의가 빠진다 —
+ * 내보내기 파일과 게시가 서로 다른 것을 말하게 된다.
+ */
+export const importDictionary = (
+  environment: unknown,
+  origin: string,
+): Promise<{ concepts: number; terms: number; total: number }> =>
+  call('/dictionary/import', { method: 'POST', body: JSON.stringify({ environment, origin }) });
+
 /* ── 사전 ───────────────────────────────────────── */
 
 export interface DictEntry {

@@ -135,7 +135,7 @@ footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content:
     <span class="no">개발 대상 아님</span>
     <div>
       <p><b>BaSyx 자체는 만들지 않습니다.</b> Eclipse 재단의 오픈소스 AAS 서버를 컨테이너 그대로 띄워 씁니다. 우리가 만드는 것은 BaSyx에 모델을 올리는 <b>게시 게이트웨이</b>이고, 그것은 이미 있으며 실제 서버에서 동작을 확인했습니다.</p>
-      <p>남은 것은 BaSyx를 개발하는 일이 아니라 연결을 채우는 일입니다 — 에디터의 게시 버튼, 개념 설명(단위·정의) 게시, 운영용 저장 설정. 아래 "남은 것"에 크기와 필요한 시점을 적었습니다.</p>
+      <p>남은 것은 BaSyx를 개발하는 일이 아니라 연결을 채우는 일이었습니다. <b>2026-09-27에 둘을 채웠습니다</b> — 에디터의 <code>BaSyx에 게시</code> 버튼과 개념 설명(단위·정의) 게시. 나머지는 아래 "남은 것"에 크기와 필요한 시점을 적었습니다.</p>
     </div>
   </div>
 </section>
@@ -189,7 +189,7 @@ footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content:
       <tbody>
         <tr><td>AAS Repository (SSP-001·002)</td><td><code>/shells</code></td><td><span class="chip ok">200</span></td><td><span class="chip ok">게시</span></td></tr>
         <tr><td>Submodel Repository (SSP-001~004)</td><td><code>/submodels</code></td><td><span class="chip ok">200</span></td><td><span class="chip ok">게시</span></td></tr>
-        <tr><td>ConceptDescription Service (SSP-001)</td><td><code>/concept-descriptions</code></td><td><span class="chip ok">200</span></td><td><span class="chip err">안 씀 — 게시 후 0건</span></td></tr>
+        <tr><td>ConceptDescription Service (SSP-001)</td><td><code>/concept-descriptions</code></td><td><span class="chip ok">200</span></td><td><span class="chip ok">게시 — 단위·정의가 함께 감</span></td></tr>
         <tr><td>AAS Registry · Discovery</td><td><code>/shell-descriptors</code> · <code>/lookup/shells</code></td><td><span class="chip plain">404</span></td><td>이 이미지에 없음 — 별도 서비스</td></tr>
       </tbody>
     </table>
@@ -204,7 +204,7 @@ footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content:
       <div class="who"><span>에디터</span><code>:3000</code></div>
       <div class="msg"><code class="req">서버에 보내기</code><span>파일 메뉴 · 새 모델로 저장</span></div>
       <div class="gap"></div>
-      <div class="msg"><code class="req">(게시 버튼 없음)</code><span>지금은 API·스크립트로 호출</span></div>
+      <div class="msg"><code class="req">BaSyx에 게시</code><span>서버에 없으면 먼저 보낸 뒤 게시 · 422면 확인 창</span></div>
     </div>
     <div class="lane">
       <div class="who"><span>apps/api</span><code>:8787</code></div>
@@ -250,14 +250,27 @@ footer { font-size: 12.5px; color: var(--ink-3); display: flex; justify-content:
   </div>
 <pre class="cmd">scripts\aas full
 pnpm --filter @aas/api exec tsx scripts/live-check.ts      # KEEP=1 이면 점검 모델을 남김</pre>
+  <h3>에디터에서 게시 — 2026-09-27</h3>
+  <p class="lede">배럴온도 개념을 용어집에 두고 Property에 붙인 뒤, <code>서버에 보내기</code> → <code>BaSyx에 게시</code>를 눌렀습니다.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>단계</th><th>결과</th></tr></thead>
+      <tbody>
+        <tr><td>서버에 보내기</td><td>모델 저장 · <b>개념 1건을 서버 사전에 넣음</b></td></tr>
+        <tr><td>BaSyx에 게시</td><td>3건 (개념 1 · 서브모델 1 · 셸 1)</td></tr>
+        <tr><td>BaSyx <code>/concept-descriptions</code></td><td><b>1건</b> — <code>unit: °C</code> · <code>dataType: REAL_MEASURE</code> · 한글 표제어까지 도착</td></tr>
+        <tr><td>다시 게시</td><td>409 → PUT으로 갱신, 같은 3건</td></tr>
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <section class="sheet">
   <div class="eyebrow">개발 여부</div>
   <h2>남은 것 — BaSyx가 아니라 연결</h2>
   <div class="backlog">
-    <div><span class="chip err">빠짐</span><div><b>개념 설명(ConceptDescription) 게시</b><p>에디터 내보내기에는 단위·정의가 실리는데, 게시는 <code>serialize(doc)</code>만 보내 <b>BaSyx에는 0건</b>입니다. 이 BaSyx는 <code>/concept-descriptions</code>를 제공합니다(실측 200) — 코드 주석의 "개념 저장소는 별도 서비스"는 이 이미지에 대해서는 맞지 않습니다. 용어집으로 만든 개념을 <code>buildExport</code>와 같은 책으로 함께 올려야 받는 쪽이 <code>0.34</code>의 단위를 압니다.</p></div><span class="when">작음 · 권장</span></div>
-    <div><span class="chip warn">없음</span><div><b>에디터의 게시 버튼</b><p>지금은 <code>POST /publish/:id</code>를 스크립트나 도구로 불러야 합니다. 서버에 보내기 뒤에 게시 → 항목별 결과(200/207/422/502)를 보여 주는 화면이 필요합니다.</p></div><span class="when">작음 · 사용자가 직접 올릴 때</span></div>
+    <div><span class="chip ok">했음</span><div><b>개념 설명(ConceptDescription) 게시</b><p>게시가 <code>serialize(doc)</code>만 보내 BaSyx에는 0건이었습니다. 이제 서버가 <code>buildServerExport</code>로 개념을 만들어 <code>/concept-descriptions</code>에 먼저 올립니다. 서버는 브라우저 용어집을 모르므로 <b>에디터가 <code>서버에 보내기</code>에서 용어집을 사전에 함께 넣습니다</b>. 사전도 샘플도 모르는 개념은 지어내지 않고 <code>unresolved</code>로 돌려줍니다.</p></div><span class="when">2026-09-27</span></div>
+    <div><span class="chip ok">했음</span><div><b>에디터의 게시 버튼</b><p>파일 메뉴의 <code>BaSyx에 게시</code>. 서버에 없는 모델이면 먼저 보내고, 결과를 한 줄로 알립니다 — 올린 건수·개념 수·실패 항목·사전이 모르는 개념. 검증 오류(422)는 확인 창에서 사람이 강행을 결정하고, BaSyx가 없으면(502) 띄우는 방법을 안내합니다.</p></div><span class="when">2026-09-27</span></div>
     <div><span class="chip warn">설정</span><div><b>저장 방식 — InMemory</b><p>컨테이너를 다시 띄우면 게시한 모델이 사라집니다. 운영에서는 영속 백엔드로 바꿔야 합니다. BaSyx 쪽 설정 문제이며 우리 코드는 바뀌지 않습니다(BaSyx 문서 기준 — 이 프로젝트에서 아직 시험하지 않음).</p></div><span class="when">설정 · 운영 전 필수</span></div>
     <div><span class="chip plain">없음</span><div><b>지운 것 동기화</b><p>게시는 올리기(POST/PUT)만 합니다. 에디터에서 서브모델을 지워도 BaSyx에는 남습니다. 무엇을 지울지 미리 보이고 확인받는 방식이어야 합니다(계획과 적용 분리).</p></div><span class="when">중간 · 모델을 자주 고칠 때</span></div>
     <div><span class="chip plain">대기</span><div><b>실행 값 갱신 <code>PATCH …/$value</code></b><p><code>patchValue()</code>는 만들어 두었지만 꽂지 않았습니다. 수집한 신호를 어느 요소에 쓸지는 AID가 말해 주지 않고 IDTA 02027(AIMC)의 몫이라, 짐작으로 잇지 않습니다.</p></div><span class="when">AIMC 결정 후</span></div>

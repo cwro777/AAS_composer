@@ -22,7 +22,7 @@ export type FetchLike = (
 ) => Promise<{ ok: boolean; status: number; text(): Promise<string> }>;
 
 export interface PublishItem {
-  kind: 'shell' | 'submodel';
+  kind: 'shell' | 'submodel' | 'concept';
   id: string;
   idShort: string;
   status: number;
@@ -58,13 +58,18 @@ function idsOf(env: Environment, key: string): Array<{ id: string; idShort: stri
 }
 
 /**
- * 셸과 서브모델을 등록한다.
+ * 개념 설명 · 셸 · 서브모델을 등록한다.
  *
  * 이미 있으면 PUT으로 갱신한다 — 두 번 눌렀을 때 409가 쌓이는 것보다 낫다.
+ *
+ * **개념 설명을 함께 올린다.** 올리지 않으면 BaSyx에서 읽는 쪽은 `0.34`가 mm인지 %인지
+ * 알 수 없다 — 내보내기 파일에는 실리는데 게시한 것에는 빠져 있었다. 이 이미지
+ * (aas-environment)는 `/concept-descriptions`를 제공한다(실측). 제공하지 않는 배포판도
+ * 있으므로 404는 실패로 세되 나머지 게시는 계속한다 — 개념 때문에 모델이 안 올라가면 안 된다.
  */
 export async function publish(
   env: Environment,
-  opts: { baseUrl: string; fetchLike: FetchLike; apiKey?: string },
+  opts: { baseUrl: string; fetchLike: FetchLike; apiKey?: string; concepts?: boolean },
 ): Promise<PublishResult> {
   const base = opts.baseUrl.replace(/\/+$/, '');
   const headers: Record<string, string> = { 'content-type': 'application/json' };
@@ -73,7 +78,7 @@ export async function publish(
   const items: PublishItem[] = [];
 
   const send = async (
-    kind: 'shell' | 'submodel',
+    kind: PublishItem['kind'],
     collection: string,
     entry: { id: string; idShort: string; body: Json },
   ): Promise<void> => {
@@ -102,7 +107,13 @@ export async function publish(
     });
   };
 
-  /* 서브모델을 먼저 올린다 — 셸이 참조하기 때문이다 */
+  /* 개념 설명을 먼저 — 서브모델의 semanticId가 가리키는 쪽이다 */
+  if (opts.concepts !== false) {
+    for (const cd of idsOf(env, 'conceptDescriptions')) {
+      await send('concept', 'concept-descriptions', cd);
+    }
+  }
+  /* 서브모델을 셸보다 먼저 올린다 — 셸이 참조하기 때문이다 */
   for (const sm of idsOf(env, 'submodels')) await send('submodel', 'submodels', sm);
   for (const shell of idsOf(env, 'assetAdministrationShells')) {
     await send('shell', 'shells', shell);
