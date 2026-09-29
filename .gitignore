@@ -15,3 +15,9 @@ test_sample/
 .env
 .env.local
 .DS_Store
+
+# 공개 저장소에 올리지 않는 것 — 파일은 로컬에 그대로 둔다.
+# 실제 설비 모델과 사내 용어집 내보내기.
+AAS_sample_OK/
+# 라이선스를 가정해 지어낸 정의(eCl@ss·IDTA). 사전 시드 전용, 배포하지 않는다.
+docs/mock/
