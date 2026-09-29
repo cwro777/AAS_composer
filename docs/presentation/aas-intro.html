@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AAS 한 장 설명</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #e9ecf1;
+  --paper: #ffffff;
+  --panel: #f3f6f9;
+  --line: #c6d0dc;
+  --line-soft: #dee4ec;
+  --ink: #111823;
+  --ink-2: #4c596a;
+  --ink-3: #6f7c8d;
+  --accent: #a85400;
+  --accent-soft: #f5e5d2;
+  --shell: #5e4a9e;
+  --submodel: #1c6aac;
+  --prop: #a85400;
+  --concept: #0c7370;
+  --concept-soft: #d9eeec;
+  --sans: 'IBM Plex Sans KR', 'IBM Plex Sans', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', 'IBM Plex Sans KR', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0f131a; --paper: #161c24; --panel: #1c232d; --line: #2f3a48; --line-soft: #242d38;
+    --ink: #dbe3ec; --ink-2: #a2aebd; --ink-3: #7c8a9b;
+    --accent: #e59a3e; --accent-soft: #33250f;
+    --shell: #a08ee0; --submodel: #5ca1df; --prop: #e59a3e; --concept: #3cb5b0; --concept-soft: #10302e;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f131a; --paper: #161c24; --panel: #1c232d; --line: #2f3a48; --line-soft: #242d38;
+  --ink: #dbe3ec; --ink-2: #a2aebd; --ink-3: #7c8a9b;
+  --accent: #e59a3e; --accent-soft: #33250f;
+  --shell: #a08ee0; --submodel: #5ca1df; --prop: #e59a3e; --concept: #3cb5b0; --concept-soft: #10302e;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+  padding: 20px 16px 28px;
+}
+code, .mono { font-family: var(--mono); word-break: normal; overflow-wrap: anywhere; }
+h1, h2, h3 { margin: 0; text-wrap: balance; line-height: 1.25; }
+p { margin: 0; }
+
+.slide {
+  max-width: 1180px;
+  margin: 0 auto;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 26px 36px 22px;
+  display: grid;
+  gap: 16px;
+}
+
+.top { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.top .std { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); letter-spacing: 0.02em; }
+.top .std b { color: var(--accent); font-weight: 500; }
+h1 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 700; letter-spacing: -0.02em; }
+h1 em { font-style: normal; color: var(--accent); }
+.lede { font-size: clamp(16px, 1.5vw, 18px); color: var(--ink-2); max-width: 62ch; }
+
+.body { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+
+/* 구조 — 자산에서 뜻까지 */
+.chain { display: grid; gap: 7px; }
+.chain .cap { font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
+.box {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--c, var(--line));
+  border-radius: var(--r);
+  background: var(--panel);
+  padding: 9px 12px;
+  display: grid;
+  gap: 3px;
+}
+.box .t { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.box b { font-size: 14.5px; }
+.box .kind { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.box .sub { font-size: 12.5px; color: var(--ink-2); }
+.box.asset { --c: var(--ink-3); background: var(--paper); border-style: dashed; }
+.box.shell { --c: var(--shell); }
+.box.sm { --c: var(--submodel); }
+.box.prop { --c: var(--prop); }
+.box.cd { --c: var(--concept); background: var(--concept-soft); border-color: var(--concept); }
+.indent { margin-left: 18px; display: grid; gap: 7px; }
+.more { font-size: 12.5px; color: var(--ink-3); padding-left: 2px; }
+.link { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--accent); padding-left: 2px; }
+.link i { flex: 1; height: 0; border-top: 1px dashed var(--accent); display: block; }
+
+/* 왜 쓰나 */
+.why { display: grid; gap: 12px; align-content: start; }
+.why > div { display: grid; gap: 3px; padding-top: 9px; border-top: 2px solid var(--ink); }
+.why b { font-size: 15.5px; }
+.why p { font-size: 13.8px; color: var(--ink-2); }
+.why .ex { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
+
+.exchange { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.exchange > div { padding: 11px 14px; display: grid; gap: 2px; border-left: 1px solid var(--line); }
+.exchange > div:first-child { border-left: 0; }
+.exchange b { font-size: 14px; }
+.exchange span { font-size: 12.5px; color: var(--ink-2); }
+.exchange code { font-size: 11.5px; color: var(--ink-3); }
+
+.foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--ink-3); }
+
+@media (max-width: 860px) {
+  .slide { padding: 22px 18px 22px; }
+  .body, .exchange { grid-template-columns: minmax(0, 1fr); }
+  .exchange > div { border-left: 0; border-top: 1px solid var(--line); }
+  .exchange > div:first-child { border-top: 0; }
+}
+@media print {
+  body { background: #fff; padding: 0; }
+  .slide { border: 0; max-width: none; }
+}
+</style>
+</head>
+<body>
+<main class="slide">
+  <div class="top">
+    <div class="std">IEC 63278-1 · Asset Administration Shell <b>V3.0</b> · IDTA</div>
+    <div class="std">디지털 트윈의 <b>표준 껍데기</b></div>
+  </div>
+
+  <div>
+    <h1>AAS는 설비에 붙이는 <em>표준 서류철</em>입니다</h1>
+    <p class="lede">설비 한 대의 명판·사양·운전 데이터를 정해진 형식으로 담아, 만든 회사가 달라도 받는 쪽이 <b>같은 방법으로 읽을 수 있게</b> 하는 규격입니다. 자산 하나에 서류철 하나가 따라다닙니다.</p>
+  </div>
+
+  <div class="body">
+    <div class="chain">
+      <div class="cap">구조 — 실제 설비 한 대의 예</div>
+
+      <div class="box asset">
+        <div class="t"><b>MX200_Line1</b><span class="kind">실물 자산</span></div>
+        <div class="sub">1공장 1라인 CNC 가공기</div>
+      </div>
+
+      <div class="box shell">
+        <div class="t"><b>MX200_Line1_AAS</b><span class="kind">AssetAdministrationShell</span></div>
+        <div class="sub">자산을 가리키는 서류철 — 전역 식별자로 어디서나 같은 것을 가리킨다</div>
+      </div>
+
+      <div class="indent">
+        <div class="box sm">
+          <div class="t"><b>Nameplate</b><span class="kind">Submodel</span></div>
+          <div class="sub">제조사 · 시리얼번호 · 제조일 (IDTA 02006 템플릿)</div>
+        </div>
+        <div class="box sm">
+          <div class="t"><b>OperationalData</b><span class="kind">Submodel</span></div>
+          <div class="sub">운전 중 값 — 서류철은 여러 묶음으로 나뉜다</div>
+        </div>
+
+        <div class="indent">
+          <div class="box prop">
+            <div class="t"><b>CurrentTemperature</b><span class="kind">Property</span><span class="mono" style="margin-left:auto;font-size:13px">45.2</span></div>
+            <div class="sub">값 하나. 이대로는 45.2가 ℃인지 %인지 알 수 없다</div>
+          </div>
+          <div class="link"><span>semanticId가 가리킨다</span><i></i></div>
+          <div class="box cd">
+            <div class="t"><b>Current temperature</b><span class="kind">ConceptDescription</span></div>
+            <div class="sub"><code>unit °C</code> · <code>REAL_MEASURE</code> · 뜻과 단위는 여기에 있다</div>
+          </div>
+        </div>
+        <div class="more">그 밖에 TechnicalData · TimeSeries · 설비 접점(AID) 등</div>
+      </div>
+    </div>
+
+    <div class="why">
+      <div>
+        <b>값에 뜻을 붙인다</b>
+        <p>숫자만 주고받으면 받는 쪽이 해석할 수 없습니다. 모든 값은 개념을 가리키고, 개념이 단위와 정의를 갖습니다.</p>
+        <span class="ex">45.2 → 45.2 °C (주축 현재 온도)</span>
+      </div>
+      <div>
+        <b>이름을 표준에서 가져온다</b>
+        <p>회사마다 "온도"를 다르게 적으면 맞출 수 없습니다. IEC CDD·eCl@ss의 식별자나 IDTA 서브모델 템플릿을 그대로 씁니다.</p>
+        <span class="ex">0112/2///61987#ABA951#009 — 시리얼번호</span>
+      </div>
+      <div>
+        <b>주고받는 방법이 정해져 있다</b>
+        <p>파일로 건네거나 서버에 올려 두면, 상대는 우리 도구를 몰라도 표준 경로로 읽어 갑니다.</p>
+        <span class="ex">GET /submodels/{id}/$value</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="exchange">
+    <div><b>AASX 파일</b><span>한 묶음으로 건네기 (OPC 패키지)</span><code>MX200_Line1_AAS.aasx</code></div>
+    <div><b>AAS V3 REST API</b><span>서버에서 골라 읽기</span><code>/shells · /submodels · /concept-descriptions</code></div>
+    <div><b>저장소 서버</b><span>올려 두면 다른 시스템이 가져감 (예: Eclipse BaSyx)</span><code>http://…:8081</code></div>
+  </div>
+
+  <div class="foot">
+    <span>Shell 1 · Submodel 여럿 · Element 여럿 · 개념은 따로 — 이 네 층이 전부입니다</span>
+    <span>AAS Composer</span>
+  </div>
+</main>
+</body>
+</html>
